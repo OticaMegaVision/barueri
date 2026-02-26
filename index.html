@@ -1156,58 +1156,98 @@
         }
 
         /* ===== BOTÕES DE PAGAMENTO PROFISSIONAIS ===== */
+        /* ===== PAYMENT METHODS — PROFISSIONAL ===== */
         .payment-methods {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin: 1rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.6rem;
+            margin: 0.75rem 0;
         }
         .payment-card {
-            flex: 1 1 120px;
-            padding: 1rem 0.5rem;
-            border: 2px solid var(--light-gray);
+            padding: 0.8rem 0.4rem;
+            border: 2px solid #e0e0e0;
             background: white;
             border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 700;
+            font-size: 0.78rem;
             color: var(--dark);
             transition: all 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            gap: 0.35rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            cursor: pointer;
+            position: relative;
         }
-        .payment-card i {
-            font-size: 1.8rem;
-            color: var(--primary);
+        .payment-card i { font-size: 1.5rem; }
+        .payment-card small { font-size: 0.65rem; font-weight: 600; opacity: 0.75; }
+        .payment-card:hover { border-color: var(--primary); background: rgba(255,107,0,0.05); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,107,0,0.15); }
+        .payment-card.active { border-color: var(--primary); background: #fff3ee; box-shadow: 0 0 0 3px rgba(255,107,0,0.2); }
+        .payment-card.active i { color: var(--primary); }
+        .payment-card.active::after { content: '✓'; position:absolute; top:4px; right:6px; font-size:0.7rem; color:var(--primary); font-weight:900; }
+        /* Cores por método */
+        .payment-card[data-method="pix"] i { color: #00a884; }
+        .payment-card[data-method="cash"] i { color: #2e7d32; }
+        .payment-card[data-method="debit"] i { color: #1565c0; }
+        .payment-card[data-method="credit"] i { color: #6a1b9a; }
+        .payment-card[data-method="installment"] i { color: #e65100; }
+        .payment-card[data-method="transfer"] i { color: #0277bd; }
+        .payment-card[data-method="cheque"] i { color: #4e342e; }
+        .payment-card[data-method="voucher"] i { color: #00838f; }
+        /* Painel de resumo de pagamento profissional */
+        .pay-summary-box {
+            background: linear-gradient(135deg, #fff8f3 0%, #fff3ea 100%);
+            border: 2px solid #ffcc9a;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 12px;
         }
-        .payment-card:hover {
-            border-color: var(--primary);
-            background: rgba(255,107,0,0.05);
-            transform: translateY(-2px);
+        .pay-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ffd9b3;
+            font-size: 0.88rem;
         }
-        .payment-card.active {
-            border-color: var(--primary);
-            background: rgba(255,107,0,0.1);
-            box-shadow: 0 0 0 3px rgba(255,107,0,0.2);
+        .pay-summary-row:last-child { border-bottom: none; }
+        .pay-summary-row .label { color: #666; font-weight: 600; }
+        .pay-summary-row .value { font-weight: 800; font-size: 1rem; color: #333; }
+        .pay-summary-row.highlight .label { color: #e65100; font-weight: 700; }
+        .pay-summary-row.highlight .value { color: #e65100; font-size: 1.15rem; }
+        .pay-summary-row.troco .value { color: #2e7d32; }
+        .pay-summary-row.restante .label { color: #c62828; font-weight: 800; }
+        .pay-summary-row.restante .value { color: #c62828; font-size: 1.15rem; }
+        /* Entrada box */
+        .entrada-retirada-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border: 2px solid #a5d6a7;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 12px;
         }
-        .dark-mode .payment-card {
-            background: #2d2d2d;
-            border-color: #444;
-            color: #e0e0e0;
+        .entrada-retirada-box h5 { color: #2e7d32; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .retirada-alert {
+            background: #fff3e0;
+            border: 2px dashed #ffb74d;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .dark-mode .payment-card i {
-            color: #ffaa33;
-        }
-        .dark-mode .payment-card:hover {
-            border-color: #ffaa33;
-            background: #3d3d3d;
-        }
-        .dark-mode .payment-card.active {
-            border-color: #ffaa33;
-            background: #3d3d3d;
-        }
+        .retirada-alert i { color: #e65100; font-size: 1.4rem; }
+        .retirada-alert .valor { font-size: 1.4rem; font-weight: 900; color: #c62828; }
+        /* dark mode */
+        .dark-mode .payment-card { background: #2d2d2d; border-color: #444; color: #e0e0e0; }
+        .dark-mode .payment-card:hover { border-color: #ffaa33; background: #3d2a1a; }
+        .dark-mode .payment-card.active { border-color: #ffaa33; background: #3d2a1a; }
+        .dark-mode .pay-summary-box { background: #2d2417; border-color: #6b3a0a; }
+        .dark-mode .pay-summary-row { border-color: #4a2f0a; }
+        .dark-mode .pay-summary-row .label { color: #bbb; }
+        .dark-mode .pay-summary-row .value { color: #eee; }
 
         /* ===== TABELAS ===== */
         .table-container {
@@ -4122,21 +4162,21 @@
                         </div>
                     </div>
 
-                    <!-- FORMA DE PAGAMENTO -->
+                    <!-- FORMA DE PAGAMENTO PROFISSIONAL -->
                     <div class="cliente-card">
                         <h3>💳 FORMA DE PAGAMENTO</h3>
 
                         <!-- MODO ÚNICO ou MISTO -->
-                        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-                            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:5px 12px;border-radius:6px;border:2px solid var(--primary);background:var(--primary);color:#fff;font-weight:700;font-size:0.8rem;" id="lbl-payment-single">
+                        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+                            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 14px;border-radius:8px;border:2px solid var(--primary);background:var(--primary);color:#fff;font-weight:700;font-size:0.82rem;" id="lbl-payment-single">
                                 <input type="radio" name="paymentMode" value="single" checked style="accent-color:#fff" onchange="Sales.setPaymentMode('single')"> 1 Forma
                             </label>
-                            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:5px 12px;border-radius:6px;border:2px solid #6c757d;background:#fff;font-weight:700;font-size:0.8rem;" id="lbl-payment-mixed">
+                            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 14px;border-radius:8px;border:2px solid #6c757d;background:#fff;font-weight:700;font-size:0.82rem;" id="lbl-payment-mixed">
                                 <input type="radio" name="paymentMode" value="mixed" style="accent-color:var(--primary)" onchange="Sales.setPaymentMode('mixed')"> ✚ Pagamento Misto
                             </label>
                         </div>
 
-                        <!-- MODO ÚNICO -->
+                        <!-- MODO ÚNICO — FORMAS -->
                         <div id="paymentSingleMode">
                             <div class="payment-methods">
                                 <button type="button" class="payment-card" data-method="pix" onclick="Sales.selectPayment('pix')">
@@ -4145,7 +4185,7 @@
                                     <small>5% desc</small>
                                 </button>
                                 <button type="button" class="payment-card" data-method="cash" onclick="Sales.selectPayment('cash')">
-                                    <i class="fas fa-money-bill"></i>
+                                    <i class="fas fa-money-bill-wave"></i>
                                     <span>Dinheiro</span>
                                     <small>3% desc</small>
                                 </button>
@@ -4155,7 +4195,7 @@
                                     <small>à vista</small>
                                 </button>
                                 <button type="button" class="payment-card" data-method="credit" onclick="Sales.selectPayment('credit')">
-                                    <i class="fas fa-credit-card"></i>
+                                    <i class="far fa-credit-card"></i>
                                     <span>Crédito</span>
                                     <small>parcelado</small>
                                 </button>
@@ -4163,6 +4203,21 @@
                                     <i class="fas fa-calendar-alt"></i>
                                     <span>Crediário</span>
                                     <small>próprio</small>
+                                </button>
+                                <button type="button" class="payment-card" data-method="transfer" onclick="Sales.selectPayment('transfer')">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <span>Transferência</span>
+                                    <small>TED/DOC</small>
+                                </button>
+                                <button type="button" class="payment-card" data-method="cheque" onclick="Sales.selectPayment('cheque')">
+                                    <i class="fas fa-money-check"></i>
+                                    <span>Cheque</span>
+                                    <small>a prazo</small>
+                                </button>
+                                <button type="button" class="payment-card" data-method="voucher" onclick="Sales.selectPayment('voucher')">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span>Voucher</span>
+                                    <small>convênio</small>
                                 </button>
                             </div>
                         </div>
@@ -4181,44 +4236,62 @@
                             </div>
                         </div>
 
-                        <!-- CREDIÁRIO PROFISSIONAL -->
+                        <!-- ══════════════════════════════════════════
+                             PAINEL DINÂMICO — exibido abaixo dos botões
+                             ══════════════════════════════════════════ -->
+
+                        <!-- CREDIÁRIO PRÓPRIO -->
                         <div id="installmentDetails">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="entryPercent">Entrada (%)</label>
-                                    <div class="input-group">
-                                        <input type="number" id="entryPercent" class="form-control" value="50" min="0" max="90" step="5" onchange="Sales.calculateInstallments()">
-                                        <span class="input-group-text">%</span>
+                            <!-- CAMPOS DE ENTRADA PAGA + RESTANTE RETIRADA -->
+                            <div class="entrada-retirada-box" style="margin-bottom:14px;">
+                                <h5><i class="fas fa-hand-holding-usd"></i> Entrada & Retirada</h5>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Entrada (%)</label>
+                                        <div class="input-group">
+                                            <input type="number" id="entryPercent" class="form-control" value="50" min="0" max="100" step="5" onchange="Sales.calculateInstallments()">
+                                            <span class="input-group-text">%</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Valor da Entrada</label>
-                                    <div class="form-control" id="entryValue" style="background: var(--light); font-weight: bold; color: var(--primary);" aria-live="polite">R$ 0,00</div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="installmentCount">Nº de Parcelas</label>
-                                    <select id="installmentCount" class="form-control" onchange="Sales.calculateInstallments()">
-                                        <option value="1">1x (à vista com entrada)</option>
-                                        <option value="2">2x</option>
-                                        <option value="3">3x</option>
-                                        <option value="4">4x</option>
-                                        <option value="5" selected>5x</option>
-                                        <option value="6">6x</option>
-                                        <option value="7">7x</option>
-                                        <option value="8">8x</option>
-                                        <option value="9">9x</option>
-                                        <option value="10">10x</option>
-                                        <option value="11">11x</option>
-                                        <option value="12">12x</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Valor da Parcela</label>
-                                    <div class="form-control" id="installmentValue" style="background: var(--light); font-weight: bold; color: var(--primary);" aria-live="polite">R$ 0,00</div>
+                                    <div class="form-group">
+                                        <label>Valor da Entrada</label>
+                                        <div class="form-control" id="entryValue" style="background:var(--light);font-weight:800;color:#2e7d32;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nº de Parcelas</label>
+                                        <select id="installmentCount" class="form-control" onchange="Sales.calculateInstallments()">
+                                            <option value="1">1x (à vista + entrada)</option>
+                                            <option value="2">2x</option>
+                                            <option value="3">3x</option>
+                                            <option value="4">4x</option>
+                                            <option value="5" selected>5x</option>
+                                            <option value="6">6x</option>
+                                            <option value="7">7x</option>
+                                            <option value="8">8x</option>
+                                            <option value="9">9x</option>
+                                            <option value="10">10x</option>
+                                            <option value="11">11x</option>
+                                            <option value="12">12x</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Valor da Parcela</label>
+                                        <div class="form-control" id="installmentValue" style="background:var(--light);font-weight:800;color:var(--primary);font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="form-row">
+                            <!-- ALERTA RESTANTE NA RETIRADA -->
+                            <div class="retirada-alert" id="retiradaAlert" style="display:none;">
+                                <i class="fas fa-glasses"></i>
+                                <div>
+                                    <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;letter-spacing:0.5px;">⚠️ Valor a pagar na retirada dos óculos</div>
+                                    <div class="valor" id="retiradaValor">R$ 0,00</div>
+                                    <div style="font-size:0.72rem;color:#777;margin-top:2px;" id="retiradaInfo"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-row" style="margin-top:12px;">
                                 <div class="form-group">
                                     <label for="lateFee">Multa por atraso (%)</label>
                                     <div class="input-group">
@@ -4251,7 +4324,7 @@
                                 </div>
                             </div>
 
-                            <!-- RESUMO DO CREDIÁRIO -->
+                            <!-- RESUMO CREDIÁRIO -->
                             <div class="resumo-crediario">
                                 <div class="resumo-item">
                                     <div class="resumo-label">Total da Venda</div>
@@ -4271,10 +4344,10 @@
                                 </div>
                             </div>
 
-                            <!-- TABELA DE PARCELAS PROFISSIONAL -->
+                            <!-- TABELA DE PARCELAS -->
                             <div style="margin-top: 25px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <h4 style="color: var(--primary); font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                                    <h4 style="color:var(--primary);font-size:18px;display:flex;align-items:center;gap:8px;">
                                         <i class="fas fa-table"></i> PLANO DE PAGAMENTO
                                     </h4>
                                     <div class="btn-group">
@@ -4286,8 +4359,7 @@
                                         </button>
                                     </div>
                                 </div>
-
-                                <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div style="overflow-x:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
                                     <table class="tabela-parcelas">
                                         <thead>
                                             <tr>
@@ -4302,18 +4374,14 @@
                                                 <th>AÇÕES</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="installmentsTableBody">
-                                            <!-- Gerado via JavaScript -->
-                                        </tbody>
-                                        <tfoot id="installmentsTableFooter">
-                                            <!-- Totais gerados via JavaScript -->
-                                        </tfoot>
+                                        <tbody id="installmentsTableBody"></tbody>
+                                        <tfoot id="installmentsTableFooter"></tfoot>
                                     </table>
                                 </div>
                             </div>
 
-                            <!-- SELETOR DE MODELO DE OS -->
-                            <div style="margin-top:18px; padding:12px; background:var(--light-gray); border-radius:8px; border:1px solid var(--light-gray);">
+                            <!-- MODELO OS + PDFs -->
+                            <div style="margin-top:18px;padding:12px;background:var(--light-gray);border-radius:8px;border:1px solid var(--light-gray);">
                                 <label style="font-size:0.8rem;font-weight:700;color:var(--gray);letter-spacing:0.5px;text-transform:uppercase;">🎨 Modelo da OS</label>
                                 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
                                     <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border-radius:6px;border:2px solid #ff6b00;background:#fff3ee;font-weight:700;font-size:0.82rem;">
@@ -4324,30 +4392,38 @@
                                     </label>
                                 </div>
                             </div>
-
-                            <!-- BOTÕES DE PDF - EXATAMENTE OS MODELOS -->
-                            <div class="btn-group" style="margin-top: 15px; justify-content: center; gap: 10px;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (ambas vias)
-                                </button>
-                                <button type="button" class="btn btn-pdf via1" onclick="Sales.gerarPDF_OS('via1')" style="background: #ff6b00;">
-                                    PDF OS (Via Ótica)
-                                </button>
-                                <button type="button" class="btn btn-pdf via2" onclick="Sales.gerarPDF_OS('via2')" style="background: #28a745;">
-                                    PDF OS (Via Cliente)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_Promissoria()">
-                                    <i class="fas fa-file-pdf"></i> PDF Promissória
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_Carne()">
-                                    <i class="fas fa-file-pdf"></i> PDF Carnê
-                                </button>
-                                <!-- Botão de comprovante aparecerá em cada linha da tabela -->
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf via1" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;">PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf via2" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;">PDF OS (Via Cliente)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_Promissoria()"><i class="fas fa-file-pdf"></i> PDF Promissória</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_Carne()"><i class="fas fa-file-pdf"></i> PDF Carnê</button>
                             </div>
                         </div>
 
-                        <!-- CRÉDITO -->
+                        <!-- CRÉDITO (CARTÃO) -->
                         <div id="creditDetails" class="d-none">
+                            <!-- ENTRADA / RESTANTE RETIRADA -->
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-hand-holding-usd"></i> Entrada & Retirada (opcional)</h5>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Entrada paga (R$)</label>
+                                        <input type="number" id="creditEntrada" class="form-control" value="0" min="0" step="0.01" placeholder="0,00" oninput="Sales.calcCreditRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante na retirada</label>
+                                        <div class="form-control" id="creditRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="creditRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
+                                        <div class="valor" id="creditRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="creditInstallments">Parcelas sem juros (1x a 5x)</label>
@@ -4381,21 +4457,36 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="btn-group" style="margin-top: 15px; justify-content: center; gap: 10px; flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (ambas vias)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background: #ff6b00;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background: #28a745;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)
-                                </button>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
                             </div>
                         </div>
 
                         <!-- DÉBITO -->
                         <div id="debitDetails" class="d-none">
+                            <!-- ENTRADA / RESTANTE RETIRADA -->
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-hand-holding-usd"></i> Entrada & Retirada (opcional)</h5>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Entrada paga (R$)</label>
+                                        <input type="number" id="debitEntrada" class="form-control" value="0" min="0" step="0.01" placeholder="0,00" oninput="Sales.calcDebitRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante na retirada</label>
+                                        <div class="form-control" id="debitRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="debitRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
+                                        <div class="valor" id="debitRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-row" style="margin-top:10px;">
                                 <div class="form-group">
                                     <label for="debitCardBrand">Bandeira</label>
@@ -4411,60 +4502,237 @@
                             <div style="background:#e8f4fd;padding:12px;border-radius:8px;margin-top:6px;">
                                 <p><i class="fas fa-credit-card" style="color:#1565c0;"></i> <strong>Débito — pagamento à vista.</strong> &nbsp; <span id="debitSummary" style="color:#1565c0;font-weight:700;"></span></p>
                             </div>
-                            <div class="btn-group" style="margin-top: 15px; justify-content: center; gap: 10px; flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (ambas vias)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background: #ff6b00;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background: #28a745;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)
-                                </button>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
                             </div>
                         </div>
 
                         <!-- PIX -->
                         <div id="pixDetails" class="d-none">
-                            <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin-top: 10px;">
-                                <p><strong>Chave PIX (CNPJ):</strong> <span id="companyPix">12.345.678/0001-99</span></p>
-                                <p><strong>Desconto de 5% aplicado:</strong> <span id="pixDiscount">R$ 0,00</span></p>
-                                <p><strong>Valor com desconto:</strong> <span id="pixFinalValue">R$ 0,00</span></p>
-                                <button class="btn btn-secondary" onclick="Sales.copyPixKey()">Copiar Chave PIX</button>
+                            <!-- ENTRADA / RESTANTE RETIRADA -->
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-hand-holding-usd"></i> Entrada & Retirada (opcional)</h5>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Entrada paga (R$)</label>
+                                        <input type="number" id="pixEntrada" class="form-control" value="0" min="0" step="0.01" placeholder="0,00" oninput="Sales.calcPixRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante na retirada</label>
+                                        <div class="form-control" id="pixRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="pixRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
+                                        <div class="valor" id="pixRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="btn-group" style="margin-top: 15px; justify-content: center; gap: 10px; flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (ambas vias)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background: #ff6b00;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background: #28a745;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)
-                                </button>
+                            <div style="background:#e8f9f3;padding:15px;border-radius:8px;border:1px solid #a5d6a7;margin-top:6px;">
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                                    <i class="fas fa-qrcode" style="font-size:2rem;color:#00a884;"></i>
+                                    <div>
+                                        <div style="font-weight:800;color:#00695c;">Chave PIX:</div>
+                                        <div style="font-size:1rem;font-weight:700;" id="companyPix">12.345.678/0001-99</div>
+                                    </div>
+                                </div>
+                                <div class="pay-summary-box" style="background:#fff;border-color:#a5d6a7;">
+                                    <div class="pay-summary-row">
+                                        <span class="label">Valor original:</span>
+                                        <span class="value" id="pixOriginalValue">R$ 0,00</span>
+                                    </div>
+                                    <div class="pay-summary-row">
+                                        <span class="label">Desconto PIX (5%):</span>
+                                        <span class="value" style="color:#2e7d32;" id="pixDiscount">- R$ 0,00</span>
+                                    </div>
+                                    <div class="pay-summary-row highlight">
+                                        <span class="label">💰 Valor a pagar no PIX:</span>
+                                        <span class="value" id="pixFinalValue">R$ 0,00</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top:10px;" onclick="Sales.copyPixKey()"><i class="fas fa-copy"></i> Copiar Chave PIX</button>
+                            </div>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
                             </div>
                         </div>
 
                         <!-- DINHEIRO -->
                         <div id="cashDetails" class="d-none">
-                            <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin-top: 10px;">
-                                <p><strong>Desconto de 3% aplicado:</strong> <span id="cashDiscount">R$ 0,00</span></p>
-                                <p><strong>Valor com desconto:</strong> <span id="cashFinalValue">R$ 0,00</span></p>
+                            <!-- ENTRADA / RESTANTE RETIRADA -->
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-hand-holding-usd"></i> Entrada & Troco</h5>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Valor recebido (R$)</label>
+                                        <input type="number" id="cashReceived" class="form-control" value="0" min="0" step="0.01" placeholder="0,00" oninput="Sales.calcCashChange()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Troco</label>
+                                        <div class="form-control" id="cashChange" style="font-weight:800;color:#2e7d32;font-size:1.1rem;">R$ 0,00</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Entrada paga (R$)</label>
+                                        <input type="number" id="cashEntrada" class="form-control" value="0" min="0" step="0.01" placeholder="0,00" oninput="Sales.calcCashRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante na retirada</label>
+                                        <div class="form-control" id="cashRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="cashRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
+                                        <div class="valor" id="cashRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="btn-group" style="margin-top: 15px; justify-content: center; gap: 10px; flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (ambas vias)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background: #ff6b00;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)
-                                </button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background: #28a745;">
-                                    <i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)
-                                </button>
+                            <div class="pay-summary-box">
+                                <div class="pay-summary-row">
+                                    <span class="label">Valor original:</span>
+                                    <span class="value" id="cashOriginalValue">R$ 0,00</span>
+                                </div>
+                                <div class="pay-summary-row">
+                                    <span class="label">Desconto dinheiro (3%):</span>
+                                    <span class="value" style="color:#2e7d32;" id="cashDiscount">- R$ 0,00</span>
+                                </div>
+                                <div class="pay-summary-row highlight">
+                                    <span class="label">💰 Valor final:</span>
+                                    <span class="value" id="cashFinalValue">R$ 0,00</span>
+                                </div>
+                            </div>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
                             </div>
                         </div>
-                    </div>
 
+                        <!-- TRANSFERÊNCIA -->
+                        <div id="transferDetails" class="d-none">
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-exchange-alt"></i> Transferência Bancária (TED/DOC)</h5>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Entrada paga (R$)</label>
+                                        <input type="number" id="transferEntrada" class="form-control" value="0" min="0" step="0.01" oninput="Sales.calcTransferRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante na retirada</label>
+                                        <div class="form-control" id="transferRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tipo</label>
+                                        <select class="form-control" id="transferType">
+                                            <option value="ted">TED</option>
+                                            <option value="doc">DOC</option>
+                                            <option value="pix_manual">PIX Manual</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="transferRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
+                                        <div class="valor" id="transferRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
+                            </div>
+                        </div>
+
+                        <!-- CHEQUE -->
+                        <div id="chequeDetails" class="d-none">
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-money-check"></i> Pagamento com Cheque</h5>
+                                <div class="form-row" style="margin-bottom:8px;">
+                                    <div class="form-group">
+                                        <label>Nº do Cheque</label>
+                                        <input type="text" id="chequeNum" class="form-control" placeholder="000000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Banco</label>
+                                        <input type="text" id="chequeBanco" class="form-control" placeholder="Ex: Bradesco">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Vencimento do Cheque</label>
+                                        <input type="date" id="chequeVenc" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group">
+                                        <label>Entrada paga (R$)</label>
+                                        <input type="number" id="chequeEntrada" class="form-control" value="0" min="0" step="0.01" oninput="Sales.calcChequeRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante na retirada</label>
+                                        <div class="form-control" id="chequeRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="chequeRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
+                                        <div class="valor" id="chequeRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
+                            </div>
+                        </div>
+
+                        <!-- VOUCHER / CONVÊNIO -->
+                        <div id="voucherDetails" class="d-none">
+                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
+                                <h5><i class="fas fa-ticket-alt"></i> Voucher / Convênio</h5>
+                                <div class="form-row" style="margin-bottom:8px;">
+                                    <div class="form-group">
+                                        <label>Código do Voucher</label>
+                                        <input type="text" id="voucherCode" class="form-control" placeholder="Ex: CONV-2025">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Convênio / Empresa</label>
+                                        <input type="text" id="voucherEmpresa" class="form-control" placeholder="Ex: Unimed, Funilândia...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Valor coberto (R$)</label>
+                                        <input type="number" id="voucherValor" class="form-control" value="0" min="0" step="0.01" oninput="Sales.calcVoucherRetirada()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Restante (cliente paga)</label>
+                                        <div class="form-control" id="voucherRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
+                                    </div>
+                                </div>
+                                <div class="retirada-alert" id="voucherRetiradaAlert" style="display:none;margin-top:8px;">
+                                    <i class="fas fa-glasses"></i>
+                                    <div>
+                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cliente paga o restante na retirada</div>
+                                        <div class="valor" id="voucherRetiradaValAlert">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
+                            </div>
+                        </div>
+
+                    </div>
                     <!-- OBSERVAÇÕES -->
                     <div class="cliente-card">
                         <h3>📝 OBSERVAÇÕES</h3>
@@ -10994,27 +11262,82 @@ ${container.innerHTML}
                 const card = document.querySelector(`[data-method="${method}"]`);
                 if (card) card.classList.add('active');
                 
-                document.getElementById('creditDetails')?.classList.add('d-none');
-                document.getElementById('installmentDetails')?.classList.add('d-none');
-                document.getElementById('pixDetails')?.classList.add('d-none');
-                document.getElementById('cashDetails')?.classList.add('d-none');
-                document.getElementById('debitDetails')?.classList.add('d-none');
+                // Oculta todos os painéis de detalhe
+                ['creditDetails','installmentDetails','pixDetails','cashDetails',
+                 'debitDetails','transferDetails','chequeDetails','voucherDetails'
+                ].forEach(id => document.getElementById(id)?.classList.add('d-none'));
                 
                 if (method === 'credit') {
                     document.getElementById('creditDetails')?.classList.remove('d-none');
+                    this.calcCreditRetirada();
                 } else if (method === 'installment') {
                     document.getElementById('installmentDetails')?.classList.remove('d-none');
                     this.calculateInstallments();
                 } else if (method === 'pix') {
                     document.getElementById('pixDetails')?.classList.remove('d-none');
                     this.calculatePixDiscount();
+                    this.calcPixRetirada();
                 } else if (method === 'cash') {
                     document.getElementById('cashDetails')?.classList.remove('d-none');
                     this.calculateCashDiscount();
+                    this.calcCashChange();
                 } else if (method === 'debit') {
                     document.getElementById('debitDetails')?.classList.remove('d-none');
                     Sales._updateDebitSummary();
+                    this.calcDebitRetirada();
+                } else if (method === 'transfer') {
+                    document.getElementById('transferDetails')?.classList.remove('d-none');
+                    this.calcTransferRetirada();
+                } else if (method === 'cheque') {
+                    document.getElementById('chequeDetails')?.classList.remove('d-none');
+                    this.calcChequeRetirada();
+                } else if (method === 'voucher') {
+                    document.getElementById('voucherDetails')?.classList.remove('d-none');
+                    this.calcVoucherRetirada();
                 }
+            },
+
+            // ── HELPERS DE RETIRADA ───────────────────────────────────────────
+            _fmtBRL(v) { return 'R$ ' + (isNaN(v)||v<0?0:v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); },
+
+            _showRetirada(inputId, displayId, alertId, alertValId) {
+                const total = parseFloat(document.getElementById('totalDisplay')?.textContent?.replace(/[R$\s.]/g,'').replace(',','.')) || 0;
+                const entrada = parseFloat(document.getElementById(inputId)?.value) || 0;
+                const restante = Math.max(0, total - entrada);
+                if (document.getElementById(displayId)) document.getElementById(displayId).textContent = this._fmtBRL(restante);
+                const alert = document.getElementById(alertId);
+                if (alert) alert.style.display = restante > 0.01 ? 'flex' : 'none';
+                if (document.getElementById(alertValId)) document.getElementById(alertValId).textContent = this._fmtBRL(restante);
+            },
+
+            calcCreditRetirada()  { this._showRetirada('creditEntrada',  'creditRetiradaVal',   'creditRetiradaAlert',   'creditRetiradaValAlert'); },
+            calcDebitRetirada()   { this._showRetirada('debitEntrada',   'debitRetiradaVal',    'debitRetiradaAlert',    'debitRetiradaValAlert'); },
+            calcPixRetirada()     { this._showRetirada('pixEntrada',     'pixRetiradaVal',      'pixRetiradaAlert',      'pixRetiradaValAlert'); },
+            calcCashRetirada()    { this._showRetirada('cashEntrada',    'cashRetiradaVal',     'cashRetiradaAlert',     'cashRetiradaValAlert'); },
+            calcTransferRetirada(){ this._showRetirada('transferEntrada','transferRetiradaVal', 'transferRetiradaAlert', 'transferRetiradaValAlert'); },
+            calcChequeRetirada()  { this._showRetirada('chequeEntrada',  'chequeRetiradaVal',   'chequeRetiradaAlert',   'chequeRetiradaValAlert'); },
+
+            calcVoucherRetirada() {
+                const total = parseFloat(document.getElementById('totalDisplay')?.textContent?.replace(/[R$\s.]/g,'').replace(',','.')) || 0;
+                const coberto = parseFloat(document.getElementById('voucherValor')?.value) || 0;
+                const restante = Math.max(0, total - coberto);
+                if (document.getElementById('voucherRetiradaVal')) document.getElementById('voucherRetiradaVal').textContent = this._fmtBRL(restante);
+                const alert = document.getElementById('voucherRetiradaAlert');
+                if (alert) alert.style.display = restante > 0.01 ? 'flex' : 'none';
+                if (document.getElementById('voucherRetiradaValAlert')) document.getElementById('voucherRetiradaValAlert').textContent = this._fmtBRL(restante);
+            },
+
+            calcCashChange() {
+                const total = parseFloat(document.getElementById('totalDisplay')?.textContent?.replace(/[R$\s.]/g,'').replace(',','.')) || 0;
+                const recebido = parseFloat(document.getElementById('cashReceived')?.value) || 0;
+                // Aplica desconto de 3% (mesmo que calculateCashDiscount)
+                const finalVal = total * 0.97;
+                const troco = Math.max(0, recebido - finalVal);
+                if (document.getElementById('cashChange')) document.getElementById('cashChange').textContent = this._fmtBRL(troco);
+                if (document.getElementById('cashOriginalValue')) document.getElementById('cashOriginalValue').textContent = this._fmtBRL(total);
+                if (document.getElementById('cashDiscount')) document.getElementById('cashDiscount').textContent = '- ' + this._fmtBRL(total * 0.03);
+                if (document.getElementById('cashFinalValue')) document.getElementById('cashFinalValue').textContent = this._fmtBRL(finalVal);
+                this.calcCashRetirada();
             },
 
             // ── MODO DE PAGAMENTO (único / misto) ────────────────────────────
@@ -11028,7 +11351,8 @@ ${container.innerHTML}
                     if (single) single.classList.add('d-none');
                     if (mixed)  mixed.classList.remove('d-none');
                     // Oculta detalhes de método único
-                    ['creditDetails','installmentDetails','pixDetails','cashDetails','debitDetails'].forEach(id => {
+                    ['creditDetails','installmentDetails','pixDetails','cashDetails','debitDetails',
+                     'transferDetails','chequeDetails','voucherDetails'].forEach(id => {
                         document.getElementById(id)?.classList.add('d-none');
                     });
                     if (lblM) { lblM.style.background = 'var(--primary)'; lblM.style.color = '#fff'; lblM.style.borderColor = 'var(--primary)'; }
@@ -11124,6 +11448,15 @@ ${container.innerHTML}
                 document.getElementById('entrySummary').innerText = Utils.formatCurrency(entryValue);
                 document.getElementById('balanceSummary').innerText = Utils.formatCurrency(remaining);
                 document.getElementById('totalParcelsSummary').innerText = installments + 'x';
+
+                // Alerta de retirada: restante = saldo parcelado
+                const alertEl = document.getElementById('retiradaAlert');
+                const valorEl = document.getElementById('retiradaValor');
+                const infoEl  = document.getElementById('retiradaInfo');
+                if (alertEl) alertEl.style.display = remaining > 0.01 ? 'flex' : 'none';
+                if (valorEl) valorEl.textContent = Utils.formatCurrency(remaining);
+                if (infoEl)  infoEl.textContent = `Entrada: ${Utils.formatCurrency(entryValue)} + ${installments}x de ${Utils.formatCurrency(installmentValue)}`;
+
                 
                 let firstDate = document.getElementById('firstDueDate').value;
                 const today = new Date();
@@ -12335,9 +12668,10 @@ ${container.innerHTML}
                 const total = state.currentSale.total;
                 const discount = total * 0.05;
                 const finalValue = total - discount;
-                
-                document.getElementById('pixDiscount').innerText = Utils.formatCurrency(discount);
+                if (document.getElementById('pixOriginalValue')) document.getElementById('pixOriginalValue').innerText = Utils.formatCurrency(total);
+                document.getElementById('pixDiscount').innerText = '- ' + Utils.formatCurrency(discount);
                 document.getElementById('pixFinalValue').innerText = Utils.formatCurrency(finalValue);
+                this.calcPixRetirada();
             },
 
             calculateCashDiscount() {
