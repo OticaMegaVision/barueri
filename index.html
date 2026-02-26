@@ -6086,6 +6086,12 @@ ORDER BY table_name;
             _realtimeChannel: null,
 
             boot() {
+                // ── Limpa filas pendentes corrompidas (não-array) no boot ──
+                const tableKeys = Object.keys(this._TABLES);
+                Promise.all(tableKeys.map(k => this._getPending('lf_pending_' + k))).then(() => {
+                    console.log('[LocalFirst] Filas pendentes verificadas');
+                });
+
                 window.addEventListener('online',  () => this._triggerSync('online'));
                 window.addEventListener('focus',   () => this._triggerSync('focus'));
                 document.addEventListener('visibilitychange', () => {
@@ -6193,7 +6199,7 @@ ORDER BY table_name;
                         const shouldPush = (reason !== 'realtime') && dirtyNow.has(stateKey);
                         if (shouldPush) {
                             const pendingKey = 'lf_pending_' + stateKey;
-                            const pendingIds = (await IDB.get(pendingKey)) || [];
+                            const pendingIds = await this._getPending(pendingKey);
                             const pendingSet = new Set(pendingIds);
                             const localItems = (state[stateKey] || []).filter(item => pendingSet.has(item.id));
 
@@ -6279,21 +6285,33 @@ ORDER BY table_name;
                 }
             },
 
+            // ── Helper: lê fila pendente sempre como array ────────────────────
+            async _getPending(key) {
+                try {
+                    const v = await IDB.get(key);
+                    if (!v) return [];
+                    if (Array.isArray(v)) return v;
+                    // Valor corrompido (número, string, objeto) → limpa e retorna []
+                    await IDB.set(key, []);
+                    return [];
+                } catch(e) { return []; }
+            },
+
             // ── PUSH INDIVIDUAL (chamado ao salvar um registro) ───────────────
-            // Registra o ID na fila pendente e dispara sync
             async pushItem(table, item) {
                 if (!item?.id) return;
-                // Adiciona ID na fila de pendentes no IDB
                 const pendingKey = 'lf_pending_' + table;
+
+                // Enfileira o ID (garante array)
                 try {
-                    const existing = (await IDB.get(pendingKey)) || [];
+                    const existing = await this._getPending(pendingKey);
                     if (!existing.includes(item.id)) existing.push(item.id);
                     await IDB.set(pendingKey, existing);
                 } catch(e) {}
 
                 this._markDirty(table);
 
-                if (!navigator.onLine) return; // será enviado no próximo sync online
+                if (!navigator.onLine) return;
                 try {
                     this._pushing = true;
                     const row = {
@@ -6303,8 +6321,7 @@ ORDER BY table_name;
                     };
                     const { error } = await supabaseClient.from(this._TABLES[table] || table).upsert(row, { onConflict: 'id' });
                     if (!error) {
-                        // Remove da fila pendente
-                        const existing = (await IDB.get(pendingKey)) || [];
+                        const existing = await this._getPending(pendingKey);
                         await IDB.set(pendingKey, existing.filter(id => id !== item.id));
                         this._dirtyKeys.delete(table);
                     }
