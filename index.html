@@ -8461,12 +8461,12 @@ ORDER BY table_name;
             async upsertPrescricao(p) { return LocalFirst.pushItem('prescriptions', p); },
             async upsertDespesa(e)    { return LocalFirst.pushItem('expenses', e); },
             async upsertFornecedor(s) { return LocalFirst.pushItem('suppliers', s); },
-            async upsertServico(s)    {},
+            async upsertServico(s)    { return LocalFirst.pushItem('services', s); },
             async upsertConfig()      { return LocalFirst.pushConfig(); },
             async deletarCliente(id)  { return LocalFirst.deleteItem('clients', id); },
             async deletarProduto(id)  { return LocalFirst.deleteItem('products', id); },
             async deletarFornecedor(id) { return LocalFirst.deleteItem('suppliers', id); },
-            async deletarServico(id)  {},
+            async deletarServico(id)  { return LocalFirst.deleteItem('services', id); },
             async deletarDespesa(id)  { return LocalFirst.deleteItem('expenses', id); },
             async verificarTabelas() {
                 const tabelas = ['clients','products','sales','expenses','prescriptions','suppliers','services','config'];
@@ -8721,6 +8721,7 @@ ORDER BY table_name;
                         if (section === 'dashboard') Dashboard.update();
                         else if (section === 'sales') {
                             Sales.renderHistory();
+                            Sales.populateSaleSelects();
                             document.getElementById('saleNumber') && (document.getElementById('saleNumber').value = Sales.generateOsNumber());
                         }
                         else if (section === 'clients') Clients.renderTable();
@@ -11405,14 +11406,30 @@ ${container.innerHTML}
             generateOsNumber() {
                 const currentYear = new Date().getFullYear();
                 if (!state.lastOsCounter) state.lastOsCounter = {};
-                if (!state.lastOsCounter[currentYear]) state.lastOsCounter[currentYear] = 1;
-                
-                const sequential = String(state.lastOsCounter[currentYear]).padStart(4, '0');
+
+                // Recalcula o próximo número baseado nas vendas existentes deste ano
+                // para evitar duplicatas mesmo após recarregar ou editar
+                const osPrefix = `OS-${currentYear}-`;
+                const usedNumbers = (state.sales || [])
+                    .map(s => s.number || '')
+                    .filter(n => n.startsWith(osPrefix))
+                    .map(n => parseInt(n.replace(osPrefix, ''), 10))
+                    .filter(n => !isNaN(n));
+
+                const maxUsed = usedNumbers.length > 0 ? Math.max(...usedNumbers) : 0;
+                const counterValue = state.lastOsCounter[currentYear] || 1;
+                // Usa o maior entre o contador salvo e o máximo real encontrado nas vendas
+                const nextNumber = Math.max(counterValue, maxUsed + 1);
+
+                // Atualiza o contador para manter consistência
+                state.lastOsCounter[currentYear] = nextNumber;
+
+                const sequential = String(nextNumber).padStart(4, '0');
                 const osNumber = `OS-${currentYear}-${sequential}`;
-                
+
                 const el = document.getElementById('saleNumber');
                 if (el) el.value = osNumber;
-                
+
                 return osNumber;
             },
 
@@ -13432,13 +13449,10 @@ ${container.innerHTML}
                     state.editingSaleId = null;
                 } else {
                     state.sales.push(sale);
-                    // Incrementar contador de OS apenas se for nova venda
+                    // Avança o contador para o próximo número após salvar
                     const currentYear = new Date().getFullYear();
-                    if (state.lastOsCounter[currentYear]) {
-                        state.lastOsCounter[currentYear]++;
-                    } else {
-                        state.lastOsCounter[currentYear] = 1;
-                    }
+                    if (!state.lastOsCounter) state.lastOsCounter = {};
+                    state.lastOsCounter[currentYear] = (state.lastOsCounter[currentYear] || 1) + 1;
                 }
                 
                 App.saveData();
@@ -13484,6 +13498,8 @@ ${container.innerHTML}
                 if (additionEl) additionEl.value = '0';
                 if (obsEl) obsEl.value = '';
                 if (professionalEl) professionalEl.value = '';
+                const clientSelectEl = document.getElementById('clientSelect');
+                if (clientSelectEl) clientSelectEl.innerHTML = '<option value="">Selecione um cliente</option>';
                 const entryValEl = document.getElementById('entryValue');
                 if (entryValEl) entryValEl.value = '0';
                 const retiradaEntryEl = document.getElementById('retiradaEntry');
