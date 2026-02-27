@@ -35,7 +35,6 @@
     </script>
     <!-- ===== /SUPABASE SDK ===== -->
 
-    <!-- RxDB/Dexie removidos — sync gerenciado pelo SupaSync (Supabase SDK) -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bibliotecas para PDF -->
@@ -102,10 +101,15 @@
         .dark-mode .cliente-info-card,
         .dark-mode .presc-rapida,
         .dark-mode .cliente-card {
-            background-color: #1e1e1e;
-            border-color: #333;
+            background-color: #1a1d27;
+            border-color: rgba(255,255,255,0.08);
             color: #e0e0e0;
         }
+        .dark-mode .card::after { opacity: 0.8; }
+        .dark-mode .card-icon { filter: brightness(0.7); }
+        .dark-mode .card-title { color: rgba(255,255,255,0.45); }
+        .dark-mode .card-value { color: #f0f0f0; }
+        .dark-mode .bar-value { background: #2d2d2d; border-color: #444; color: #e0e0e0; }
 
         .dark-mode .form-control {
             background-color: #2d2d2d;
@@ -145,7 +149,7 @@
 
         .dark-mode .menu-item:hover,
         .dark-mode .menu-item.active {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
         }
 
         .dark-mode .header {
@@ -297,10 +301,13 @@
         }
 
         body {
-            background: var(--light);
+            background: #f4f5f7;
             color: var(--dark);
             transition: var(--transition);
             min-height: 100vh;
+        }
+        .dark-mode body {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
         }
 
         /* ===== LAYOUT PRINCIPAL ===== */
@@ -310,22 +317,27 @@
         }
 
         .sidebar {
-            width: 260px;
+            width: 240px;
             background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            transition: width 0.3s;
+            overflow-x: hidden;
+            transition: width 0.3s cubic-bezier(.4,0,.2,1);
             z-index: 100;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+            box-shadow: 2px 0 32px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
         }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
 
         .sidebar-header {
-            padding: 1.5rem 1.2rem 1.3rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-            background: rgba(0,0,0,0.18);
+            padding: 1.4rem 1.1rem 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
         }
 
         .close-sidebar {
@@ -334,148 +346,156 @@
             right: 10px;
             background: none;
             border: none;
-            color: white;
-            font-size: 24px;
+            color: rgba(255,255,255,0.6);
+            font-size: 22px;
             cursor: pointer;
             display: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            transition: background 0.2s;
         }
+        .close-sidebar:hover { background: rgba(255,255,255,0.1); }
 
         .logo-container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.9rem;
         }
 
-        /* ── Sidebar: logo circular preenchendo todo o círculo sem distorção ── */
+        /* ── Sidebar: logo circular ── */
         .logo-wrapper {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             overflow: hidden;
-            border: 3px solid rgba(255,255,255,0.9);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             flex-shrink: 0;
-            background-color: var(--secondary);
+            background-color: var(--primary);
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             display: block;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
-        .logo-wrapper:hover { transform: scale(1.05); }
-        /* <img> dentro do wrapper fica oculta — usamos background-image no wrapper */
+        .logo-wrapper:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(0,0,0,0.4); }
         .logo-img { display: none !important; }
-        /* Placeholder (sem logo) */
         .logo-placeholder {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid rgba(255,255,255,0.9);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             cursor: pointer;
             transition: transform 0.2s;
             flex-shrink: 0;
-            background: rgba(255,255,255,0.15);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
+            font-size: 18px;
             color: white;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         .logo-placeholder:hover { transform: scale(1.05); }
 
         .company-name {
-            font-size: 1.05rem;
-            font-weight: 800;
+            font-size: 0.93rem;
+            font-weight: 700;
             color: white;
             word-break: break-word;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            letter-spacing: 0.3px;
+            letter-spacing: 0.1px;
+            line-height: 1.2;
         }
 
         .company-subtitle {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.75);
-            font-weight: 600;
-            letter-spacing: 2px;
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.4);
+            font-weight: 500;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-top: 1px;
+            margin-top: 2px;
         }
 
         .sidebar-menu {
             flex: 1;
-            padding: 0.75rem 0.6rem;
+            padding: 0.5rem 0.75rem;
+            overflow-y: auto;
         }
 
         .sidebar-section-label {
-            padding: 0.7rem 0.8rem 0.3rem;
-            font-size: 0.6rem;
-            font-weight: 800;
-            color: rgba(255,255,255,0.45);
-            letter-spacing: 2px;
+            padding: 1rem 0.6rem 0.4rem;
+            font-size: 0.58rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.25);
+            letter-spacing: 2.5px;
             text-transform: uppercase;
         }
 
         .menu-item {
-            padding: 0.7rem 1rem;
+            padding: 0.65rem 0.85rem;
             display: flex;
             align-items: center;
-            gap: 11px;
+            gap: 10px;
             cursor: pointer;
-            transition: all 0.15s;
-            border-left: 3px solid transparent;
-            border-radius: 10px;
-            color: rgba(255,255,255,0.85);
-            font-size: 0.855rem;
-            font-weight: 600;
-            margin-bottom: 2px;
+            transition: all 0.18s;
+            border-radius: 9px;
+            color: rgba(255,255,255,0.55);
+            font-size: 0.84rem;
+            font-weight: 500;
+            margin-bottom: 1px;
+            position: relative;
         }
 
         .menu-item i {
             width: 18px;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
         .menu-item:hover {
-            background: rgba(255,255,255,0.12);
-            border-left-color: rgba(255,204,0,0.5);
-            color: white;
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.9);
         }
 
         .menu-item.active {
-            background: rgba(255,255,255,0.22);
-            border-left-color: var(--secondary);
+            background: rgba(255,255,255,0.1);
             color: white;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            font-weight: 600;
+        }
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: var(--primary);
         }
 
         .sidebar-footer {
-            padding: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.15);
+            padding: 0.85rem 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
         }
 
         .theme-toggle {
             width: 100%;
-            padding: 0.7rem;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            border-radius: 10px;
+            padding: 0.6rem 0.85rem;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.55);
+            border-radius: 9px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: var(--transition);
-            font-size: 0.85rem;
-            font-weight: 600;
+            gap: 10px;
+            transition: all 0.18s;
+            font-size: 0.83rem;
+            font-weight: 500;
         }
-        .theme-toggle:hover { background: rgba(255,255,255,0.2); }
+        .theme-toggle:hover { background: rgba(255,255,255,0.1); color: white; }
 
         .theme-toggle:hover {
             background: rgba(255,255,255,0.2);
@@ -483,9 +503,9 @@
 
         .main-content {
             flex: 1;
-            margin-left: 260px;
+            margin-left: 240px;
             padding: 1.5rem;
-            transition: margin-left 0.3s;
+            transition: margin-left 0.3s cubic-bezier(.4,0,.2,1);
             min-width: 0;
         }
 
@@ -506,48 +526,59 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--light-gray);
-            margin-bottom: 2rem;
+            padding-bottom: 1.1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            margin-bottom: 1.75rem;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .header-left h1 {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            color: var(--primary);
-            font-weight: 600;
+            font-size: clamp(1.3rem, 3.5vw, 1.7rem);
+            color: var(--dark);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        #pageSubtitle {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 500;
+            margin-top: 1px;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
         }
 
         .datetime-widget {
             background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            box-shadow: var(--box-shadow);
+            padding: 0.4rem 1rem;
+            border-radius: 10px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+            border: 1px solid rgba(0,0,0,0.05);
             text-align: center;
         }
 
         .time {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.05rem;
+            font-weight: 800;
             color: var(--primary);
+            letter-spacing: -0.3px;
         }
 
         .date {
-            font-size: 0.85rem;
+            font-size: 0.72rem;
             color: var(--gray);
+            font-weight: 500;
         }
 
         .backup-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         /* ===== SEÇÕES ===== */
@@ -577,9 +608,9 @@
         /* ===== CARDS ===== */
         .dashboard-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
         }
 
         .dashboard-cards .card[style*="grid-column: span 2"],
@@ -596,52 +627,77 @@
 
         .card {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 1.5rem;
-            border-top: 4px solid var(--primary);
-            transition: transform 0.2s;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 1.35rem 1.35rem 1.1rem;
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--card-accent, var(--primary));
+            border-radius: 14px 14px 0 0;
         }
 
         .card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+            align-items: flex-start;
+            margin-bottom: 0.85rem;
         }
 
         .card-title {
-            font-size: 0.95rem;
+            font-size: 0.75rem;
             color: var(--gray);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
         }
 
         .card-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.5px;
         }
 
         .dashboard-charts {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
         }
 
         /* ── Dashboard: painéis de alertas ── */
         .dash-alert-panel {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: 1px solid rgba(0,0,0,0.06);
             overflow: hidden;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
         .dash-alert-header {
             display: flex;
@@ -649,16 +705,17 @@
             justify-content: space-between;
             padding: 0.85rem 1.2rem;
             font-weight: 700;
-            font-size: 0.95rem;
-            letter-spacing: 0.3px;
+            font-size: 0.82rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
-        .dash-alert-header.birthday { background: linear-gradient(90deg,#ff6b00,#ffcc00); color: white; }
-        .dash-alert-header.glasses  { background: linear-gradient(90deg,#007bff,#0056b3); color: white; }
+        .dash-alert-header.birthday { background: linear-gradient(90deg,#ff6b00 0%,#ffaa00 100%); color: white; }
+        .dash-alert-header.glasses  { background: linear-gradient(90deg,#3b82f6 0%,#2563eb 100%); color: white; }
         .dash-alert-header .badge-count {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.25);
             border-radius: 999px;
             padding: 2px 10px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
         .dash-alert-list { max-height: 280px; overflow-y: auto; }
         .dash-alert-item {
@@ -919,49 +976,60 @@
 
         .chart-container {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 1.5rem;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: 1px solid rgba(0,0,0,0.06);
+            padding: 1.5rem 1.5rem 1.8rem;
             overflow-x: auto;
         }
 
         .chart-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 700;
             margin-bottom: 1.5rem;
             color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
         }
 
         .bar-chart {
             display: flex;
             align-items: flex-end;
             justify-content: space-around;
-            height: 200px;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--light-gray);
+            height: 180px;
+            padding: 1.2rem 0 0;
+            border-bottom: 2px solid var(--light-gray);
             min-width: 300px;
+            gap: 4px;
         }
 
         .bar {
-            width: 40px;
-            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 4px 4px 0 0;
+            flex: 1;
+            max-width: 48px;
+            background: linear-gradient(180deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 60%, transparent) 100%);
+            border-radius: 6px 6px 0 0;
             position: relative;
-            margin: 0 0.25rem;
-            transition: height 0.3s;
+            transition: height 0.4s cubic-bezier(.4,0,.2,1), opacity 0.2s;
+            cursor: pointer;
+            min-height: 4px;
         }
+
+        .bar:hover { opacity: 0.8; }
 
         .bar-value {
             position: absolute;
-            top: -22px;
+            top: -26px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-size: 0.65rem;
+            font-weight: 700;
             white-space: nowrap;
-            background: var(--light-gray);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
+            color: var(--dark);
+            background: white;
+            border: 1px solid var(--light-gray);
+            padding: 2px 5px;
+            border-radius: 5px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
 
         .bar-label {
@@ -969,9 +1037,10 @@
             bottom: -22px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.7rem;
+            font-size: 0.64rem;
             white-space: nowrap;
             color: var(--gray);
+            font-weight: 500;
         }
 
         /* ===== FORMULÁRIOS ===== */
@@ -1798,22 +1867,28 @@
         .dash-period-bar {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
+            gap: 0.4rem;
+            margin-bottom: 1.5rem;
             flex-wrap: wrap;
+            background: white;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.05);
         }
         .dash-period-label {
-            font-size: 0.82rem;
+            font-size: 0.72rem;
             color: var(--gray);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 1px;
+            margin-right: 4px;
         }
         .dash-period-btn {
-            padding: 5px 14px;
-            border-radius: 20px;
-            border: 1.5px solid var(--light-gray);
-            background: white;
+            padding: 5px 13px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
             font-size: 0.8rem;
             font-weight: 600;
             color: var(--gray);
@@ -1821,28 +1896,30 @@
             transition: all 0.15s;
         }
         .dash-period-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+            background: var(--light-gray);
+            color: var(--dark);
         }
         .dash-period-btn.active {
             background: var(--primary);
-            border-color: var(--primary);
             color: white;
+            box-shadow: 0 2px 8px rgba(255,107,0,0.3);
         }
         .dash-period-custom {
             display: none;
-            gap: 0.5rem;
+            gap: 0.4rem;
             align-items: center;
         }
         .dash-period-custom.show { display: flex; }
         .dash-period-custom input {
             padding: 4px 8px;
             border: 1.5px solid var(--light-gray);
-            border-radius: 6px;
-            font-size: 0.82rem;
+            border-radius: 7px;
+            font-size: 0.8rem;
         }
-        .dark-mode .dash-period-btn { background: #2d2d2d; border-color: #444; color: #aaa; }
-        .dark-mode .dash-period-btn.active { background: #ff9944; border-color: #ff9944; color: #111; }
+        .dark-mode .dash-period-bar { background: #1a1d27; border-color: rgba(255,255,255,0.07); }
+        .dark-mode .dash-period-btn { color: #999; }
+        .dark-mode .dash-period-btn:hover { background: rgba(255,255,255,0.08); color: #e0e0e0; }
+        .dark-mode .dash-period-btn.active { background: var(--primary); color: white; }
         .dark-mode .dash-period-custom input { background: #2d2d2d; border-color: #444; color: #e0e0e0; }
 
         /* ===== MODAL WHATSAPP CONFIRMAÇÃO ===== */
@@ -1995,17 +2072,30 @@
             to { transform: rotate(360deg); }
         }
 
+        /* ===== SYNC BUTTON ANIMATION ===== */
+        #headerSyncBtn.syncing #headerSyncIcon {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 992px) {
-            .sidebar { width: 70px; }
+            .sidebar { width: 66px; }
             .sidebar .company-name,
             .sidebar .company-subtitle,
             .sidebar .sidebar-section-label,
             .sidebar .menu-item span,
             .sidebar-footer .theme-toggle span { display: none; }
-            .main-content { margin-left: 70px; }
-            .menu-item { justify-content: center; padding: 1rem; border-radius: 8px; border-left: 3px solid transparent; }
-            .menu-item i { font-size: 1.2rem; }
+            .main-content { margin-left: 66px; }
+            .menu-item { justify-content: center; padding: 0.7rem; border-radius: 9px; }
+            .menu-item i { font-size: 1.05rem; }
+            .menu-item.active::before { display: none; }
+            .menu-item.active { background: rgba(255,255,255,0.12); }
+            .logo-container { justify-content: center; }
+            .sidebar-header { padding: 1.1rem 0.6rem; }
+            .sidebar-footer { padding: 0.6rem; }
+            .theme-toggle { justify-content: center; padding: 0.6rem; }
         }
 
         @media (max-width: 768px) {
@@ -2190,8 +2280,7 @@
             .sidebar, .header, .header-right,
             .menu-toggle, .btn-group, .modal,
             #pwa-install-banner, #pwa-update-toast, #pwa-offline-bar,
-            #rxdb-sync-status, #rxdb-sync-toggle,
-            .auto-save-indicator, #cloudSyncIndicator,
+                    .auto-save-indicator, #cloudSyncIndicator,
             .datetime-widget, .theme-toggle { display: none !important; }
 
             /* ── Layout de impressão ── */
@@ -3563,101 +3652,7 @@
             overflow: hidden;
         }
         
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .btn:active::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        /* Cards com hover melhorado */
-        .card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        
-        /* Inputs com validação visual */
-        .form-control.valid {
-            border-color: var(--success);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328a745'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1.2rem;
-            padding-right: 3rem;
-        }
-        
-        .form-control.invalid {
-            border-color: var(--danger);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc3545'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1.2rem;
-            padding-right: 3rem;
-        }
-        
-        /* Skeleton loading para melhor UX */
-        .skeleton {
-            animation: skeleton-loading 1s linear infinite alternate;
-        }
-        
-        @keyframes skeleton-loading {
-            0% {
-                background-color: hsl(200, 20%, 80%);
-            }
-            100% {
-                background-color: hsl(200, 20%, 95%);
-            }
-        }
-        
-        /* Melhor scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--light);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--gray);
-            border-radius: 5px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-        
-        /* Print melhorado */
-        /* print-color-adjust já declarado no bloco @media print principal acima */
-        
-        /* Responsividade melhorada */
-        @media (max-width: 576px) {
-            .btn {
-                font-size: 0.85rem;
-                padding: 0.6rem 1rem;
-            }
-            
-            .modal-content {
-                margin: 0.5rem;
-                max-height: 95vh;
-            }
-        }
+
     
 </style>
 
@@ -3749,7 +3744,7 @@
             <header class="header no-print">
                 <div class="header-left">
                     <h1 id="pageTitle">Vendas</h1>
-                    <div id="pageSubtitle">Nova Ordem de Serviço</div>
+                    <div id="pageSubtitle"></div>
                 </div>
                 <div class="header-right">
                     <div class="datetime-widget" aria-live="polite">
@@ -3760,8 +3755,8 @@
                         <button class="btn btn-secondary btn-sm" onclick="App.exportBackup()" aria-label="Exportar backup"><i class="fas fa-download"></i> Backup</button>
                         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importBackup').click()" aria-label="Importar backup"><i class="fas fa-upload"></i> Restaurar</button>
                         <input type="file" id="importBackup" class="d-none" accept=".json" onchange="App.importBackup(event)" aria-hidden="true">
-                        <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="SupaSync.syncDown()" title="Baixar dados atualizados da nuvem">
-                            &#9729; Sync
+                        <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="SupaSync.syncDown()" title="Sincronizar com a nuvem" id="headerSyncBtn">
+                            <i class="fas fa-cloud-arrow-down" id="headerSyncIcon"></i> Sync
                         </button>
                         <button class="btn btn-sm" style="background:#3b82f6;color:#fff;font-weight:700;" onclick="if(confirm('Enviar todos os dados locais para o Supabase?'))SupaSync.migrarParaSupabase()" title="Enviar dados locais para o Supabase (use 1x)">
                             &#8679; Migrar
@@ -4079,6 +4074,7 @@
                     <!-- ITENS DA VENDA -->
                     <div class="cliente-card">
                         <h3>🛒 ITENS DA VENDA</h3>
+
                         
                         <div class="sale-items" id="saleItemsContainer">
                             <!-- Itens serão inseridos via JavaScript -->
@@ -4166,15 +4162,6 @@
                     <div class="cliente-card">
                         <h3>💳 FORMA DE PAGAMENTO</h3>
 
-                        <!-- MODO ÚNICO ou MISTO -->
-                        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-                            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 14px;border-radius:8px;border:2px solid var(--primary);background:var(--primary);color:#fff;font-weight:700;font-size:0.82rem;" id="lbl-payment-single">
-                                <input type="radio" name="paymentMode" value="single" checked style="accent-color:#fff" onchange="Sales.setPaymentMode('single')"> 1 Forma
-                            </label>
-                            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 14px;border-radius:8px;border:2px solid #6c757d;background:#fff;font-weight:700;font-size:0.82rem;" id="lbl-payment-mixed">
-                                <input type="radio" name="paymentMode" value="mixed" style="accent-color:var(--primary)" onchange="Sales.setPaymentMode('mixed')"> ✚ Pagamento Misto
-                            </label>
-                        </div>
 
                         <!-- MODO ÚNICO — FORMAS -->
                         <div id="paymentSingleMode">
@@ -4222,19 +4209,6 @@
                             </div>
                         </div>
 
-                        <!-- MODO MISTO -->
-                        <div id="paymentMixedMode" class="d-none">
-                            <div style="background:#f0f7ff;border:1px solid #c0d9f0;border-radius:8px;padding:12px;margin-bottom:10px;">
-                                <p style="font-size:0.82rem;color:#1565c0;margin-bottom:8px;font-weight:700;">💡 Distribua o valor total entre as formas de pagamento:</p>
-                                <div id="mixedPaymentRows" style="display:flex;flex-direction:column;gap:8px;"></div>
-                                <button type="button" onclick="Sales.addMixedRow()" style="margin-top:8px;background:var(--primary);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:0.8rem;cursor:pointer;font-weight:700;">+ Adicionar forma</button>
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#e8f5e9;border-radius:6px;font-size:0.85rem;">
-                                <span>Total da OS: <strong id="mixedTotalOS">R$ 0,00</strong></span>
-                                <span>Distribuído: <strong id="mixedTotalDistrib" style="color:var(--primary)">R$ 0,00</strong></span>
-                                <span id="mixedDiffLabel" style="font-weight:700;color:#c0392b;display:none;">Diferença: <span id="mixedDiff"></span></span>
-                            </div>
-                        </div>
 
                         <!-- ══════════════════════════════════════════
                              PAINEL DINÂMICO — exibido abaixo dos botões
@@ -4254,17 +4228,21 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label>Valor da Entrada</label>
-                                        <div class="form-control" id="entryValue" style="background:var(--light);font-weight:800;color:#2e7d32;font-size:1.05rem;">R$ 0,00</div>
+                                        <label>Valor da Entrada (R$)</label>
+                                        <input type="text" inputmode="numeric" class="form-control" id="entryValue" style="font-weight:800;color:#2e7d32;font-size:1.05rem;" placeholder="0,00" oninput="Utils.maskMoney(this); Sales.calculateInstallmentsFromValue()" value="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Valor na Retirada (R$)</label>
+                                        <input type="text" inputmode="numeric" class="form-control" id="retiradaEntry" style="font-weight:800;color:#e65100;font-size:1.05rem;" placeholder="0,00" oninput="Utils.maskMoney(this); Sales.calculateInstallmentsFromValue()" value="0">
                                     </div>
                                     <div class="form-group">
                                         <label>Nº de Parcelas</label>
-                                        <select id="installmentCount" class="form-control" onchange="Sales.calculateInstallments()">
-                                            <option value="1">1x (à vista + entrada)</option>
-                                            <option value="2">2x</option>
+                                        <select id="installmentCount" class="form-control" onchange="Sales.calculateInstallmentsFromValue()">
+                                            <option value="1">1x</option>
+                                            <option value="2" selected>2x</option>
                                             <option value="3">3x</option>
                                             <option value="4">4x</option>
-                                            <option value="5" selected>5x</option>
+                                            <option value="5">5x</option>
                                             <option value="6">6x</option>
                                             <option value="7">7x</option>
                                             <option value="8">8x</option>
@@ -4388,7 +4366,7 @@
                                         <input type="radio" name="osModelo" value="colorido" checked onchange="state.osModelo=this.value"> 🟠 Colorido
                                     </label>
                                     <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border-radius:6px;border:2px solid #aaa;background:#fff;font-weight:700;font-size:0.82rem;">
-                                        <input type="radio" name="osModelo" value="semfundo" onchange="state.osModelo=this.value"> ⬜ Sem Fundo
+                                        <input type="radio" name="osModelo" value="semfundo" onchange="state.osModelo=this.value"> ⬜ Sem Cor
                                     </label>
                                 </div>
                             </div>
@@ -5129,9 +5107,8 @@
                                 <select id="productCategory" class="form-control" required>
                                     <option value="lentes">Lentes</option>
                                     <option value="armacoes">Armações</option>
-                                    <option value="armacao_uso_sem_custo">Armação — Uso Sem Custo</option>
                                     <option value="oculos_sol">Óculos de Sol</option>
-                                    <option value="acessorios">Acessórios</option>
+                                    <option value="tratamentos">Tratamentos</option>
                                     <option value="coloracao">Coloração</option>
                                 </select>
                             </div>
@@ -5872,80 +5849,97 @@
                                 <i class="fas fa-database"></i> Setup do Banco de Dados (Supabase)
                             </h4>
                             <p style="color: #1e429f; font-size: 0.85rem; margin-bottom: 1rem;">
-                                Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>7 tabelas exatas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code> e <code>config</code>. Estrutura Local-First: cada tabela armazena o objeto completo em JSON (<code>_data</code>), garantindo sync perfeito entre navegadores.
+                                Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>8 tabelas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code>, <code>services</code> e <code>config</code>. Estrutura Local-First: <code>_data</code> em <strong>JSONB</strong> com <code>created_at</code> + <code>updated_at</code> automáticos. Seguro executar novamente — usa IF NOT EXISTS e migração sem perda de dados.
                             </p>
                             <div style="background:#1e1e2e;color:#a6e3a1;font-family:monospace;font-size:0.72rem;padding:1rem;border-radius:8px;max-height:320px;overflow-y:auto;line-height:1.5;margin-bottom:1rem;white-space:pre;" id="sqlSetup">-- ╔══════════════════════════════════════════════════════════════════╗
--- ║  ÓticaVision Pro — SQL Setup LocalFirst (Local-First Sync)      ║
--- ║  Estrutura: id TEXT PK + _data TEXT (JSON) + updated_at         ║
--- ║  Tabelas: clients, products, sales, expenses,                   ║
--- ║           prescriptions, suppliers, config                      ║
+-- ║  ÓticaVision Pro — SQL Setup v2 (Local-First Sync)              ║
+-- ║  Estrutura: id TEXT PK + _data JSONB + created_at + updated_at  ║
+-- ║  Tabelas (8): clients, products, sales, expenses,               ║
+-- ║               prescriptions, suppliers, services, config        ║
 -- ║  Cole no Supabase SQL Editor e execute tudo de uma vez.         ║
 -- ╚══════════════════════════════════════════════════════════════════╝
 
--- ── FUNÇÃO updated_at automático ────────────────────────────────
+-- ── 1. FUNÇÃO updated_at automático ──────────────────────────────
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN NEW.updated_at = now(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 
--- ── CRIA TABELAS (estrutura Local-First: id + _data JSON + updated_at) ──
+-- ── 2. CRIA / ATUALIZA TABELAS ───────────────────────────────────
+--    Estrutura Local-First: id (PK) + _data (JSONB) + timestamps
 DO $$ DECLARE t TEXT;
 BEGIN
   FOR t IN SELECT unnest(ARRAY[
-    'clients','products','sales','expenses','prescriptions','suppliers','config'
+    'clients','products','sales','expenses',
+    'prescriptions','suppliers','services','config'
   ]) LOOP
+
+    -- Cria tabela com colunas corretas
     EXECUTE format('
       CREATE TABLE IF NOT EXISTS %I (
         id         TEXT PRIMARY KEY,
-        _data      TEXT,
-        updated_at TIMESTAMPTZ DEFAULT now()
+        _data      JSONB NOT NULL DEFAULT ''{}''::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-      CREATE INDEX IF NOT EXISTS idx_%I_updated_at ON %I(updated_at);
-    ', t, t, t);
+      -- Índices de performance
+      CREATE INDEX IF NOT EXISTS idx_%I_updated_at ON %I(updated_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_%I_created_at ON %I(created_at DESC);
+    ', t, t, t, t, t);
 
+    -- Adiciona colunas novas em tabelas existentes (migração segura)
+    BEGIN
+      EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();', t);
+    EXCEPTION WHEN others THEN NULL; END;
+
+    -- Trigger updated_at
     EXECUTE format('
       DROP TRIGGER IF EXISTS trg_%I_updated ON %I;
-      CREATE TRIGGER trg_%I_updated BEFORE UPDATE ON %I
-      FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+      CREATE TRIGGER trg_%I_updated
+        BEFORE UPDATE ON %I
+        FOR EACH ROW EXECUTE FUNCTION set_updated_at();
     ', t, t, t, t);
 
+    -- Row Level Security
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY;', t);
-
     BEGIN
       EXECUTE format('
         DROP POLICY IF EXISTS "anon_all" ON %I;
-        CREATE POLICY "anon_all" ON %I FOR ALL TO anon
-        USING (true) WITH CHECK (true);
+        CREATE POLICY "anon_all" ON %I
+          FOR ALL TO anon USING (true) WITH CHECK (true);
       ', t, t);
     EXCEPTION WHEN duplicate_object THEN NULL;
     END;
+
   END LOOP;
 END $$;
 
--- ── REALTIME: habilita replicação para sync em tempo real ───────
+-- ── 3. REALTIME — habilita replicação em tempo real ──────────────
 DO $$ DECLARE t TEXT;
 BEGIN
   FOR t IN SELECT unnest(ARRAY[
-    'clients','products','sales','expenses','prescriptions','suppliers','config'
+    'clients','products','sales','expenses',
+    'prescriptions','suppliers','services','config'
   ]) LOOP
     BEGIN
-      EXECUTE format(
-        'ALTER PUBLICATION supabase_realtime ADD TABLE %I', t
-      );
-    EXCEPTION WHEN others THEN NULL; -- ignora se já adicionado
-    END;
+      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE %I', t);
+    EXCEPTION WHEN others THEN NULL; END; -- ignora se já adicionado
   END LOOP;
 END $$;
 
--- ── VERIFICAÇÃO FINAL ────────────────────────────────────────────
--- Confirma que todas as 7 tabelas foram criadas corretamente:
-SELECT table_name, 
-       (SELECT count(*) FROM information_schema.columns c WHERE c.table_name = t.table_name AND c.table_schema = 'public') AS colunas
+-- ── 4. VERIFICAÇÃO FINAL ─────────────────────────────────────────
+SELECT
+  table_name,
+  (SELECT count(*) FROM information_schema.columns c
+   WHERE c.table_name = t.table_name AND c.table_schema = 'public') AS total_colunas
 FROM information_schema.tables t
 WHERE table_schema = 'public'
-  AND table_name IN ('clients','products','sales','expenses','prescriptions','suppliers','config')
+  AND table_name IN (
+    'clients','products','sales','expenses',
+    'prescriptions','suppliers','services','config'
+  )
 ORDER BY table_name;
--- Resultado esperado: 7 linhas, cada uma com 3 colunas (id, _data, updated_at)</div>
+-- Resultado esperado: 8 linhas, cada uma com 4 colunas (id, _data, created_at, updated_at)</div>
                             <button class="btn btn-primary" onclick="
                                 const sql = document.getElementById('sqlSetup').innerText;
                                 navigator.clipboard.writeText(sql).then(() => Toast.show('SQL copiado! Cole no Supabase SQL Editor.', 'success', 4000));
@@ -5955,9 +5949,14 @@ ORDER BY table_name;
                             <a href="https://supabase.com/dashboard/project/qhscxyistzlmxxnjrqao/sql/new" target="_blank" class="btn btn-secondary" style="margin-left:0.5rem;">
                                 <i class="fas fa-external-link-alt"></i> Abrir SQL Editor
                             </a>
-                            <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;margin-left:0.5rem;" onclick="SupaSync.syncDown()">
-                                <i class="fas fa-cloud-download-alt"></i> Sincronizar Agora
-                            </button>
+                            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
+                                <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="SupaSync.syncDown()">
+                                    <i class="fas fa-cloud-download-alt"></i> Sync Agora
+                                </button>
+                                <button class="btn btn-sm" style="background:#6366f1;color:#fff;font-weight:700;" onclick="SupaSync.verificarTabelas()">
+                                    <i class="fas fa-table"></i> Verificar 8 Tabelas
+                                </button>
+                            </div>
                         </div>
 
                         <!-- ÁREA DE RISCO -->
@@ -6346,7 +6345,8 @@ ORDER BY table_name;
                 sales:         'sales',
                 expenses:      'expenses',
                 prescriptions: 'prescriptions',
-                suppliers:     'suppliers'
+                suppliers:     'suppliers',
+                services:      'services'
             },
 
             // ── INICIALIZAÇÃO ─────────────────────────────────────────────────
@@ -6448,7 +6448,7 @@ ORDER BY table_name;
                 if (!navigator.onLine) { this._updatePanel(); return; }
 
                 this._syncing = true;
-                const btn = document.getElementById('rxdb-sync-toggle');
+                const btn = document.getElementById('headerSyncBtn');
                 if (btn) { btn.classList.add('syncing'); btn.title = 'Sincronizando...'; }
 
                 try {
@@ -6513,7 +6513,7 @@ ORDER BY table_name;
 
                         data.forEach(remote => {
                             try {
-                                const remoteItem = JSON.parse(remote._data);
+                                const remoteItem = typeof remote._data === 'string' ? JSON.parse(remote._data) : remote._data;
                                 // Guarda o timestamp do Supabase no item para pull futuro
                                 remoteItem._supabase_at = remote.updated_at;
                                 const local = localMap[remote.id];
@@ -6637,17 +6637,24 @@ ORDER BY table_name;
                     const { data, error } = await supabaseClient
                         .from('config').select('_data').eq('id', 'empresa').maybeSingle();
                     if (error || !data) return;
-                    const cfg = JSON.parse(data._data);
+                    const cfg = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
                     if (cfg.company)      Object.assign(state.company, cfg.company);
                     if (cfg.notificacoes) Object.assign(state.notificacoes, cfg.notificacoes);
                     if (cfg.wppMensagens) Object.assign(state.wppMensagens, cfg.wppMensagens);
                     if (cfg.backupConfig) Object.assign(state.backupConfig, cfg.backupConfig);
+                    // Atualiza form e display após sync
+                    await App.saveData(true);
+                    App.updateCompanyDisplay();
+                    if (typeof Config !== 'undefined') Config.load();
+                    if (state.company.primaryColor) document.documentElement.style.setProperty('--primary', state.company.primaryColor);
+                    if (state.company.secondaryColor) document.documentElement.style.setProperty('--secondary', state.company.secondaryColor);
+                    console.log('[LocalFirst] Config sincronizada da nuvem');
                 } catch(e) { console.warn('[LocalFirst] pullConfig:', e.message); }
             },
 
             // ── ATUALIZA PAINEL DE STATUS ─────────────────────────────────────
             _updatePanel() {
-                const panel = document.getElementById('rxdb-sync-status');
+                const panel = document.getElementById('syncStatusPanel');
                 if (!panel?.classList.contains('show')) return;
 
                 const online = navigator.onLine;
@@ -6681,7 +6688,7 @@ ORDER BY table_name;
 
                 const colMap = {
                     'ss-clients': 'clients', 'ss-products': 'products', 'ss-sales': 'sales',
-                    'ss-expenses': 'expenses', 'ss-prescriptions': 'prescriptions', 'ss-suppliers': 'suppliers'
+                    'ss-expenses': 'expenses', 'ss-prescriptions': 'prescriptions', 'ss-suppliers': 'suppliers', 'ss-services': 'services'
                 };
                 for (const [elId, stateKey] of Object.entries(colMap)) {
                     const el = document.getElementById(elId);
@@ -7142,7 +7149,6 @@ ORDER BY table_name;
                                 }
                             }
                         } catch (e2) {
-                            console.warn('Fallback ReceitaWS falhou:', e2.message);
                         }
                     }
 
@@ -7995,7 +8001,7 @@ ORDER BY table_name;
                 const presc = state.prescriptions.find(p => p.clientId === clientId);
                 
                 if (!presc) {
-                    alert('Cliente não possui receituário cadastrado');
+                    Toast.show('Cliente não possui receituário cadastrado', 'warning');
                     return;
                 }
                 
@@ -8070,7 +8076,37 @@ ORDER BY table_name;
             async deletarFornecedor(id) { return LocalFirst.deleteItem('suppliers', id); },
             async deletarServico(id)  {},
             async deletarDespesa(id)  { return LocalFirst.deleteItem('expenses', id); },
-            async syncDown()          { return LocalFirst.sync('manual'); },
+            async verificarTabelas() {
+                const tabelas = ['clients','products','sales','expenses','prescriptions','suppliers','services','config'];
+                Toast.show('Verificando tabelas no Supabase...', 'info');
+                const resultados = [];
+                for (const t of tabelas) {
+                    try {
+                        const { error } = await supabaseClient.from(t).select('id', { count: 'exact', head: true });
+                        resultados.push({ tabela: t, ok: !error, erro: error?.message });
+                    } catch(e) {
+                        resultados.push({ tabela: t, ok: false, erro: e.message });
+                    }
+                }
+                const erros = resultados.filter(r => !r.ok);
+                if (erros.length === 0) {
+                    Toast.show(`✅ Todas as 8 tabelas verificadas com sucesso!`, 'success');
+                } else {
+                    Toast.show(`⚠️ Tabelas com problema: ${erros.map(r=>r.tabela).join(', ')}. Execute o SQL Setup.`, 'warning');
+                }
+            },
+            async syncDown() {
+                const btn = document.getElementById('headerSyncBtn');
+                if (btn) btn.classList.add('syncing');
+                try {
+                    await LocalFirst.sync('manual');
+                    Toast.show('✅ Sync concluído!', 'success', 2500);
+                } catch(e) {
+                    Toast.show('❌ Erro no sync: ' + e.message, 'error');
+                } finally {
+                    if (btn) btn.classList.remove('syncing');
+                }
+            },
             async syncDelta()         { return LocalFirst.sync('delta'); },
             async migrarParaSupabase(){ return LocalFirst.sync('manual'); },
             async _flushQueue()       {}
@@ -8764,43 +8800,64 @@ ORDER BY table_name;
                 const companyAddress = addrParts.join(', ') || 'Endereço não configurado';
 
                 document.getElementById('dashboardCards').innerHTML = `
-                    <div class="card" style="border-top-color:#ff6b00;">
-                        <div class="card-header"><span class="card-title">💰 Vendas — ${label}</span><i class="fas fa-chart-line" style="color:#ff6b00"></i></div>
-                        <div class="card-value" style="color:#ff6b00;">${Utils.formatCurrency(totalSales)}</div>
-                        <div style="font-size:0.8rem;color:var(--gray);margin-top:0.25rem;">${countSales} OS • Ticket médio: ${Utils.formatCurrency(ticketMedio)}</div>
+                    <div class="card" style="--card-accent:#ff6b00;">
+                        <div class="card-header">
+                            <span class="card-title">Vendas — ${label}</span>
+                            <div class="card-icon" style="background:#fff5ee;color:#ff6b00;"><i class="fas fa-arrow-trend-up"></i></div>
+                        </div>
+                        <div class="card-value">${Utils.formatCurrency(totalSales)}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${countSales} OS &nbsp;·&nbsp; Ticket: <strong>${Utils.formatCurrency(ticketMedio)}</strong></div>
                     </div>
-                    <div class="card" style="border-top-color:#dc3545;">
-                        <div class="card-header"><span class="card-title">💸 Despesas — ${label}</span><i class="fas fa-money-bill-wave" style="color:#dc3545"></i></div>
-                        <div class="card-value" style="color:#dc3545;">${Utils.formatCurrency(totalExpenses)}</div>
-                        <div style="font-size:0.8rem;color:var(--gray);margin-top:0.25rem;">${expenses.length} lançamento${expenses.length !== 1 ? 's' : ''}</div>
+                    <div class="card" style="--card-accent:#dc3545;">
+                        <div class="card-header">
+                            <span class="card-title">Despesas — ${label}</span>
+                            <div class="card-icon" style="background:#fff0f1;color:#dc3545;"><i class="fas fa-receipt"></i></div>
+                        </div>
+                        <div class="card-value">${Utils.formatCurrency(totalExpenses)}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${expenses.length} lançamento${expenses.length !== 1 ? 's' : ''}</div>
                     </div>
-                    <div class="card" style="border-top-color:${profit >= 0 ? '#28a745' : '#dc3545'};">
-                        <div class="card-header"><span class="card-title">📈 Lucro — ${label}</span><i class="fas fa-coins" style="color:${profit >= 0 ? '#28a745' : '#dc3545'}"></i></div>
-                        <div class="card-value" style="color:${profit >= 0 ? '#28a745' : '#dc3545'};">${Utils.formatCurrency(profit)}</div>
-                        <div style="font-size:0.8rem;color:var(--gray);margin-top:0.25rem;">${profit >= 0 ? '✅ Positivo' : '⚠️ Negativo'}</div>
+                    <div class="card" style="--card-accent:${profit >= 0 ? '#22c55e' : '#dc3545'};">
+                        <div class="card-header">
+                            <span class="card-title">Resultado — ${label}</span>
+                            <div class="card-icon" style="background:${profit >= 0 ? '#f0fdf4' : '#fff0f1'};color:${profit >= 0 ? '#22c55e' : '#dc3545'};"><i class="fas fa-${profit >= 0 ? 'coins' : 'exclamation-triangle'}"></i></div>
+                        </div>
+                        <div class="card-value" style="color:${profit >= 0 ? '#22c55e' : '#dc3545'};">${Utils.formatCurrency(profit)}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${profit >= 0 ? '▲ Positivo' : '▼ Negativo'}</div>
                     </div>
-                    <div class="card" style="border-top-color:#17a2b8;">
-                        <div class="card-header"><span class="card-title">📋 OS em Aberto</span><i class="fas fa-clipboard-list" style="color:#17a2b8"></i></div>
-                        <div class="card-value" style="color:#17a2b8;">${salesPendentes}</div>
-                        <div style="font-size:0.8rem;color:var(--gray);margin-top:0.25rem;">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
+                    <div class="card" style="--card-accent:#0ea5e9;">
+                        <div class="card-header">
+                            <span class="card-title">OS em Aberto</span>
+                            <div class="card-icon" style="background:#f0f9ff;color:#0ea5e9;"><i class="fas fa-file-alt"></i></div>
+                        </div>
+                        <div class="card-value" style="color:#0ea5e9;">${salesPendentes}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
                     </div>
-                    <div class="card" style="border-top-color:#6f42c1;">
-                        <div class="card-header"><span class="card-title">👥 Clientes</span><i class="fas fa-users" style="color:#6f42c1"></i></div>
-                        <div class="card-value" style="color:#6f42c1;">${totalClients}</div>
-                        <div style="font-size:0.8rem;color:var(--gray);margin-top:0.25rem;">${totalPresc} receituário${totalPresc !== 1 ? 's' : ''} cadastrado${totalPresc !== 1 ? 's' : ''}</div>
+                    <div class="card" style="--card-accent:#8b5cf6;">
+                        <div class="card-header">
+                            <span class="card-title">Clientes</span>
+                            <div class="card-icon" style="background:#f5f3ff;color:#8b5cf6;"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="card-value" style="color:#8b5cf6;">${totalClients}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${totalPresc} receituário${totalPresc !== 1 ? 's' : ''}</div>
                     </div>
-                    <div class="card" style="border-top-color:#fd7e14;">
-                        <div class="card-header"><span class="card-title">💳 Pagamento Top</span><i class="fas fa-credit-card" style="color:#fd7e14"></i></div>
-                        <div class="card-value" style="color:#fd7e14;font-size:1.2rem;">${topPay ? payLabels[topPay[0]]||topPay[0] : '—'}</div>
-                        <div style="font-size:0.8rem;color:var(--gray);margin-top:0.25rem;">${topPay ? topPay[1]+' venda'+(topPay[1]!==1?'s':'') : 'Sem vendas'}</div>
+                    <div class="card" style="--card-accent:#f59e0b;">
+                        <div class="card-header">
+                            <span class="card-title">Pagamento Top</span>
+                            <div class="card-icon" style="background:#fffbeb;color:#f59e0b;"><i class="fas fa-award"></i></div>
+                        </div>
+                        <div class="card-value" style="color:#f59e0b;font-size:1.3rem;">${topPay ? payLabels[topPay[0]]||topPay[0] : '—'}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${topPay ? topPay[1]+' venda'+(topPay[1]!==1?'s':'') : 'Sem vendas'}</div>
                     </div>
-                    <div class="card" style="border-top-color:#20c997;grid-column:span 2;background:linear-gradient(135deg,#f8fffc,#f0fff8);">
-                        <div class="card-header"><span class="card-title">🏪 ${company.name || 'ÓticaVision Pro'}</span><i class="fas fa-store" style="color:#20c997"></i></div>
-                        <div style="font-size:0.82rem;color:var(--gray);display:flex;flex-wrap:wrap;gap:0.75rem 1.5rem;margin-top:4px;">
-                            <span><i class="fas fa-map-marker-alt" style="color:#dc3545;margin-right:4px;"></i>${companyAddress}</span>
-                            ${company.phone ? `<span><i class="fas fa-phone" style="color:#28a745;margin-right:4px;"></i>${company.phone}</span>` : ''}
-                            ${company.cnpj  ? `<span><i class="fas fa-id-card" style="color:#17a2b8;margin-right:4px;"></i>CNPJ: ${company.cnpj}</span>` : ''}
-                            ${company.pix   ? `<span><i class="fas fa-qrcode" style="color:#6f42c1;margin-right:4px;"></i>PIX: ${company.pix}</span>` : ''}
+                    <div class="card" style="--card-accent:#10b981;grid-column:span 2;">
+                        <div class="card-header">
+                            <span class="card-title" style="font-size:0.8rem;font-weight:700;color:var(--dark);">${company.name || 'ÓticaVision Pro'}</span>
+                            <div class="card-icon" style="background:#f0fdf4;color:#10b981;"><i class="fas fa-store"></i></div>
+                        </div>
+                        <div style="font-size:0.8rem;color:var(--gray);display:flex;flex-wrap:wrap;gap:0.5rem 1.5rem;">
+                            <span><i class="fas fa-map-marker-alt" style="color:#dc3545;margin-right:4px;width:14px;text-align:center;"></i>${companyAddress}</span>
+                            ${company.phone ? `<span><i class="fas fa-phone" style="color:#22c55e;margin-right:4px;width:14px;text-align:center;"></i>${company.phone}</span>` : ''}
+                            ${company.cnpj  ? `<span><i class="fas fa-id-card" style="color:#0ea5e9;margin-right:4px;width:14px;text-align:center;"></i>CNPJ: ${company.cnpj}</span>` : ''}
+                            ${company.pix   ? `<span><i class="fas fa-qrcode" style="color:#8b5cf6;margin-right:4px;width:14px;text-align:center;"></i>PIX: ${company.pix}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -9137,6 +9194,13 @@ ORDER BY table_name;
             clearForm() {
                 document.getElementById('clientForm').reset();
                 state.editingId = null;
+                // Limpa explicitamente todos os campos de texto do cliente
+                ['clientName','clientPhone','clientEmail','clientCpf','clientCep',
+                 'clientAddress','clientNumber','clientComplement','clientNeighborhood',
+                 'clientCity','clientState'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
                 document.getElementById('clientCode').value = 'CLI-' + (state.clients.length + 1).toString().padStart(3, '0');
                 document.getElementById('clientBirthDate').value = new Date().toISOString().slice(0,10);
                 // Limpa receituário silenciosamente (sem confirm) ao resetar o formulário
@@ -11340,38 +11404,12 @@ ${container.innerHTML}
                 this.calcCashRetirada();
             },
 
-            // ── MODO DE PAGAMENTO (único / misto) ────────────────────────────
+            // ── MODO DE PAGAMENTO (único) ────────────────────────────
             setPaymentMode(mode) {
                 const single = document.getElementById('paymentSingleMode');
-                const mixed  = document.getElementById('paymentMixedMode');
-                const lblS   = document.getElementById('lbl-payment-single');
-                const lblM   = document.getElementById('lbl-payment-mixed');
-
-                if (mode === 'mixed') {
-                    if (single) single.classList.add('d-none');
-                    if (mixed)  mixed.classList.remove('d-none');
-                    // Oculta detalhes de método único
-                    ['creditDetails','installmentDetails','pixDetails','cashDetails','debitDetails',
-                     'transferDetails','chequeDetails','voucherDetails'].forEach(id => {
-                        document.getElementById(id)?.classList.add('d-none');
-                    });
-                    if (lblM) { lblM.style.background = 'var(--primary)'; lblM.style.color = '#fff'; lblM.style.borderColor = 'var(--primary)'; }
-                    if (lblS) { lblS.style.background = '#fff'; lblS.style.color = '#333'; lblS.style.borderColor = '#aaa'; }
-                    state.currentSale.paymentMode = 'mixed';
-                    // Adiciona 2 linhas iniciais se ainda vazio
-                    if (!document.querySelector('.mixed-row')) {
-                        this.addMixedRow();
-                        this.addMixedRow();
-                    }
-                    this.updateMixedTotals();
-                } else {
-                    if (mixed)  mixed.classList.add('d-none');
-                    if (single) single.classList.remove('d-none');
-                    if (lblS) { lblS.style.background = 'var(--primary)'; lblS.style.color = '#fff'; lblS.style.borderColor = 'var(--primary)'; }
-                    if (lblM) { lblM.style.background = '#fff'; lblM.style.color = '#333'; lblM.style.borderColor = '#6c757d'; }
-                    state.currentSale.paymentMode = 'single';
-                    this.selectPayment(state.currentSale.paymentMethod || 'installment');
-                }
+                if (single) single.classList.remove('d-none');
+                state.currentSale.paymentMode = 'single';
+                this.selectPayment(state.currentSale.paymentMethod || 'installment');
             },
 
             addMixedRow() {
@@ -11432,30 +11470,51 @@ ${container.innerHTML}
                     .map(r => `${labels[r.method]||r.method}: ${Utils.formatCurrency(r.value)}`).join(' + ');
             },
 
+            // Calcula com base no % da entrada (quando o usuário altera o %)
             calculateInstallments() {
                 const total = state.currentSale.total;
                 document.getElementById('totalSaleValue').innerText = Utils.formatCurrency(total);
                 
                 const entryPercent = parseFloat(document.getElementById('entryPercent').value) / 100;
                 const entryValue = total * entryPercent;
-                const remaining = total - entryValue;
+                // Sincroniza o campo de entrada editável
+                const entryEl = document.getElementById('entryValue');
+                if (entryEl) { 
+                    const v = entryValue.toFixed(2);
+                    entryEl.value = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                }
+                this.calculateInstallmentsFromValue();
+            },
+
+            // Calcula parcelas usando o valor de entrada digitado diretamente
+            calculateInstallmentsFromValue() {
+                const total = state.currentSale.total;
+                document.getElementById('totalSaleValue').innerText = Utils.formatCurrency(total);
+
+                const entryValue = Utils.parseMoney(document.getElementById('entryValue')?.value) || 0;
+                const retiradaEntry = Utils.parseMoney(document.getElementById('retiradaEntry')?.value) || 0;
+                // Sincroniza percentual
+                const entryPercent = total > 0 ? (entryValue / total * 100) : 0;
+                const entryPercentEl = document.getElementById('entryPercent');
+                if (entryPercentEl) entryPercentEl.value = Math.round(entryPercent);
+
+                const remaining = Math.max(0, total - entryValue - retiradaEntry);
                 const installments = parseInt(document.getElementById('installmentCount').value);
-                const installmentValue = remaining / installments;
+                const installmentValue = installments > 0 ? remaining / installments : 0;
                 
-                document.getElementById('entryValue').innerText = Utils.formatCurrency(entryValue);
                 document.getElementById('installmentValue').innerText = Utils.formatCurrency(installmentValue);
-                
                 document.getElementById('entrySummary').innerText = Utils.formatCurrency(entryValue);
                 document.getElementById('balanceSummary').innerText = Utils.formatCurrency(remaining);
                 document.getElementById('totalParcelsSummary').innerText = installments + 'x';
 
-                // Alerta de retirada: restante = saldo parcelado
+                // Alerta de retirada
                 const alertEl = document.getElementById('retiradaAlert');
                 const valorEl = document.getElementById('retiradaValor');
                 const infoEl  = document.getElementById('retiradaInfo');
-                if (alertEl) alertEl.style.display = remaining > 0.01 ? 'flex' : 'none';
-                if (valorEl) valorEl.textContent = Utils.formatCurrency(remaining);
-                if (infoEl)  infoEl.textContent = `Entrada: ${Utils.formatCurrency(entryValue)} + ${installments}x de ${Utils.formatCurrency(installmentValue)}`;
+                const totalRetirada = retiradaEntry;
+                if (alertEl) alertEl.style.display = (retiradaEntry > 0.01 || remaining > 0.01) ? 'flex' : 'none';
+                if (valorEl) valorEl.textContent = Utils.formatCurrency(retiradaEntry > 0 ? retiradaEntry : remaining);
+                if (infoEl)  infoEl.textContent = `Entrada: ${Utils.formatCurrency(entryValue)}${retiradaEntry > 0 ? ' | Retirada: ' + Utils.formatCurrency(retiradaEntry) : ''} | ${installments}x de ${Utils.formatCurrency(installmentValue)}`;
 
                 
                 let firstDate = document.getElementById('firstDueDate').value;
@@ -11513,8 +11572,9 @@ ${container.innerHTML}
                 }
                 
                 state.currentSale.paymentDetails = {
-                    entryPercent: entryPercent * 100,
+                    entryPercent: entryPercent,
                     entryValue: entryValue,
+                    retiradaEntry: retiradaEntry,
                     installments: installments,
                     installmentValue: installmentValue,
                     parcels: parcels,
@@ -11815,12 +11875,26 @@ ${container.innerHTML}
                 // Selecionar método de pagamento
                 this.selectPayment(sale.paymentMethod);
 
+                // Restaurar profissional
+                if (profEl) profEl.value = sale.professional || '';
+
                 // Se for crediário, restaurar campos de parcelas e recalcular
                 if (sale.paymentMethod === 'installment' && sale.paymentDetails) {
-                    document.getElementById('entryPercent').value = sale.paymentDetails.entryPercent;
-                    document.getElementById('installmentCount').value = sale.paymentDetails.installments;
+                    const pDet = sale.paymentDetails;
+                    const entryValEl = document.getElementById('entryValue');
+                    if (entryValEl) {
+                        const ev = (pDet.entryValue || 0).toFixed(2);
+                        entryValEl.value = ev.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    }
+                    const retEl = document.getElementById('retiradaEntry');
+                    if (retEl) {
+                        const rv = (pDet.retiradaEntry || 0).toFixed(2);
+                        retEl.value = rv.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    }
+                    document.getElementById('entryPercent').value = pDet.entryPercent || 0;
+                    document.getElementById('installmentCount').value = pDet.installments;
                     // Recalcular parcelas (isso também vai gerar paymentDetails novamente, mas usaremos os dados salvos)
-                    this.calculateInstallments(); // vai gerar novas parcelas, mas podemos substituir pelos dados salvos
+                    this.calculateInstallmentsFromValue(); // vai gerar novas parcelas, mas podemos substituir pelos dados salvos
                     // Substituir as parcelas geradas pelos dados salvos
                     if (sale.paymentDetails.parcels) {
                         state.currentSale.paymentDetails.parcels = sale.paymentDetails.parcels.map(p => ({ ...p }));
@@ -11887,25 +11961,25 @@ ${container.innerHTML}
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#444':'#000'};color:#fff">OD</td><td>Longe</td>
+                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OD</td><td>Longe</td>
                                         <td>${presc.od?.sph || '0.00'}</td><td>${presc.od?.cyl || '0.00'}</td>
                                         <td>${presc.od?.axis || '0°'}</td><td>${presc.od?.add || '0.00'}</td>
                                         <td>${presc.od?.dnp || '—'}</td>
                                     </tr>
                                     <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#444':'#000'};color:#fff">OE</td><td>Longe</td>
+                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OE</td><td>Longe</td>
                                         <td>${presc.oe?.sph || '0.00'}</td><td>${presc.oe?.cyl || '0.00'}</td>
                                         <td>${presc.oe?.axis || '0°'}</td><td>${presc.oe?.add || '0.00'}</td>
                                         <td>${presc.oe?.dnp || '—'}</td>
                                     </tr>
                                     <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#444':'#000'};color:#fff">OD</td><td>Perto</td>
+                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OD</td><td>Perto</td>
                                         <td>${presc.od?.sph && presc.od?.add ? (parseFloat(presc.od.sph)+parseFloat(presc.od.add)).toFixed(2) : '0.00'}</td>
                                         <td>${presc.od?.cyl || '0.00'}</td><td>${presc.od?.axis || '0°'}</td><td>—</td>
                                         <td>${presc.od?.dnp ? (parseFloat(presc.od.dnp)-2.5).toFixed(1) : '—'}</td>
                                     </tr>
                                     <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#444':'#000'};color:#fff">OE</td><td>Perto</td>
+                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OE</td><td>Perto</td>
                                         <td>${presc.oe?.sph && presc.oe?.add ? (parseFloat(presc.oe.sph)+parseFloat(presc.oe.add)).toFixed(2) : '0.00'}</td>
                                         <td>${presc.oe?.cyl || '0.00'}</td><td>${presc.oe?.axis || '0°'}</td><td>—</td>
                                         <td>${presc.oe?.dnp ? (parseFloat(presc.oe.dnp)-2.5).toFixed(1) : '—'}</td>
@@ -12783,7 +12857,7 @@ ${container.innerHTML}
             sendWhatsApp() {
                 const client = state.clients.find(c => c.id === state.currentSale.clientId);
                 if (!client || !client.phone) {
-                    alert('Cliente não possui telefone cadastrado');
+                    Toast.show('Cliente não possui telefone cadastrado', 'warning');
                     return;
                 }
                 
@@ -13014,6 +13088,13 @@ ${container.innerHTML}
                 if (discountEl) discountEl.value = '0';
                 if (additionEl) additionEl.value = '0';
                 if (obsEl) obsEl.value = '';
+                if (professionalEl) professionalEl.value = '';
+                const entryValEl = document.getElementById('entryValue');
+                if (entryValEl) entryValEl.value = '0';
+                const retiradaEntryEl = document.getElementById('retiradaEntry');
+                if (retiradaEntryEl) retiradaEntryEl.value = '0';
+                const entryPctEl = document.getElementById('entryPercent');
+                if (entryPctEl) entryPctEl.value = '0';
                 if (selectedClientEl) selectedClientEl.style.display = 'none';
                 if (prescSectionEl) prescSectionEl.style.display = 'none';
                 if (clientSearchEl) clientSearchEl.style.display = 'none';
@@ -13282,7 +13363,6 @@ ${container.innerHTML}
             BackupManager.init();
             KeyboardShortcuts.init();
             LogSystem.log('info', 'Sistema Iniciado', 'ÓticaVision Pro v2.0');
-            console.log('🚀 ÓticaVision Pro v2.0 - Melhorias Carregadas');
             // Melhorias de interface integradas (evita race condition com segundo DOMContentLoaded)
             setTimeout(() => {
                 adicionarTooltips();
@@ -13427,7 +13507,6 @@ ${container.innerHTML}
 
                 // Atualiza próximo backup no estado
                 state.backupConfig.nextAutoBackup = alvo.toISOString();
-                console.log('[Backup] Próximo backup diário:', alvo.toLocaleString('pt-BR'));
             },
 
             // Verificação por intervalo (garante que o sistema não "perdeu" o horário)
@@ -13475,14 +13554,12 @@ ${container.innerHTML}
 
                     // Notifica usuário
                     Toast.show('✅ Backup diário realizado às ' + new Date(timestamp).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 'success', 4000);
-                    console.log('[Backup] Backup diário concluído:', timestamp);
 
                     // Atualiza painel se Configurações estiver aberta
                     if (document.getElementById('tabBackup')?.style.display !== 'none') {
                         Config.renderBackupStatus();
                     }
                 } else {
-                    console.log('[Backup] Backup automático (sessão):', timestamp);
                 }
             },
 
@@ -13760,7 +13837,6 @@ ${container.innerHTML}
             });
         }
         
-        console.log('✅ Todas as melhorias foram aplicadas com sucesso!');
     
 </script>
 
@@ -13894,96 +13970,8 @@ ${container.innerHTML}
 </script>
 <!-- ===== /PWA ===== -->
 
-<!-- ===== RXDB SYNC STATUS INDICATOR ===== -->
-<style>
-  #rxdb-sync-status {
-    position: fixed; bottom: 70px; right: 16px;
-    background: #1e1e2e; color: #cdd6f4;
-    border: 1px solid #313244; border-radius: 10px;
-    padding: 10px 14px; font-size: 0.78rem;
-    font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-    z-index: 9998; min-width: 200px;
-    transition: opacity 0.3s;
-    display: none;
-  }
-  #rxdb-sync-status.show { display: block; }
-  #rxdb-sync-status .sync-row { display: flex; justify-content: space-between; gap: 12px; margin: 2px 0; }
-  #rxdb-sync-status .sync-label { color: #a6e3a1; font-weight: 600; }
-  #rxdb-sync-status .sync-ok   { color: #a6e3a1; }
-  #rxdb-sync-status .sync-err  { color: #f38ba8; }
-  #rxdb-sync-status .sync-off  { color: #fab387; }
-  #rxdb-sync-status .sync-head { font-weight: 700; color: #89b4fa; margin-bottom: 6px; border-bottom: 1px solid #313244; padding-bottom: 4px; }
-  #rxdb-sync-toggle {
-    position: fixed; bottom: 70px; right: 16px;
-    background: #1e1e2e; color: #89b4fa;
-    border: 1px solid #313244; border-radius: 50%;
-    width: 36px; height: 36px; font-size: 16px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 9999;
-    transition: background 0.2s;
-  }
-  #rxdb-sync-toggle:hover { background: #313244; }
-  #rxdb-sync-toggle.syncing { animation: spin 1s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-</style>
 
-<button id="rxdb-sync-toggle" title="Status de sincronização">☁️</button>
-<div id="rxdb-sync-status">
-  <div class="sync-head">⚡ Local-First Sync</div>
-  <div class="sync-row"><span>Engine local:</span><span id="ss-engine" class="sync-ok">IndexedDB</span></div>
-  <div class="sync-row"><span>Status:</span><span id="ss-status" class="sync-ok">Aguardando...</span></div>
-  <div class="sync-row"><span>Realtime:</span><span id="ss-realtime" class="sync-ok">Conectando...</span></div>
-  <div class="sync-row"><span>Último sync:</span><span id="ss-last">—</span></div>
-  <div class="sync-row"><span>Fila offline:</span><span id="ss-queue" class="sync-ok">0 ops</span></div>
-  <div class="sync-row"><span>Clientes:</span><span id="ss-clients">—</span></div>
-  <div class="sync-row"><span>Produtos:</span><span id="ss-products">—</span></div>
-  <div class="sync-row"><span>Vendas:</span><span id="ss-sales">—</span></div>
-  <div class="sync-row"><span>Despesas:</span><span id="ss-expenses">—</span></div>
-  <div class="sync-row"><span>Prescrições:</span><span id="ss-prescriptions">—</span></div>
-  <div class="sync-row"><span>Fornecedores:</span><span id="ss-suppliers">—</span></div>
-  <div style="margin-top:8px; border-top:1px solid #313244; padding-top:6px; display:flex; gap:4px;">
-    <button onclick="LocalFirst.sync('manual')" style="background:#89b4fa;color:#1e1e2e;border:none;border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:700;flex:1;">🔄 Sync</button>
-    <button onclick="LocalFirst.pushConfig()" style="background:#a6e3a1;color:#1e1e2e;border:none;border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:700;flex:1;">⚙️ Config</button>
-  </div>
-</div>
 
-<script>
-(function(){
-  // Toggle painel
-  document.getElementById('rxdb-sync-toggle').addEventListener('click', function(){
-    const panel = document.getElementById('rxdb-sync-status');
-    if (panel.classList.contains('show')) {
-      panel.classList.remove('show');
-      panel.style.bottom = '70px';
-      this.style.bottom  = '70px';
-    } else {
-      panel.classList.add('show');
-      panel.style.bottom = '116px';
-      this.style.bottom  = '116px';
-      if(typeof LocalFirst !== 'undefined') LocalFirst._updatePanel();
-    }
-  });
-
-  // Painel atualizado pelo LocalFirst._updatePanel()
-  window._updateSyncPanel = function() {
-    if (typeof LocalFirst !== 'undefined') LocalFirst._updatePanel();
-  };
-
-  // Atualiza painel a cada 5s se estiver aberto
-  setInterval(() => { if(typeof LocalFirst !== 'undefined') LocalFirst._updatePanel(); }, 5000);
-})();
-</script>
-<!-- ===== /RXDB SYNC STATUS INDICATOR ===== -->
-
-<!--
-  ╔══════════════════════════════════════════════════════════════════════════╗
-  ║  SUPABASE — SQL LocalFirst (sincronizado com o botão "Setup" em Config) ║
-  ║  Tabelas: clients, products, sales, expenses,                           ║
-  ║           prescriptions, suppliers, config                              ║
-  ║  Estrutura: id TEXT PK + _data TEXT (JSON) + updated_at TIMESTAMPTZ     ║
-  ╚══════════════════════════════════════════════════════════════════════════╝
--->
 
 </body>
 </html>
