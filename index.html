@@ -144,16 +144,37 @@
         }
 
         .dark-mode .sidebar {
-            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            background: linear-gradient(180deg, #1c1c1c 0%, #111111 100%);
         }
 
         .dark-mode .menu-item:hover,
         .dark-mode .menu-item.active {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.10);
         }
 
         .dark-mode .header {
-            border-color: #333;
+            border-color: #222;
+            background: #161616;
+        }
+
+        .dark-mode .main-content {
+            background: #111111;
+        }
+
+        .dark-mode .header-left h1 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .section-title {
+            color: #cccccc;
+        }
+
+        .dark-mode .card-value {
+            color: #e8e8e8;
+        }
+
+        .dark-mode .card {
+            border-top-color: #444;
         }
 
         .dark-mode .badge {
@@ -196,8 +217,8 @@
         }
 
         .dark-mode .presc-rapida {
-            background-color: #2a2a1a;
-            border-left-color: #888;
+            background-color: #1e1e1e;
+            border-left-color: #555;
         }
 
         .dark-mode .presc-field {
@@ -223,7 +244,7 @@
         }
 
         .dark-mode .datetime-widget .time {
-            color: #ff9944;
+            color: #e8e8e8;
         }
 
         .dark-mode .datetime-widget .date {
@@ -231,19 +252,19 @@
         }
 
         .dark-mode .header-left h1 {
-            color: #ff9944;
+            color: #e0e0e0;
         }
 
         .dark-mode .section-title {
-            color: #ff9944;
+            color: #cccccc;
         }
 
         .dark-mode .card-value {
-            color: #ff9944;
+            color: #e8e8e8;
         }
 
         .dark-mode .card {
-            border-top-color: #ff9944;
+            border-top-color: #444444;
         }
 
         .dark-mode #pixDetails > div,
@@ -307,7 +328,7 @@
             min-height: 100vh;
         }
         .dark-mode body {
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: #111111;
         }
 
         /* ===== LAYOUT PRINCIPAL ===== */
@@ -317,30 +338,26 @@
         }
 
         .sidebar {
-            width: 80px;
+            width: 120px;
             background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             position: fixed;
             height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             transition: width 0.3s cubic-bezier(.4,0,.2,1);
             z-index: 100;
             box-shadow: 2px 0 32px rgba(0,0,0,0.25);
             display: flex;
             flex-direction: column;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+        .sidebar::-webkit-scrollbar { display: none; width: 0; }
 
         .sidebar-header {
-            padding: 1rem 0.5rem 0.8rem;
+            padding: 0.6rem 0.5rem 0.5rem;
             border-bottom: 1px solid rgba(255,255,255,0.07);
             flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         .close-sidebar {
@@ -364,14 +381,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.3rem;
             width: 100%;
         }
 
         /* ── Sidebar: logo circular ── */
         .logo-wrapper {
-            width: 52px;
-            height: 52px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             overflow: hidden;
             cursor: pointer;
@@ -387,8 +404,8 @@
         .logo-wrapper:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(0,0,0,0.4); }
         .logo-img { display: none !important; }
         .logo-placeholder {
-            width: 52px;
-            height: 52px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.2s;
@@ -398,7 +415,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             color: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
@@ -408,11 +425,13 @@
             font-size: 0.62rem;
             font-weight: 700;
             color: white;
-            word-break: break-word;
             letter-spacing: 0.1px;
             line-height: 1.2;
             text-align: center;
-            max-width: 76px;
+            width: 100%;
+            white-space: normal;
+            word-break: break-word;
+            overflow: visible;
         }
 
         .company-subtitle {
@@ -421,44 +440,52 @@
 
         .sidebar-menu {
             flex: 1;
-            padding: 0.5rem 0.4rem;
-            overflow-y: auto;
+            padding: 0.2rem 0.4rem;
+            overflow: hidden; /* nunca mostra scrollbar */
         }
 
         .sidebar-section-label {
-            padding: 1rem 0.6rem 0.4rem;
-            font-size: 0.58rem;
+            padding: 0.4rem 0.4rem 0.15rem;
+            font-size: 0.5rem;
             font-weight: 700;
             color: rgba(255,255,255,0.25);
-            letter-spacing: 2.5px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            display: none;
+            text-align: center;
         }
 
         .menu-item {
-            padding: 0.7rem 0.5rem;
+            padding: 0.38rem 0.4rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 2px;
             cursor: pointer;
             transition: all 0.18s;
-            border-radius: 9px;
+            border-radius: 8px;
             color: rgba(255,255,255,0.55);
-            font-size: 0.84rem;
+            font-size: 0.82rem;
             font-weight: 500;
             margin-bottom: 1px;
             position: relative;
         }
 
         .menu-item span {
-            display: none;
+            display: block;
+            font-size: 0.58rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 108px;
+            line-height: 1.1;
         }
 
         .menu-item i {
-            width: 18px;
+            width: 16px;
             text-align: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
 
@@ -484,33 +511,34 @@
         }
 
         .sidebar-footer {
-            padding: 0.6rem 0.4rem;
+            padding: 0.4rem 0.4rem;
             border-top: 1px solid rgba(255,255,255,0.07);
             flex-shrink: 0;
         }
 
         .theme-toggle {
             width: 100%;
-            padding: 0.6rem 0.5rem;
+            padding: 0.4rem 0.4rem;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.08);
             color: rgba(255,255,255,0.55);
-            border-radius: 9px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 2px;
             transition: all 0.18s;
-            font-size: 0.83rem;
+            font-size: 0.56rem;
             font-weight: 500;
         }
-        .theme-toggle span { display: none; }
+        .theme-toggle span { display: block; }
+        .theme-toggle i { font-size: 0.85rem; }
         .theme-toggle:hover { background: rgba(255,255,255,0.1); color: white; }
 
         .main-content {
             flex: 1;
-            margin-left: 80px;
+            margin-left: 120px;
             padding: 1.5rem;
             transition: margin-left 0.3s cubic-bezier(.4,0,.2,1);
             min-width: 0;
@@ -972,13 +1000,13 @@
         .dark-mode .wpp-sidebar        { background: #1e1e1e; }
         .dark-mode .wpp-nav-item       { color: #ddd; border-color: #333; }
         .dark-mode .wpp-nav-item:hover { background: #1a2e1a; }
-        .dark-mode .wpp-nav-item.active{ background: #1a3a1a; color: #86efac; }
+        .dark-mode .wpp-nav-item.active{ background: #2a2a2a; color: #e0e0e0; }
         .dark-mode .wpp-editor-panel   { background: #1e1e1e; }
         .dark-mode .wpp-textarea       { background: #2d2d2d; border-color: #444; color: #e0e0e0; }
-        .dark-mode .wpp-vars-section   { border-color: #2d4a2d; }
-        .dark-mode .wpp-vars-header    { background: #1a2a1a; }
+        .dark-mode .wpp-vars-section   { border-color: #333333; }
+        .dark-mode .wpp-vars-header    { background: #1e1e1e; }
         .dark-mode .wpp-vars-chips     { background: #1e1e1e; }
-        .dark-mode .wpp-chip           { background: #1a3a1a; color: #86efac; border-color: #2d5a2d; }
+        .dark-mode .wpp-chip           { background: #2a2a2a; color: #cccccc; border-color: #444444; }
         .dark-mode .wpp-action-bar     { background: #252525; border-color: #333; }
 
         .chart-container {
@@ -1318,10 +1346,10 @@
         .retirada-alert .valor { font-size: 1.4rem; font-weight: 900; color: #c62828; }
         /* dark mode */
         .dark-mode .payment-card { background: #2d2d2d; border-color: #444; color: #e0e0e0; }
-        .dark-mode .payment-card:hover { border-color: #ffaa33; background: #3d2a1a; }
-        .dark-mode .payment-card.active { border-color: #ffaa33; background: #3d2a1a; }
-        .dark-mode .pay-summary-box { background: #2d2417; border-color: #6b3a0a; }
-        .dark-mode .pay-summary-row { border-color: #4a2f0a; }
+        .dark-mode .payment-card:hover { border-color: #888888; background: #2d2d2d; }
+        .dark-mode .payment-card.active { border-color: #aaaaaa; background: #333333; }
+        .dark-mode .pay-summary-box { background: #1e1e1e; border-color: #444444; }
+        .dark-mode .pay-summary-row { border-color: #333333; }
         .dark-mode .pay-summary-row .label { color: #bbb; }
         .dark-mode .pay-summary-row .value { color: #eee; }
 
@@ -2094,7 +2122,7 @@
             .sidebar .sidebar-section-label,
             .sidebar .menu-item span,
             .sidebar-footer .theme-toggle span { display: none; }
-            .main-content { margin-left: 80px; }
+            .main-content { margin-left: 120px; }
             .menu-item { justify-content: center; padding: 0.7rem; border-radius: 9px; }
             .menu-item i { font-size: 1.05rem; }
             .menu-item.active::before { display: none; }
@@ -5837,26 +5865,18 @@
                     <div class="form-container">
                         <h3 style="color: var(--primary); margin-bottom: 1.5rem;"><i class="fas fa-database"></i> Backup e Restauração</h3>
 
-                        <!-- WIDGET LOCAL-FIRST SYNC -->
-                        <div class="sync-status-panel" id="syncStatusPanel">
-                            <h4>⚡ Local-First Sync</h4>
-                            <div class="sync-row"><span class="sync-label">Engine local:</span><span class="sync-ok" id="ss-engine">IndexedDB</span></div>
-                            <div class="sync-row"><span class="sync-label">Status:</span><span id="ss-status" class="sync-ok">🟢 Online</span></div>
-                            <div class="sync-row"><span class="sync-label">Realtime:</span><span id="ss-realtime" class="sync-ok">Conectando...</span></div>
-                            <div class="sync-row"><span class="sync-label">Último sync:</span><span id="ss-last" class="sync-ok">—</span></div>
-                            <div class="sync-row"><span class="sync-label">Fila offline:</span><span id="ss-queue" class="sync-ok">0 ops</span></div>
-                            <div class="sync-row"><span class="sync-label">Clientes:</span><span id="ss-clients" class="sync-ok">0 reg.</span></div>
-                            <div class="sync-row"><span class="sync-label">Produtos:</span><span id="ss-products" class="sync-ok">0 reg.</span></div>
-                            <div class="sync-row"><span class="sync-label">Vendas:</span><span id="ss-sales" class="sync-ok">0 reg.</span></div>
-                            <div class="sync-row"><span class="sync-label">Despesas:</span><span id="ss-expenses" class="sync-ok">0 reg.</span></div>
-                            <div class="sync-row"><span class="sync-label">Prescrições:</span><span id="ss-prescriptions" class="sync-ok">0 reg.</span></div>
-                            <div class="sync-row"><span class="sync-label">Fornecedores:</span><span id="ss-suppliers" class="sync-ok">0 reg.</span></div>
-                            <div class="sync-actions">
-                                <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="LocalFirst.sync('manual').then(()=>LocalFirst._updatePanel())">
-                                    <i class="fas fa-sync"></i> Sync
-                                </button>
-                                <button class="btn btn-sm" style="background:#6366f1;color:#fff;font-weight:700;" onclick="LocalFirst._updatePanel()">
-                                    <i class="fas fa-cog"></i> Atualizar Status
+                        <!-- SYNC RÁPIDO -->
+                        <div style="background: linear-gradient(135deg, #1e1e2e, #2a2a3e); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+                            <div style="display:flex; align-items:center; gap:0.75rem;">
+                                <div id="syncBtnStatusDot" style="width:12px;height:12px;border-radius:50%;background:#a6e3a1;box-shadow:0 0 6px #a6e3a1;flex-shrink:0;"></div>
+                                <div>
+                                    <div style="color:white;font-weight:700;font-size:0.95rem;">⚡ Local-First Sync</div>
+                                    <div id="syncBtnStatusText" style="color:#a6adc8;font-size:0.78rem;margin-top:2px;">Último sync: <span id="syncBtnLastTime">—</span></div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                                <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="LocalFirst.sync('manual').then(()=>{ const t=new Date().toLocaleTimeString('pt-BR'); document.getElementById('syncBtnLastTime').textContent=t; Toast.show('Sync concluído!','success'); })">
+                                    <i class="fas fa-sync"></i> Sincronizar Agora
                                 </button>
                             </div>
                         </div>
@@ -14331,9 +14351,13 @@ ${container.innerHTML}
 
   function checkOnline() {
     var bar = document.getElementById('pwa-offline-bar');
-    if (!navigator.onLine) { bar.classList.add('visible'); }
-    else {
+    var dot = document.getElementById('syncBtnStatusDot');
+    if (!navigator.onLine) {
+      bar.classList.add('visible');
+      if(dot) { dot.style.background='#f38ba8'; dot.style.boxShadow='0 0 6px #f38ba8'; }
+    } else {
       bar.classList.remove('visible');
+      if(dot) { dot.style.background='#a6e3a1'; dot.style.boxShadow='0 0 6px #a6e3a1'; }
       if (swReg && 'sync' in swReg) swReg.sync.register('sync-data').catch(function(){});
     }
   }
