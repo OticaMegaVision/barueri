@@ -317,7 +317,7 @@
         }
 
         .sidebar {
-            width: 66px;
+            width: 80px;
             background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             position: fixed;
@@ -370,8 +370,8 @@
 
         /* ── Sidebar: logo circular ── */
         .logo-wrapper {
-            width: 42px;
-            height: 42px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             overflow: hidden;
             cursor: pointer;
@@ -387,8 +387,8 @@
         .logo-wrapper:hover { transform: scale(1.05); box-shadow: 0 4px 18px rgba(0,0,0,0.4); }
         .logo-img { display: none !important; }
         .logo-placeholder {
-            width: 42px;
-            height: 42px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.2s;
@@ -398,24 +398,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
             color: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         .logo-placeholder:hover { transform: scale(1.05); }
 
         .company-name {
-            font-size: 0.6rem;
+            font-size: 0.62rem;
             font-weight: 700;
             color: white;
             word-break: break-word;
             letter-spacing: 0.1px;
             line-height: 1.2;
             text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 60px;
+            max-width: 76px;
         }
 
         .company-subtitle {
@@ -513,7 +510,7 @@
 
         .main-content {
             flex: 1;
-            margin-left: 66px;
+            margin-left: 80px;
             padding: 1.5rem;
             transition: margin-left 0.3s cubic-bezier(.4,0,.2,1);
             min-width: 0;
@@ -2097,7 +2094,7 @@
             .sidebar .sidebar-section-label,
             .sidebar .menu-item span,
             .sidebar-footer .theme-toggle span { display: none; }
-            .main-content { margin-left: 66px; }
+            .main-content { margin-left: 80px; }
             .menu-item { justify-content: center; padding: 0.7rem; border-radius: 9px; }
             .menu-item i { font-size: 1.05rem; }
             .menu-item.active::before { display: none; }
@@ -3664,6 +3661,36 @@
         
 
     
+
+        /* ===== SYNC STATUS PANEL ===== */
+        .sync-status-panel {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .sync-status-panel h4 { color: #89b4fa; font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .sync-row { display: flex; justify-content: space-between; padding: 0.35rem 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .sync-label { color: #a6adc8; }
+        .sync-ok { color: #a6e3a1; font-weight: 600; }
+        .sync-off { color: #f38ba8; font-weight: 600; }
+        .sync-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+        .conta-item { background: white; border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.5rem; border-left: 4px solid var(--success); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-wrap: wrap; }
+        .conta-item.pagar { border-left-color: var(--danger); }
+        .conta-item.vencida { border-left-color: var(--warning); background: #fffbf0; }
+        .conta-item.paga { opacity: 0.65; background: #f0fff4; border-left-color: #aaa; }
+        .conta-item-info { flex: 1; min-width: 0; }
+        .conta-item-nome { font-weight: 600; font-size: 0.88rem; color: var(--dark); }
+        .conta-item-det { font-size: 0.76rem; color: var(--gray); margin-top: 2px; }
+        .conta-item-valor { font-weight: 700; font-size: 0.95rem; color: var(--success); white-space: nowrap; }
+        .conta-item.pagar .conta-item-valor { color: var(--danger); }
+        .conta-item-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+        .dark-mode .conta-item { background: #1a1d27; }
+        .dark-mode .conta-item.vencida { background: #2a2510; }
+        .dark-mode .conta-item.paga { background: #1a2a1a; }
 </style>
 
 <!-- Estilos de qualidade extra para documentos PDF e impressão -->
@@ -3796,7 +3823,104 @@
 
                 <div class="dashboard-cards" id="dashboardCards"></div>
 
-                <!-- Painéis de alertas WhatsApp -->
+                <!-- CONTAS A RECEBER E A PAGAR -->
+                <div class="dashboard-charts" id="contasPaineis" style="margin-bottom: 1rem;">
+                    <!-- Contas a Receber -->
+                    <div class="chart-container" style="padding: 1.25rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem;">
+                            <div class="chart-title" style="margin-bottom:0; color:#28a745;">
+                                <i class="fas fa-arrow-circle-down" style="margin-right:0.4rem;"></i>Contas a Receber
+                            </div>
+                            <button class="btn btn-sm" style="background:#28a745;color:white;font-size:0.78rem;" onclick="ContasManager.showModal('receber')">
+                                <i class="fas fa-plus"></i> Nova
+                            </button>
+                        </div>
+                        <div id="contasReceberTotal" style="font-size:1.3rem;font-weight:700;color:#28a745;margin-bottom:0.75rem;">R$ 0,00</div>
+                        <div id="contasReceberList" style="max-height:220px;overflow-y:auto;">
+                            <p style="color:var(--gray);font-size:0.85rem;text-align:center;padding:1rem 0;">Nenhuma conta a receber</p>
+                        </div>
+                    </div>
+                    <!-- Contas a Pagar -->
+                    <div class="chart-container" style="padding: 1.25rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.85rem; flex-wrap:wrap; gap:0.5rem;">
+                            <div class="chart-title" style="margin-bottom:0; color:#dc3545;">
+                                <i class="fas fa-arrow-circle-up" style="margin-right:0.4rem;"></i>Contas a Pagar
+                            </div>
+                            <button class="btn btn-sm" style="background:#dc3545;color:white;font-size:0.78rem;" onclick="ContasManager.showModal('pagar')">
+                                <i class="fas fa-plus"></i> Nova
+                            </button>
+                        </div>
+                        <div id="contasPagarTotal" style="font-size:1.3rem;font-weight:700;color:#dc3545;margin-bottom:0.75rem;">R$ 0,00</div>
+                        <div id="contasPagarList" style="max-height:220px;overflow-y:auto;">
+                            <p style="color:var(--gray);font-size:0.85rem;text-align:center;padding:1rem 0;">Nenhuma conta a pagar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Contas -->
+                <div id="modalContas" class="modal" style="display:none;" role="dialog">
+                    <div class="modal-content" style="max-width:480px;">
+                        <div class="modal-header">
+                            <h3 id="modalContasTitulo">Nova Conta</h3>
+                            <button class="modal-close" onclick="ContasManager.closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="contaEditId">
+                            <input type="hidden" id="contaTipo">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:2;">
+                                    <label>Descrição *</label>
+                                    <input type="text" id="contaDescricao" class="form-control" placeholder="Ex: Fornecedor XYZ, Parcela OS-001...">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Valor (R$) *</label>
+                                    <input type="number" id="contaValor" class="form-control" placeholder="0,00" step="0.01" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Vencimento *</label>
+                                    <input type="date" id="contaVencimento" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Cliente/Fornecedor</label>
+                                    <input type="text" id="contaParte" class="form-control" placeholder="Nome (opcional)">
+                                </div>
+                                <div class="form-group">
+                                    <label>Categoria</label>
+                                    <input type="text" id="contaCategoria" class="form-control" placeholder="Ex: Aluguel, OS, Lens...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Observações</label>
+                                <textarea id="contaObs" class="form-control" rows="2" style="resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="ContasManager.closeModal()">Cancelar</button>
+                            <button class="btn btn-primary" onclick="ContasManager.saveConta()"><i class="fas fa-save"></i> Salvar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Comprovante -->
+                <div id="modalComprovante" class="modal" style="display:none;" role="dialog">
+                    <div class="modal-content" style="max-width:420px;">
+                        <div class="modal-header">
+                            <h3>🧾 Comprovante de Pagamento</h3>
+                            <button class="modal-close" onclick="document.getElementById('modalComprovante').style.display='none'">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="comprovanteContent" style="font-family:monospace; font-size:0.85rem; line-height:1.7; white-space:pre-wrap; background:var(--light); padding:1rem; border-radius:8px; border:1px dashed var(--gray);"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="document.getElementById('modalComprovante').style.display='none'">Fechar</button>
+                            <button class="btn btn-primary" onclick="ContasManager.imprimirComprovante()"><i class="fas fa-print"></i> Imprimir</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="dashboard-charts" id="dashAlertPanels">
                     <!-- Aniversariantes do dia -->
                     <div class="dash-alert-panel">
@@ -5713,6 +5837,30 @@
                     <div class="form-container">
                         <h3 style="color: var(--primary); margin-bottom: 1.5rem;"><i class="fas fa-database"></i> Backup e Restauração</h3>
 
+                        <!-- WIDGET LOCAL-FIRST SYNC -->
+                        <div class="sync-status-panel" id="syncStatusPanel">
+                            <h4>⚡ Local-First Sync</h4>
+                            <div class="sync-row"><span class="sync-label">Engine local:</span><span class="sync-ok" id="ss-engine">IndexedDB</span></div>
+                            <div class="sync-row"><span class="sync-label">Status:</span><span id="ss-status" class="sync-ok">🟢 Online</span></div>
+                            <div class="sync-row"><span class="sync-label">Realtime:</span><span id="ss-realtime" class="sync-ok">Conectando...</span></div>
+                            <div class="sync-row"><span class="sync-label">Último sync:</span><span id="ss-last" class="sync-ok">—</span></div>
+                            <div class="sync-row"><span class="sync-label">Fila offline:</span><span id="ss-queue" class="sync-ok">0 ops</span></div>
+                            <div class="sync-row"><span class="sync-label">Clientes:</span><span id="ss-clients" class="sync-ok">0 reg.</span></div>
+                            <div class="sync-row"><span class="sync-label">Produtos:</span><span id="ss-products" class="sync-ok">0 reg.</span></div>
+                            <div class="sync-row"><span class="sync-label">Vendas:</span><span id="ss-sales" class="sync-ok">0 reg.</span></div>
+                            <div class="sync-row"><span class="sync-label">Despesas:</span><span id="ss-expenses" class="sync-ok">0 reg.</span></div>
+                            <div class="sync-row"><span class="sync-label">Prescrições:</span><span id="ss-prescriptions" class="sync-ok">0 reg.</span></div>
+                            <div class="sync-row"><span class="sync-label">Fornecedores:</span><span id="ss-suppliers" class="sync-ok">0 reg.</span></div>
+                            <div class="sync-actions">
+                                <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="LocalFirst.sync('manual').then(()=>LocalFirst._updatePanel())">
+                                    <i class="fas fa-sync"></i> Sync
+                                </button>
+                                <button class="btn btn-sm" style="background:#6366f1;color:#fff;font-weight:700;" onclick="LocalFirst._updatePanel()">
+                                    <i class="fas fa-cog"></i> Atualizar Status
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- STATUS DO BACKUP AUTOMÁTICO -->
                         <div id="backupStatusCard" style="background: var(--light); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; border-left: 4px solid var(--gray);">
                             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
@@ -6720,12 +6868,226 @@ ORDER BY table_name;
         window.LocalFirst = LocalFirst;
 
 
+        // Expõe LocalFirst globalmente para botões do painel
+        window.LocalFirst = LocalFirst;
+
+
         // Helpers de conveniência (legados)
         async function idbSave(key, value) { return IDB.set(key, value); }
         async function idbGet(key) { return IDB.get(key); }
 
+        // ==================== CONTAS A RECEBER / A PAGAR ====================
+        const ContasManager = {
+            _key: 'contas_financeiras',
 
-                // ==================== WHATSAPP CONFIRM MODAL ====================
+            async getAll() {
+                try {
+                    const raw = await IDB.get(this._key);
+                    return raw ? JSON.parse(raw) : [];
+                } catch(e) { return []; }
+            },
+
+            async saveAll(contas) {
+                await IDB.set(this._key, JSON.stringify(contas));
+            },
+
+            fmt(v) {
+                return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+            },
+
+            async renderAll() {
+                const contas = await this.getAll();
+                const hoje = new Date().toISOString().split('T')[0];
+
+                const receber = contas.filter(c => c.tipo === 'receber');
+                const pagar   = contas.filter(c => c.tipo === 'pagar');
+
+                const totalRec = receber.filter(c=>!c.pago).reduce((s,c)=>s+parseFloat(c.valor||0),0);
+                const totalPag = pagar.filter(c=>!c.pago).reduce((s,c)=>s+parseFloat(c.valor||0),0);
+
+                const elRec = document.getElementById('contasReceberTotal');
+                const elPag = document.getElementById('contasPagarTotal');
+                if(elRec) elRec.textContent = this.fmt(totalRec);
+                if(elPag) elPag.textContent = this.fmt(totalPag);
+
+                this._renderList('contasReceberList', receber, hoje);
+                this._renderList('contasPagarList', pagar, hoje);
+            },
+
+            _renderList(elId, contas, hoje) {
+                const el = document.getElementById(elId);
+                if(!el) return;
+                if(!contas.length) {
+                    el.innerHTML = '<p style="color:var(--gray);font-size:0.85rem;text-align:center;padding:0.75rem 0;">Nenhum lançamento</p>';
+                    return;
+                }
+                // Sort: pendentes primeiro, vencidas em destaque
+                contas.sort((a,b)=>{
+                    if(a.pago && !b.pago) return 1;
+                    if(!a.pago && b.pago) return -1;
+                    return (a.vencimento||'') < (b.vencimento||'') ? -1 : 1;
+                });
+                el.innerHTML = contas.map(c => {
+                    const venc = c.vencimento || '';
+                    const vencida = !c.pago && venc && venc < hoje;
+                    const classes = ['conta-item', c.tipo, c.pago?'paga':'', vencida?'vencida':''].filter(Boolean).join(' ');
+                    const vencLabel = venc ? new Date(venc+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                    const statusBadge = c.pago
+                        ? '<span style="background:#28a745;color:white;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">✓ Pago</span>'
+                        : vencida
+                            ? '<span style="background:#ffc107;color:#000;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">⚠ Vencida</span>'
+                            : '<span style="background:#e9ecef;color:#555;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">Pendente</span>';
+                    return `<div class="${classes}">
+                        <div class="conta-item-info">
+                            <div class="conta-item-nome">${c.descricao||'—'}</div>
+                            <div class="conta-item-det">${c.parte||''} ${c.categoria ? '· '+c.categoria : ''} · Venc: ${vencLabel} ${statusBadge}</div>
+                        </div>
+                        <span class="conta-item-valor">${this.fmt(c.valor)}</span>
+                        <div class="conta-item-actions">
+                            ${!c.pago ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixa('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
+                            <button class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.75rem;" title="Comprovante" onclick="ContasManager.gerarComprovante('${c.id}')"><i class="fas fa-receipt"></i></button>
+                            <button class="btn btn-sm" style="background:#17a2b8;color:white;padding:4px 8px;font-size:0.75rem;" title="Editar" onclick="ContasManager.editarConta('${c.id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.75rem;" title="Excluir" onclick="ContasManager.excluirConta('${c.id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+
+            showModal(tipo) {
+                document.getElementById('contaEditId').value = '';
+                document.getElementById('contaTipo').value = tipo;
+                document.getElementById('contaDescricao').value = '';
+                document.getElementById('contaValor').value = '';
+                document.getElementById('contaVencimento').value = new Date().toISOString().split('T')[0];
+                document.getElementById('contaParte').value = '';
+                document.getElementById('contaCategoria').value = '';
+                document.getElementById('contaObs').value = '';
+                document.getElementById('modalContasTitulo').textContent = tipo === 'receber' ? '💰 Nova Conta a Receber' : '💸 Nova Conta a Pagar';
+                document.getElementById('modalContas').style.display = 'flex';
+            },
+
+            closeModal() {
+                document.getElementById('modalContas').style.display = 'none';
+            },
+
+            async saveConta() {
+                const desc = document.getElementById('contaDescricao').value.trim();
+                const valor = parseFloat(document.getElementById('contaValor').value);
+                const venc  = document.getElementById('contaVencimento').value;
+                if(!desc) { Toast.show('Informe a descrição','warning'); return; }
+                if(!valor || valor <= 0) { Toast.show('Informe um valor válido','warning'); return; }
+                if(!venc) { Toast.show('Informe o vencimento','warning'); return; }
+
+                const contas = await this.getAll();
+                const editId = document.getElementById('contaEditId').value;
+
+                if(editId) {
+                    const idx = contas.findIndex(c=>c.id===editId);
+                    if(idx>=0) {
+                        contas[idx] = { ...contas[idx],
+                            descricao: desc, valor, vencimento: venc,
+                            parte: document.getElementById('contaParte').value.trim(),
+                            categoria: document.getElementById('contaCategoria').value.trim(),
+                            obs: document.getElementById('contaObs').value.trim()
+                        };
+                    }
+                    Toast.show('Conta atualizada!','success');
+                } else {
+                    contas.push({
+                        id: 'conta_' + Date.now(),
+                        tipo: document.getElementById('contaTipo').value,
+                        descricao: desc, valor, vencimento: venc,
+                        parte: document.getElementById('contaParte').value.trim(),
+                        categoria: document.getElementById('contaCategoria').value.trim(),
+                        obs: document.getElementById('contaObs').value.trim(),
+                        pago: false,
+                        criado: new Date().toISOString()
+                    });
+                    Toast.show('Conta adicionada!','success');
+                }
+                await this.saveAll(contas);
+                this.closeModal();
+                this.renderAll();
+            },
+
+            async darBaixa(id) {
+                if(!confirm('Confirmar baixa nesta conta?')) return;
+                const contas = await this.getAll();
+                const idx = contas.findIndex(c=>c.id===id);
+                if(idx>=0) {
+                    contas[idx].pago = true;
+                    contas[idx].dataPagamento = new Date().toISOString();
+                    await this.saveAll(contas);
+                    Toast.show('Baixa registrada!','success');
+                    this.renderAll();
+                    this.gerarComprovante(id);
+                }
+            },
+
+            async gerarComprovante(id) {
+                const contas = await this.getAll();
+                const c = contas.find(x=>x.id===id);
+                if(!c) return;
+                const emp = state.company || {};
+                const dataPag = c.dataPagamento ? new Date(c.dataPagamento).toLocaleString('pt-BR') : '—';
+                const vencFmt = c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                const tipo = c.tipo === 'receber' ? 'RECEBIMENTO' : 'PAGAMENTO';
+                const txt = [
+                    '═══════════════════════════════',
+                    `   ${emp.name || 'EMPRESA'}`,
+                    `   CNPJ: ${emp.cnpj || '—'}`,
+                    '═══════════════════════════════',
+                    `   COMPROVANTE DE ${tipo}`,
+                    '───────────────────────────────',
+                    `Descrição : ${c.descricao}`,
+                    `Valor     : ${this.fmt(c.valor)}`,
+                    `Vencimento: ${vencFmt}`,
+                    `${tipo === 'RECEBIMENTO' ? 'Cliente' : 'Fornecedor'}: ${c.parte || '—'}`,
+                    `Categoria : ${c.categoria || '—'}`,
+                    c.obs ? `Obs       : ${c.obs}` : null,
+                    '───────────────────────────────',
+                    `Status    : ${c.pago ? '✓ PAGO' : 'PENDENTE'}`,
+                    c.pago ? `Data Pag. : ${dataPag}` : null,
+                    '═══════════════════════════════',
+                    `Emitido em: ${new Date().toLocaleString('pt-BR')}`,
+                ].filter(Boolean).join('\n');
+                document.getElementById('comprovanteContent').textContent = txt;
+                document.getElementById('modalComprovante').style.display = 'flex';
+            },
+
+            imprimirComprovante() {
+                const c = document.getElementById('comprovanteContent').textContent;
+                const w = window.open('','_blank','width=400,height=600');
+                w.document.write(`<html><head><title>Comprovante</title><style>body{font-family:monospace;padding:20px;white-space:pre;font-size:13px;}@media print{body{margin:0;}}</style></head><body>${c}</body></html>`);
+                w.document.close();
+                w.print();
+            },
+
+            async editarConta(id) {
+                const contas = await this.getAll();
+                const c = contas.find(x=>x.id===id);
+                if(!c) return;
+                document.getElementById('contaEditId').value = id;
+                document.getElementById('contaTipo').value = c.tipo;
+                document.getElementById('contaDescricao').value = c.descricao||'';
+                document.getElementById('contaValor').value = c.valor||'';
+                document.getElementById('contaVencimento').value = c.vencimento||'';
+                document.getElementById('contaParte').value = c.parte||'';
+                document.getElementById('contaCategoria').value = c.categoria||'';
+                document.getElementById('contaObs').value = c.obs||'';
+                document.getElementById('modalContasTitulo').textContent = c.tipo === 'receber' ? '✏️ Editar Conta a Receber' : '✏️ Editar Conta a Pagar';
+                document.getElementById('modalContas').style.display = 'flex';
+            },
+
+            async excluirConta(id) {
+                if(!confirm('Excluir esta conta?')) return;
+                const contas = await this.getAll();
+                await this.saveAll(contas.filter(c=>c.id!==id));
+                Toast.show('Conta excluída','info');
+                this.renderAll();
+            }
+        };
+        window.ContasManager = ContasManager;
         const WppConfirm = {
             _url: '',
 
@@ -8572,6 +8934,7 @@ ORDER BY table_name;
                 this.updateRecentSales();
                 this.updateBirthdayAlerts();
                 this.updateGlassesAlerts();
+                if (typeof ContasManager !== 'undefined') ContasManager.renderAll();
             },
 
             setPeriod(period, btn) {
@@ -10050,6 +10413,8 @@ ORDER BY table_name;
                 // Renderiza painel de backup ao abrir a aba
                 if (tabName === 'backup') {
                     this.renderBackupStatus();
+                    // Atualiza o widget de sync
+                    setTimeout(() => { if(window.LocalFirst) LocalFirst._updatePanel(); }, 100);
                 }
 
                 // Mostra badge da loja ativa ao abrir aba empresa
