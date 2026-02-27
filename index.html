@@ -3758,8 +3758,8 @@
             </div>
             <nav class="sidebar-menu" aria-label="Navegação principal">
                 <div class="sidebar-section-label">Principal</div>
-                <div class="menu-item" data-section="dashboard" role="button" tabindex="0"><i class="fas fa-home"></i><span>Dashboard</span></div>
-                <div class="menu-item active" data-section="sales" role="button" tabindex="0"><i class="fas fa-shopping-cart"></i><span>Vendas</span></div>
+                <div class="menu-item active" data-section="dashboard" role="button" tabindex="0"><i class="fas fa-home"></i><span>Dashboard</span></div>
+                <div class="menu-item" data-section="sales" role="button" tabindex="0"><i class="fas fa-shopping-cart"></i><span>Vendas</span></div>
                 <div class="menu-item" data-section="clients" role="button" tabindex="0"><i class="fas fa-users"></i><span>Clientes</span></div>
                 <div class="menu-item" data-section="products" role="button" tabindex="0"><i class="fas fa-box"></i><span>Produtos</span></div>
                 <div class="sidebar-section-label">Gestão</div>
@@ -3780,7 +3780,7 @@
             
             <header class="header no-print">
                 <div class="header-left">
-                    <h1 id="pageTitle">Vendas</h1>
+                    <h1 id="pageTitle">Dashboard</h1>
                     <div id="pageSubtitle"></div>
                 </div>
                 <div class="header-right">
@@ -3804,7 +3804,7 @@
             </header>
 
             <!-- Seção Dashboard -->
-            <section id="dashboard" class="section" aria-labelledby="pageTitle">
+            <section id="dashboard" class="section active" aria-labelledby="pageTitle">
 
                 <!-- Filtro de período -->
                 <div class="dash-period-bar">
@@ -3964,7 +3964,7 @@
             </section>
 
             <!-- Seção Vendas -->
-            <section id="sales" class="section active" aria-labelledby="pageTitle">
+            <section id="sales" class="section" aria-labelledby="pageTitle">
                 <div class="form-container no-print">
                     <h2 class="section-title">NOVA ORDEM DE SERVIÇO</h2>
                     
@@ -13734,11 +13734,11 @@ ${container.innerHTML}
         // ==================== INICIALIZAÇÃO ====================
         document.addEventListener('DOMContentLoaded', async () => {
             await App.init();
+            Dashboard.update();
             Usuarios.renderTable();
             BackupManager.init();
             KeyboardShortcuts.init();
             LogSystem.log('info', 'Sistema Iniciado', 'ÓticaVision Pro v2.0');
-            // Melhorias de interface integradas (evita race condition com segundo DOMContentLoaded)
             setTimeout(() => {
                 adicionarTooltips();
                 melhorarAcessibilidade();
