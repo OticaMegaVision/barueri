@@ -14,7 +14,32 @@
     <meta name="apple-mobile-web-app-title" content="ÓticaVision">
     <meta name="msapplication-TileColor" content="#ff6b00">
     <meta name="msapplication-tap-highlight" content="no">
-    <link rel="manifest" href="manifest.json">
+    <!-- Manifest inline para evitar erro de ícone 144x144 não encontrado -->
+    <script>
+    (function() {
+        var manifest = {
+            name: "ÓticaVision Pro",
+            short_name: "ÓticaVision",
+            description: "Sistema Profissional de Gestão para Óticas",
+            start_url: "./",
+            scope: "./",
+            display: "standalone",
+            background_color: "#ffffff",
+            theme_color: "#ff6b00",
+            orientation: "portrait-primary",
+            icons: [
+                { src: "icons/icon-192x192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                { src: "icons/icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+            ]
+        };
+        var blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = url;
+        document.currentScript.parentNode.insertBefore(link, document.currentScript);
+    })();
+    </script>
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
@@ -6486,8 +6511,9 @@ ORDER BY table_name;
             },
 
             // ── SYNC PRINCIPAL ────────────────────────────────────────────────
-            // Push: envia apenas registros marcados como dirty (mudanças locais)
+            // Push: envia registros dirty + processa fila de deleções pendentes
             // Pull: traz do Supabase registros mais novos que o último sync
+            //       Remove localmente qualquer item com _deleted=true (soft-delete)
             async sync(reason = 'manual') {
                 if (this._syncing) return;
                 if (!navigator.onLine) { this._updatePanel(); return; }
@@ -6506,6 +6532,37 @@ ORDER BY table_name;
                     const dirtyNow = new Set(this._dirtyKeys);
 
                     for (const [stateKey, table] of Object.entries(this._TABLES)) {
+
+                        // ── FLUSH DELEÇÕES PENDENTES (fila offline) ───────────────
+                        const deletedKey = 'lf_deleted_' + stateKey;
+                        const pendingDeletes = await this._getPending(deletedKey);
+                        if (pendingDeletes.length > 0) {
+                            this._pushing = true;
+                            const flushedDeletes = [];
+                            for (const delId of pendingDeletes) {
+                                try {
+                                    const tombstone = {
+                                        id: delId,
+                                        _data: JSON.stringify({ id: delId, _deleted: true }),
+                                        updated_at: new Date().toISOString()
+                                    };
+                                    const { error } = await supabaseClient
+                                        .from(table)
+                                        .upsert(tombstone, { onConflict: 'id' });
+                                    if (!error) {
+                                        flushedDeletes.push(delId);
+                                        pushed++;
+                                        console.log('[LocalFirst] flush delete OK:', table, delId);
+                                    }
+                                } catch(e) {}
+                            }
+                            if (flushedDeletes.length > 0) {
+                                const remaining = pendingDeletes.filter(id => !flushedDeletes.includes(id));
+                                await IDB.set(deletedKey, remaining);
+                            }
+                            await new Promise(r => setTimeout(r, 300));
+                            this._pushing = false;
+                        }
 
                         // ── PUSH: apenas se o stateKey tem mudanças locais pendentes ──
                         // Razões 'realtime'/'interval' NÃO fazem push — evitam loop e spam
@@ -6552,13 +6609,25 @@ ORDER BY table_name;
                         if (pullErr) { console.warn('[LocalFirst] Pull erro em', table, pullErr.message); continue; }
                         if (!data || data.length === 0) continue;
 
-                        // Mescla: mais recente vence — usa _local_ts para comparar (não updated_at do Supabase)
+                        // Mescla: mais recente vence — usa _supabase_at para comparar
                         const localMap = {};
                         (state[stateKey] || []).forEach(item => { localMap[item.id] = item; });
 
+                        let deletedCount = 0;
                         data.forEach(remote => {
                             try {
                                 const remoteItem = typeof remote._data === 'string' ? JSON.parse(remote._data) : remote._data;
+
+                                // ── SOFT DELETE: item marcado como deletado → remove do estado local ──
+                                if (remoteItem && remoteItem._deleted === true) {
+                                    if (localMap[remote.id]) {
+                                        delete localMap[remote.id];
+                                        deletedCount++;
+                                        console.log('[LocalFirst] Soft-delete aplicado:', table, remote.id);
+                                    }
+                                    return; // não adiciona ao localMap
+                                }
+
                                 // Guarda o timestamp do Supabase no item para pull futuro
                                 remoteItem._supabase_at = remote.updated_at;
                                 const local = localMap[remote.id];
@@ -6573,6 +6642,12 @@ ORDER BY table_name;
                         });
 
                         state[stateKey] = Object.values(localMap);
+
+                        // Se houve deleções remotas, atualiza a UI correspondente
+                        if (deletedCount > 0) {
+                            pulled += deletedCount;
+                            this._refreshTableUI(stateKey);
+                        }
                     }
 
                     // Salva estado mesclado no IDB
@@ -6596,6 +6671,25 @@ ORDER BY table_name;
                     if (btn) { btn.classList.remove('syncing'); btn.title = 'Status de sincronização'; }
                     this._updatePanel();
                 }
+            },
+
+            // ── Atualiza a UI da tabela após deleção remota ──────────────────
+            _refreshTableUI(stateKey) {
+                try {
+                    switch(stateKey) {
+                        case 'clients':   if (typeof Clients   !== 'undefined') Clients.renderTable();   break;
+                        case 'products':  if (typeof Products  !== 'undefined') Products.renderTable();  break;
+                        case 'sales':     if (typeof Sales     !== 'undefined') Sales.renderHistory();   break;
+                        case 'services':  if (typeof Services  !== 'undefined') Services.renderTable();  break;
+                        case 'suppliers': if (typeof Suppliers !== 'undefined') Suppliers.renderTable(); break;
+                        case 'expenses':
+                            if (typeof Expenses !== 'undefined') {
+                                Expenses.renderTable();
+                                if (typeof Expenses.updateSummary === 'function') Expenses.updateSummary();
+                            }
+                            break;
+                    }
+                } catch(e) {}
             },
 
             // ── Helper: lê fila pendente sempre como array ────────────────────
@@ -6646,17 +6740,50 @@ ORDER BY table_name;
                 }
             },
 
-            // ── DELETE (local + Supabase) ─────────────────────────────────────
+            // ── DELETE (soft-delete: marca _deleted=true + enfileira para sync) ──
+            // Funciona offline: enfileira em lf_deleted_<table> e sincroniza quando online
             async deleteItem(table, id) {
-                if (!navigator.onLine) return;
+                if (!id) return;
+                const deletedKey = 'lf_deleted_' + table;
+
+                // Enfileira o ID na lista de deleções pendentes (persiste offline)
+                try {
+                    const existing = await this._getPending(deletedKey);
+                    if (!existing.includes(id)) existing.push(id);
+                    await IDB.set(deletedKey, existing);
+                } catch(e) {}
+
+                this._markDirty(table);
+
+                if (!navigator.onLine) {
+                    console.warn('[LocalFirst] deleteItem offline — enfileirado para sync:', table, id);
+                    return;
+                }
+
+                // Online: envia soft-delete para Supabase imediatamente
                 try {
                     this._pushing = true;
-                    await supabaseClient.from(this._TABLES[table] || table).delete().eq('id', id);
+                    const tombstone = {
+                        id: id,
+                        _data: JSON.stringify({ id, _deleted: true }),
+                        updated_at: new Date().toISOString()
+                    };
+                    const { error } = await supabaseClient
+                        .from(this._TABLES[table] || table)
+                        .upsert(tombstone, { onConflict: 'id' });
+                    if (!error) {
+                        // Remove da fila de pendentes de deleção
+                        const remaining = (await this._getPending(deletedKey)).filter(x => x !== id);
+                        await IDB.set(deletedKey, remaining);
+                        console.log('[LocalFirst] deleteItem OK (soft-delete):', table, id);
+                    } else {
+                        console.warn('[LocalFirst] deleteItem falhou:', error.message);
+                    }
                     await new Promise(r => setTimeout(r, 300));
                     this._pushing = false;
                 } catch(e) {
                     this._pushing = false;
-                    console.warn('[LocalFirst] deleteItem falhou:', e.message);
+                    console.warn('[LocalFirst] deleteItem erro:', e.message);
                 }
             },
 
@@ -6750,10 +6877,6 @@ ORDER BY table_name;
                 }
             }
         };
-
-        // Expõe LocalFirst globalmente para botões do painel
-        window.LocalFirst = LocalFirst;
-
 
         // Expõe LocalFirst globalmente para botões do painel
         window.LocalFirst = LocalFirst;
@@ -10145,6 +10268,7 @@ ORDER BY table_name;
                 Modal.showConfirm('Excluir esta despesa?', () => {
                     state.expenses = state.expenses.filter(e => e.id !== id);
                     App.saveData();
+                    LocalFirst.deleteItem('expenses', id);
                     this.renderTable();
                     this.updateSummary();
                     Dashboard.update();
@@ -13945,6 +14069,7 @@ ${container.innerHTML}
                 Modal.showConfirm('Excluir esta venda?', () => {
                     state.sales = state.sales.filter(s => s.id !== id);
                     App.saveData();
+                    LocalFirst.deleteItem('sales', id);
                     this.renderHistory();
                     Toast.show('Venda excluída com sucesso!');
                 });
