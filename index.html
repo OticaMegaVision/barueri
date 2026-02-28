@@ -28,7 +28,7 @@
       const SUPABASE_URL  = 'https://qhscxyistzlmxxnjrqao.supabase.co';
       const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoc2N4eWlzdHpsbXh4bmpycWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTQzOTMsImV4cCI6MjA4NzQzMDM5M30.xrhD08N1PcOVAMdA0vovxbHOHrcSdqIYkJWw4K6G13w';
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      supabaseClient.from('clients').select('count').then(({error}) => {
+      supabaseClient.from('clients').select('id', { count: 'exact', head: true }).then(({error}) => {
         if (error) console.error('[Supabase] ❌ Erro:', error.message);
         else console.log('[Supabase] ✅ Conectado!');
       });
@@ -8461,12 +8461,12 @@ ORDER BY table_name;
             async upsertPrescricao(p) { return LocalFirst.pushItem('prescriptions', p); },
             async upsertDespesa(e)    { return LocalFirst.pushItem('expenses', e); },
             async upsertFornecedor(s) { return LocalFirst.pushItem('suppliers', s); },
-            async upsertServico(s)    { return LocalFirst.pushItem('services', s); },
+            async upsertServico(s)    {},
             async upsertConfig()      { return LocalFirst.pushConfig(); },
             async deletarCliente(id)  { return LocalFirst.deleteItem('clients', id); },
             async deletarProduto(id)  { return LocalFirst.deleteItem('products', id); },
             async deletarFornecedor(id) { return LocalFirst.deleteItem('suppliers', id); },
-            async deletarServico(id)  { return LocalFirst.deleteItem('services', id); },
+            async deletarServico(id)  {},
             async deletarDespesa(id)  { return LocalFirst.deleteItem('expenses', id); },
             async verificarTabelas() {
                 const tabelas = ['clients','products','sales','expenses','prescriptions','suppliers','services','config'];
@@ -8482,9 +8482,11 @@ ORDER BY table_name;
                 }
                 const erros = resultados.filter(r => !r.ok);
                 if (erros.length === 0) {
-                    Toast.show(`✅ Todas as 8 tabelas verificadas com sucesso!`, 'success');
+                    Toast.show(`✅ Todas as 8 tabelas verificadas com sucesso!`, 'success', 4000);
                 } else {
-                    Toast.show(`⚠️ Tabelas com problema: ${erros.map(r=>r.tabela).join(', ')}. Execute o SQL Setup.`, 'warning');
+                    const nomes = erros.map(r => r.tabela).join(', ');
+                    Toast.show(`⚠️ Problema nas tabelas: ${nomes}. Execute o SQL Setup.`, 'warning', 6000);
+                    console.table(resultados);
                 }
             },
             async syncDown() {
@@ -8641,6 +8643,14 @@ ORDER BY table_name;
                             });
                         }
                     });
+                    // Retroativamente adiciona id nos receituários antigos que não tinham
+                    if (Array.isArray(state.prescriptions)) {
+                        state.prescriptions.forEach(p => {
+                            if (!p.id && p.clientId) {
+                                p.id = 'PRESC-' + p.clientId;
+                            }
+                        });
+                    }
                     const dataStr = JSON.stringify(state);
                     await IDB.set(STORAGE_KEY, dataStr);
                     await IDB.set(STORAGE_KEY + '_ts', now);
@@ -8721,7 +8731,6 @@ ORDER BY table_name;
                         if (section === 'dashboard') Dashboard.update();
                         else if (section === 'sales') {
                             Sales.renderHistory();
-                            Sales.populateSaleSelects();
                             document.getElementById('saleNumber') && (document.getElementById('saleNumber').value = Sales.generateOsNumber());
                         }
                         else if (section === 'clients') Clients.renderTable();
@@ -9394,6 +9403,7 @@ ORDER BY table_name;
                 }
                 
                 const presc = {
+                    id: 'PRESC-' + client.id,
                     clientId: client.id,
                     date: document.getElementById('clientPrescDate').value,
                     optometrist: document.getElementById('clientPrescOptometrist').value,
@@ -11406,30 +11416,14 @@ ${container.innerHTML}
             generateOsNumber() {
                 const currentYear = new Date().getFullYear();
                 if (!state.lastOsCounter) state.lastOsCounter = {};
-
-                // Recalcula o próximo número baseado nas vendas existentes deste ano
-                // para evitar duplicatas mesmo após recarregar ou editar
-                const osPrefix = `OS-${currentYear}-`;
-                const usedNumbers = (state.sales || [])
-                    .map(s => s.number || '')
-                    .filter(n => n.startsWith(osPrefix))
-                    .map(n => parseInt(n.replace(osPrefix, ''), 10))
-                    .filter(n => !isNaN(n));
-
-                const maxUsed = usedNumbers.length > 0 ? Math.max(...usedNumbers) : 0;
-                const counterValue = state.lastOsCounter[currentYear] || 1;
-                // Usa o maior entre o contador salvo e o máximo real encontrado nas vendas
-                const nextNumber = Math.max(counterValue, maxUsed + 1);
-
-                // Atualiza o contador para manter consistência
-                state.lastOsCounter[currentYear] = nextNumber;
-
-                const sequential = String(nextNumber).padStart(4, '0');
+                if (!state.lastOsCounter[currentYear]) state.lastOsCounter[currentYear] = 1;
+                
+                const sequential = String(state.lastOsCounter[currentYear]).padStart(4, '0');
                 const osNumber = `OS-${currentYear}-${sequential}`;
-
+                
                 const el = document.getElementById('saleNumber');
                 if (el) el.value = osNumber;
-
+                
                 return osNumber;
             },
 
@@ -13449,10 +13443,13 @@ ${container.innerHTML}
                     state.editingSaleId = null;
                 } else {
                     state.sales.push(sale);
-                    // Avança o contador para o próximo número após salvar
+                    // Incrementar contador de OS apenas se for nova venda
                     const currentYear = new Date().getFullYear();
-                    if (!state.lastOsCounter) state.lastOsCounter = {};
-                    state.lastOsCounter[currentYear] = (state.lastOsCounter[currentYear] || 1) + 1;
+                    if (state.lastOsCounter[currentYear]) {
+                        state.lastOsCounter[currentYear]++;
+                    } else {
+                        state.lastOsCounter[currentYear] = 1;
+                    }
                 }
                 
                 App.saveData();
@@ -13498,8 +13495,6 @@ ${container.innerHTML}
                 if (additionEl) additionEl.value = '0';
                 if (obsEl) obsEl.value = '';
                 if (professionalEl) professionalEl.value = '';
-                const clientSelectEl = document.getElementById('clientSelect');
-                if (clientSelectEl) clientSelectEl.innerHTML = '<option value="">Selecione um cliente</option>';
                 const entryValEl = document.getElementById('entryValue');
                 if (entryValEl) entryValEl.value = '0';
                 const retiradaEntryEl = document.getElementById('retiradaEntry');
