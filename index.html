@@ -1263,9 +1263,12 @@
         /* ===== PAYMENT METHODS — PROFISSIONAL ===== */
         .payment-methods {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 0.6rem;
             margin: 0.75rem 0;
+        }
+        @media (max-width: 600px) {
+            .payment-methods { grid-template-columns: repeat(3, 1fr); }
         }
         .payment-card {
             padding: 0.8rem 0.4rem;
@@ -1296,9 +1299,6 @@
         .payment-card[data-method="debit"] i { color: #1565c0; }
         .payment-card[data-method="credit"] i { color: #6a1b9a; }
         .payment-card[data-method="installment"] i { color: #e65100; }
-        .payment-card[data-method="transfer"] i { color: #0277bd; }
-        .payment-card[data-method="cheque"] i { color: #4e342e; }
-        .payment-card[data-method="voucher"] i { color: #00838f; }
         /* Painel de resumo de pagamento profissional */
         .pay-summary-box {
             background: linear-gradient(135deg, #fff8f3 0%, #fff3ea 100%);
@@ -4351,21 +4351,6 @@
                                     <span>Crediário</span>
                                     <small>próprio</small>
                                 </button>
-                                <button type="button" class="payment-card" data-method="transfer" onclick="Sales.selectPayment('transfer')">
-                                    <i class="fas fa-exchange-alt"></i>
-                                    <span>Transferência</span>
-                                    <small>TED/DOC</small>
-                                </button>
-                                <button type="button" class="payment-card" data-method="cheque" onclick="Sales.selectPayment('cheque')">
-                                    <i class="fas fa-money-check"></i>
-                                    <span>Cheque</span>
-                                    <small>a prazo</small>
-                                </button>
-                                <button type="button" class="payment-card" data-method="voucher" onclick="Sales.selectPayment('voucher')">
-                                    <i class="fas fa-ticket-alt"></i>
-                                    <span>Voucher</span>
-                                    <small>convênio</small>
-                                </button>
                             </div>
                         </div>
 
@@ -4744,123 +4729,6 @@
                                 <div class="pay-summary-row highlight">
                                     <span class="label">💰 Valor final:</span>
                                     <span class="value" id="cashFinalValue">R$ 0,00</span>
-                                </div>
-                            </div>
-                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
-                            </div>
-                        </div>
-
-                        <!-- TRANSFERÊNCIA -->
-                        <div id="transferDetails" class="d-none">
-                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
-                                <h5><i class="fas fa-exchange-alt"></i> Transferência Bancária (TED/DOC)</h5>
-                                <div class="form-row" style="margin-bottom:0;">
-                                    <div class="form-group">
-                                        <label>Entrada paga (R$)</label>
-                                        <input type="number" id="transferEntrada" class="form-control" value="0" min="0" step="0.01" oninput="Sales.calcTransferRetirada()">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Restante na retirada</label>
-                                        <div class="form-control" id="transferRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tipo</label>
-                                        <select class="form-control" id="transferType">
-                                            <option value="ted">TED</option>
-                                            <option value="doc">DOC</option>
-                                            <option value="pix_manual">PIX Manual</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="retirada-alert" id="transferRetiradaAlert" style="display:none;margin-top:8px;">
-                                    <i class="fas fa-glasses"></i>
-                                    <div>
-                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
-                                        <div class="valor" id="transferRetiradaValAlert">R$ 0,00</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
-                            </div>
-                        </div>
-
-                        <!-- CHEQUE -->
-                        <div id="chequeDetails" class="d-none">
-                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
-                                <h5><i class="fas fa-money-check"></i> Pagamento com Cheque</h5>
-                                <div class="form-row" style="margin-bottom:8px;">
-                                    <div class="form-group">
-                                        <label>Nº do Cheque</label>
-                                        <input type="text" id="chequeNum" class="form-control" placeholder="000000">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Banco</label>
-                                        <input type="text" id="chequeBanco" class="form-control" placeholder="Ex: Bradesco">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Vencimento do Cheque</label>
-                                        <input type="date" id="chequeVenc" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-row" style="margin-bottom:0;">
-                                    <div class="form-group">
-                                        <label>Entrada paga (R$)</label>
-                                        <input type="number" id="chequeEntrada" class="form-control" value="0" min="0" step="0.01" oninput="Sales.calcChequeRetirada()">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Restante na retirada</label>
-                                        <div class="form-control" id="chequeRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
-                                    </div>
-                                </div>
-                                <div class="retirada-alert" id="chequeRetiradaAlert" style="display:none;margin-top:8px;">
-                                    <i class="fas fa-glasses"></i>
-                                    <div>
-                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada dos óculos</div>
-                                        <div class="valor" id="chequeRetiradaValAlert">R$ 0,00</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas vias)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> PDF OS (Via Ótica)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> PDF OS (Via Cliente)</button>
-                            </div>
-                        </div>
-
-                        <!-- VOUCHER / CONVÊNIO -->
-                        <div id="voucherDetails" class="d-none">
-                            <div class="entrada-retirada-box" style="margin-top:10px;margin-bottom:12px;">
-                                <h5><i class="fas fa-ticket-alt"></i> Voucher / Convênio</h5>
-                                <div class="form-row" style="margin-bottom:8px;">
-                                    <div class="form-group">
-                                        <label>Código do Voucher</label>
-                                        <input type="text" id="voucherCode" class="form-control" placeholder="Ex: CONV-2025">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Convênio / Empresa</label>
-                                        <input type="text" id="voucherEmpresa" class="form-control" placeholder="Ex: Unimed, Funilândia...">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Valor coberto (R$)</label>
-                                        <input type="number" id="voucherValor" class="form-control" value="0" min="0" step="0.01" oninput="Sales.calcVoucherRetirada()">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Restante (cliente paga)</label>
-                                        <div class="form-control" id="voucherRetiradaVal" style="font-weight:800;color:#c62828;font-size:1.05rem;">R$ 0,00</div>
-                                    </div>
-                                </div>
-                                <div class="retirada-alert" id="voucherRetiradaAlert" style="display:none;margin-top:8px;">
-                                    <i class="fas fa-glasses"></i>
-                                    <div>
-                                        <div style="font-size:0.78rem;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cliente paga o restante na retirada</div>
-                                        <div class="valor" id="voucherRetiradaValAlert">R$ 0,00</div>
-                                    </div>
                                 </div>
                             </div>
                             <div class="btn-group" style="margin-top:15px;justify-content:center;gap:10px;flex-wrap:wrap;">
@@ -11621,7 +11489,7 @@ ${container.innerHTML}
                         <td>${s.number}</td>
                         <td>${Utils.sanitizeHTML(clientName)}</td>
                         <td>${Utils.formatCurrency(s.total)}</td>
-                        <td>${s.paymentMethod === 'installment' ? 'Crediário' : (s.paymentMethod || '—')}</td>
+                        <td>${{'pix':'PIX','cash':'Dinheiro','debit':'Débito','credit':'Crédito','installment':'Crediário'}[s.paymentMethod] || s.paymentMethod || '—'}</td>
                         <td><span class="badge badge-${st.cls}">${st.label}</span></td>
                         <td>${Utils.formatDate(s.date)}</td>
                         <td class="action-buttons">
@@ -11809,7 +11677,7 @@ ${container.innerHTML}
                 let subtotal = state.currentSale.items.reduce((acc, i) => acc + i.subtotal, 0);
                 const discount = Utils.parseMoney(document.getElementById('discountValue').value) || 0;
                 const addition = Utils.parseMoney(document.getElementById('additionValue').value) || 0;
-                const total = subtotal - discount + addition;
+                const total = Math.max(0, subtotal - discount + addition);
                 
                 state.currentSale.subtotal = subtotal;
                 state.currentSale.discount = discount;
@@ -11819,30 +11687,39 @@ ${container.innerHTML}
                 document.getElementById('subtotalDisplay').innerText = Utils.formatCurrency(subtotal);
                 document.getElementById('totalDisplay').innerText = Utils.formatCurrency(total);
                 
-                if (state.currentSale.paymentMethod === 'installment') {
+                // Recalcula o painel do método ativo
+                const method = state.currentSale.paymentMethod;
+                if (method === 'installment') {
                     this.calculateInstallments();
-                } else if (state.currentSale.paymentMethod === 'pix') {
+                } else if (method === 'pix') {
                     this.calculatePixDiscount();
-                } else if (state.currentSale.paymentMethod === 'cash') {
+                    this.calcPixRetirada();
+                } else if (method === 'cash') {
                     this.calculateCashDiscount();
+                    this.calcCashChange();
+                } else if (method === 'credit') {
+                    this.calculateCredit();
+                    this.calcCreditRetirada();
+                } else if (method === 'debit') {
+                    this._updateDebitSummary();
+                    this.calcDebitRetirada();
                 }
             },
 
             selectPayment(method) {
                 state.currentSale.paymentMethod = method;
-                
+
                 document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
                 const card = document.querySelector(`[data-method="${method}"]`);
                 if (card) card.classList.add('active');
-                
+
                 // Oculta todos os painéis de detalhe
-                ['creditDetails','installmentDetails','pixDetails','cashDetails',
-                 'debitDetails','transferDetails','chequeDetails','voucherDetails'
-                ].forEach(id => document.getElementById(id)?.classList.add('d-none'));
-                
+                ['creditDetails','installmentDetails','pixDetails','cashDetails','debitDetails']
+                    .forEach(id => document.getElementById(id)?.classList.add('d-none'));
+
                 if (method === 'credit') {
                     document.getElementById('creditDetails')?.classList.remove('d-none');
-                    this.calcCreditRetirada();
+                    this.calculateCredit();
                 } else if (method === 'installment') {
                     document.getElementById('installmentDetails')?.classList.remove('d-none');
                     this.calculateInstallments();
@@ -11856,17 +11733,8 @@ ${container.innerHTML}
                     this.calcCashChange();
                 } else if (method === 'debit') {
                     document.getElementById('debitDetails')?.classList.remove('d-none');
-                    Sales._updateDebitSummary();
+                    this._updateDebitSummary();
                     this.calcDebitRetirada();
-                } else if (method === 'transfer') {
-                    document.getElementById('transferDetails')?.classList.remove('d-none');
-                    this.calcTransferRetirada();
-                } else if (method === 'cheque') {
-                    document.getElementById('chequeDetails')?.classList.remove('d-none');
-                    this.calcChequeRetirada();
-                } else if (method === 'voucher') {
-                    document.getElementById('voucherDetails')?.classList.remove('d-none');
-                    this.calcVoucherRetirada();
                 }
             },
 
@@ -11887,29 +11755,17 @@ ${container.innerHTML}
             calcDebitRetirada()   { this._showRetirada('debitEntrada',   'debitRetiradaVal',    'debitRetiradaAlert',    'debitRetiradaValAlert'); },
             calcPixRetirada()     { this._showRetirada('pixEntrada',     'pixRetiradaVal',      'pixRetiradaAlert',      'pixRetiradaValAlert'); },
             calcCashRetirada()    { this._showRetirada('cashEntrada',    'cashRetiradaVal',     'cashRetiradaAlert',     'cashRetiradaValAlert'); },
-            calcTransferRetirada(){ this._showRetirada('transferEntrada','transferRetiradaVal', 'transferRetiradaAlert', 'transferRetiradaValAlert'); },
-            calcChequeRetirada()  { this._showRetirada('chequeEntrada',  'chequeRetiradaVal',   'chequeRetiradaAlert',   'chequeRetiradaValAlert'); },
 
-            calcVoucherRetirada() {
-                const total = parseFloat(document.getElementById('totalDisplay')?.textContent?.replace(/[R$\s.]/g,'').replace(',','.')) || 0;
-                const coberto = parseFloat(document.getElementById('voucherValor')?.value) || 0;
-                const restante = Math.max(0, total - coberto);
-                if (document.getElementById('voucherRetiradaVal')) document.getElementById('voucherRetiradaVal').textContent = this._fmtBRL(restante);
-                const alert = document.getElementById('voucherRetiradaAlert');
-                if (alert) alert.style.display = restante > 0.01 ? 'flex' : 'none';
-                if (document.getElementById('voucherRetiradaValAlert')) document.getElementById('voucherRetiradaValAlert').textContent = this._fmtBRL(restante);
-            },
+
+
 
             calcCashChange() {
-                const total = parseFloat(document.getElementById('totalDisplay')?.textContent?.replace(/[R$\s.]/g,'').replace(',','.')) || 0;
-                const recebido = parseFloat(document.getElementById('cashReceived')?.value) || 0;
-                // Aplica desconto de 3% (mesmo que calculateCashDiscount)
+                const total = state.currentSale.total || 0;
                 const finalVal = total * 0.97;
+                const recebido = parseFloat(document.getElementById('cashReceived')?.value) || 0;
                 const troco = Math.max(0, recebido - finalVal);
                 if (document.getElementById('cashChange')) document.getElementById('cashChange').textContent = this._fmtBRL(troco);
-                if (document.getElementById('cashOriginalValue')) document.getElementById('cashOriginalValue').textContent = this._fmtBRL(total);
-                if (document.getElementById('cashDiscount')) document.getElementById('cashDiscount').textContent = '- ' + this._fmtBRL(total * 0.03);
-                if (document.getElementById('cashFinalValue')) document.getElementById('cashFinalValue').textContent = this._fmtBRL(finalVal);
+                this.calculateCashDiscount();
                 this.calcCashRetirada();
             },
 
@@ -12511,7 +12367,7 @@ ${container.innerHTML}
                             ${showPrices ? `<td style="text-align:right">${Utils.formatCurrency(item.price)}</td><td style="text-align:right">${Utils.formatCurrency(item.subtotal)}</td>` : ''}
                         </tr>`).join('');
 
-                    const pagMethodLabel = {'pix':'PIX','cash':'Dinheiro','debit':'Débito','credit':'Crédito','installment':'Crediário'}[sale.paymentMethod] || sale.paymentMethod;
+                    const pagMethodLabel = {'pix':'PIX','cash':'Dinheiro','debit':'Débito','credit':'Crédito','installment':'Crediário'}[sale.paymentMethod] || sale.paymentMethod || '—';
                     const isMixed = sale.paymentMode === 'mixed' && sale.mixedPayments?.length;
 
                     const pagHtml = details ? `
@@ -13247,35 +13103,64 @@ ${container.innerHTML}
                 // PDF no tamanho real: largura 80mm, altura = conteúdo real
                 gerarPDFTamanhoReal(el, `COMPROVANTE_OS${sale.number}_P${parcela.number}`, 80);
             },
+            // ── CRÉDITO (cartão) ────────────────────────────────────────────────
+            calculateCredit() {
+                const total = state.currentSale.total || 0;
+                const creditTax = parseFloat(state.company?.creditTax) || 2.5;
+
+                // Parcelas sem juros (1x–5x)
+                const selSemJuros = document.getElementById('creditInstallments');
+                if (selSemJuros) {
+                    Array.from(selSemJuros.options).forEach(opt => {
+                        const n = parseInt(opt.value);
+                        opt.text = `${n}x de ${Utils.formatCurrency(total / n)} — sem juros`;
+                    });
+                }
+                // Parcelas com juros (6x–10x) — Tabela Price
+                const selComJuros = document.getElementById('creditInstallmentsInterest');
+                if (selComJuros) {
+                    Array.from(selComJuros.options).forEach(opt => {
+                        const n = parseInt(opt.value);
+                        const taxa = creditTax / 100;
+                        const pmt = total * (taxa * Math.pow(1+taxa,n)) / (Math.pow(1+taxa,n) - 1);
+                        opt.text = `${n}x de ${Utils.formatCurrency(pmt)} — ${creditTax}% a.m.`;
+                    });
+                }
+                this.calcCreditRetirada();
+            },
+
+            calculateCreditInterest() { this.calculateCredit(); },
+
             calculatePixDiscount() {
-                const total = state.currentSale.total;
+                const total = state.currentSale.total || 0;
                 const discount = total * 0.05;
                 const finalValue = total - discount;
                 if (document.getElementById('pixOriginalValue')) document.getElementById('pixOriginalValue').innerText = Utils.formatCurrency(total);
-                document.getElementById('pixDiscount').innerText = '- ' + Utils.formatCurrency(discount);
-                document.getElementById('pixFinalValue').innerText = Utils.formatCurrency(finalValue);
+                if (document.getElementById('pixDiscount')) document.getElementById('pixDiscount').innerText = '- ' + Utils.formatCurrency(discount);
+                if (document.getElementById('pixFinalValue')) document.getElementById('pixFinalValue').innerText = Utils.formatCurrency(finalValue);
                 this.calcPixRetirada();
             },
 
             calculateCashDiscount() {
-                const total = state.currentSale.total;
+                const total = state.currentSale.total || 0;
                 const discount = total * 0.03;
                 const finalValue = total - discount;
-                
-                document.getElementById('cashDiscount').innerText = Utils.formatCurrency(discount);
-                document.getElementById('cashFinalValue').innerText = Utils.formatCurrency(finalValue);
+                if (document.getElementById('cashOriginalValue')) document.getElementById('cashOriginalValue').innerText = Utils.formatCurrency(total);
+                if (document.getElementById('cashDiscount')) document.getElementById('cashDiscount').innerText = '- ' + Utils.formatCurrency(discount);
+                if (document.getElementById('cashFinalValue')) document.getElementById('cashFinalValue').innerText = Utils.formatCurrency(finalValue);
             },
 
             _updateDebitSummary() {
-                const total = state.currentSale.total;
+                const total = state.currentSale.total || 0;
                 const parcelas = parseInt(document.getElementById('debitInstallments')?.value || 1);
                 const el = document.getElementById('debitSummary');
                 if (!el) return;
-                if (parcelas === 1) {
+                if (parcelas <= 1) {
                     el.textContent = 'À vista: ' + Utils.formatCurrency(total);
                 } else {
                     el.textContent = parcelas + 'x de ' + Utils.formatCurrency(total / parcelas);
                 }
+                this.calcDebitRetirada();
             },
 
             copyPixKey() {
@@ -13606,13 +13491,24 @@ ${container.innerHTML}
                 const retiradaEntryEl = document.getElementById('retiradaEntry');
                 if (retiradaEntryEl) retiradaEntryEl.value = '0';
                 const entryPctEl = document.getElementById('entryPercent');
-                if (entryPctEl) entryPctEl.value = '0';
+                if (entryPctEl) entryPctEl.value = '50';
                 if (selectedClientEl) selectedClientEl.style.display = 'none';
                 if (prescSectionEl) prescSectionEl.style.display = 'none';
                 if (clientSearchEl) clientSearchEl.style.display = 'none';
                 const searchClientSaleEl = document.getElementById('searchClientSale');
                 if (searchClientSaleEl) searchClientSaleEl.value = '';
                 if (statusEl) statusEl.value = 'orcamento';
+                // Reseta campos de cada método de pagamento
+                ['pixEntrada','cashEntrada','cashReceived','creditEntrada','debitEntrada'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.value = '0';
+                });
+                ['pixRetiradaVal','cashRetiradaVal','cashChange','creditRetiradaVal','debitRetiradaVal'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.textContent = 'R$ 0,00';
+                });
+                ['pixOriginalValue','pixDiscount','pixFinalValue',
+                 'cashOriginalValue','cashDiscount','cashFinalValue'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.textContent = 'R$ 0,00';
+                });
                 
                 this.generateOsNumber();
                 this.setDefaultDates();
