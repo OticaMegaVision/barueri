@@ -4366,11 +4366,15 @@
                             <div style="background:#e8f9f3;border:1.5px solid #a5d6a7;border-radius:12px;padding:16px;margin-top:12px;">
                                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
                                     <i class="fas fa-qrcode" style="font-size:2.2rem;color:#00a884;"></i>
-                                    <div>
-                                        <div style="font-weight:800;color:#00695c;font-size:14px;">Pagamento via PIX <span style="background:#a5d6a7;color:#1b5e20;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700;">5% de desconto</span></div>
+                                    <div style="flex:1;">
+                                        <div style="font-weight:800;color:#00695c;font-size:14px;">Pagamento via PIX</div>
                                         <div style="font-size:12px;color:#555;margin-top:4px;">Chave: <strong id="companyPix">—</strong>
                                             <button type="button" onclick="Sales.copyPixKey()" style="margin-left:6px;padding:2px 8px;background:#00a884;color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;"><i class="fas fa-copy"></i> Copiar</button>
                                         </div>
+                                        <label style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-size:13px;color:#2e7d32;font-weight:600;">
+                                            <input type="checkbox" id="pixDescontoAtivo" checked onchange="Sales.PAY.pixCalc.call(Sales.PAY)" style="width:16px;height:16px;cursor:pointer;">
+                                            Aplicar desconto PIX (5%) — opcional
+                                        </label>
                                     </div>
                                 </div>
                                 <div style="background:#fff;border-radius:8px;border:1px solid #c8e6c9;overflow:hidden;">
@@ -4415,7 +4419,13 @@
                             <div style="background:#f1f8e9;border:1.5px solid #aed581;border-radius:12px;padding:16px;margin-top:12px;">
                                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
                                     <i class="fas fa-money-bill-wave" style="font-size:2rem;color:#2e7d32;"></i>
-                                    <div style="font-weight:800;color:#1b5e20;font-size:14px;">Pagamento em Dinheiro <span style="background:#c8e6c9;color:#2e7d32;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700;">3% de desconto</span></div>
+                                    <div style="flex:1;">
+                                        <div style="font-weight:800;color:#1b5e20;font-size:14px;">Pagamento em Dinheiro</div>
+                                        <label style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-size:13px;color:#2e7d32;font-weight:600;">
+                                            <input type="checkbox" id="cashDescontoAtivo" checked onchange="Sales.PAY.cashCalc.call(Sales.PAY)" style="width:16px;height:16px;cursor:pointer;">
+                                            Aplicar desconto dinheiro (3%) — opcional
+                                        </label>
+                                    </div>
                                 </div>
                                 <div style="background:#fff;border-radius:8px;border:1px solid #dcedc8;overflow:hidden;margin-bottom:12px;">
                                     <div style="display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f1f8e9;">
@@ -9520,10 +9530,14 @@ ORDER BY table_name;
 
             // Limpa campos de prescrição SEM pedir confirmação (uso interno após salvar)
             _resetPrescFields() {
-                ['clientOdSph','clientOdCyl','clientOdAdd','clientOeSph','clientOeCyl','clientOeAdd'].forEach(id => {
+                // Campos longe (OD e OE) — esférico, cilíndrico, adição
+                ['clientOdSph','clientOdCyl','clientOdAdd','clientOeSph','clientOeCyl','clientOeAdd',
+                 // Campos perto (near) calculados automaticamente
+                 'clientOdNearSph','clientOdNearCyl','clientOeNearSph','clientOeNearCyl'].forEach(id => {
                     const el = document.getElementById(id); if (el) el.value = '0.00';
                 });
                 ['clientOdAxis','clientOeAxis','clientOdDnp','clientOeDnp',
+                 'clientOdNearAxis','clientOdNearDnp','clientOeNearAxis','clientOeNearDnp',
                  'clientPrescDp','clientPrescHeight','clientPrescNotes','clientPrescOptometrist'].forEach(id => {
                     const el = document.getElementById(id); if (el) el.value = '';
                 });
@@ -11679,10 +11693,11 @@ ${container.innerHTML}
                     if (alertVal) alertVal.textContent = this.fmt(restante);
                 },
 
-                // PIX — desconto 5% salvo no total real
+                // PIX — desconto 5% opcional
                 pixCalc() {
                     const bruto = state.currentSale._grossTotal || state.currentSale.total || 0;
-                    const desc  = bruto * 0.05;
+                    const ativo = document.getElementById('pixDescontoAtivo')?.checked !== false;
+                    const desc  = ativo ? bruto * 0.05 : 0;
                     const final = bruto - desc;
                     // Atualiza state com total já com desconto
                     state.currentSale.total = final;
@@ -11691,7 +11706,7 @@ ${container.innerHTML}
                     if (tdEl) tdEl.innerText = this.fmt(final);
                     // Atualiza painel PIX
                     const b = document.getElementById('pixBruto'); if (b) b.innerText = this.fmt(bruto);
-                    const d = document.getElementById('pixDesconto'); if (d) d.innerText = '- ' + this.fmt(desc);
+                    const d = document.getElementById('pixDesconto'); if (d) d.innerText = ativo ? '- ' + this.fmt(desc) : '— (não aplicado)';
                     const f = document.getElementById('pixFinal'); if (f) f.innerText = this.fmt(final);
                     // Atualiza chave PIX
                     const pix = state.company?.pix || state.company?.cnpj || '—';
@@ -11699,10 +11714,11 @@ ${container.innerHTML}
                     this.retirada('pix');
                 },
 
-                // Dinheiro — desconto 3% salvo no total real
+                // Dinheiro — desconto 3% opcional
                 cashCalc() {
                     const bruto = state.currentSale._grossTotal || state.currentSale.total || 0;
-                    const desc  = bruto * 0.03;
+                    const ativo = document.getElementById('cashDescontoAtivo')?.checked !== false;
+                    const desc  = ativo ? bruto * 0.03 : 0;
                     const final = bruto - desc;
                     // Atualiza state com total já com desconto
                     state.currentSale.total = final;
@@ -11711,7 +11727,7 @@ ${container.innerHTML}
                     if (tdEl) tdEl.innerText = this.fmt(final);
                     // Atualiza painel Dinheiro
                     const b = document.getElementById('cashBruto'); if (b) b.innerText = this.fmt(bruto);
-                    const d = document.getElementById('cashDesconto'); if (d) d.innerText = '- ' + this.fmt(desc);
+                    const d = document.getElementById('cashDesconto'); if (d) d.innerText = ativo ? '- ' + this.fmt(desc) : '— (não aplicado)';
                     const f = document.getElementById('cashFinal'); if (f) f.innerText = this.fmt(final);
                     this.cashChange();
                     this.retirada('cash');
@@ -13525,12 +13541,14 @@ ${container.innerHTML}
                     return;
                 }
 
-                // Calcula desconto do método (PIX 5%, Dinheiro 3%)
+                // Calcula desconto do método (PIX 5% opcional, Dinheiro 3% opcional)
                 const method = state.currentSale.paymentMethod;
                 const grossTotal = state.currentSale._grossTotal || state.currentSale.total || 0;
                 let methodDiscount = 0;
-                if (method === 'pix')  methodDiscount = grossTotal * 0.05;
-                if (method === 'cash') methodDiscount = grossTotal * 0.03;
+                if (method === 'pix' && document.getElementById('pixDescontoAtivo')?.checked !== false)
+                    methodDiscount = grossTotal * 0.05;
+                if (method === 'cash' && document.getElementById('cashDescontoAtivo')?.checked !== false)
+                    methodDiscount = grossTotal * 0.03;
                 // Total final já foi aplicado pelo PAY object
                 const finalTotal = state.currentSale.total;
                 
@@ -13614,10 +13632,10 @@ ${container.innerHTML}
                 const statusEl = document.getElementById('saleStatus');
                 
                 if (sellerEl) sellerEl.value = '';
-                if (discountEl) discountEl.value = '0';
-                if (additionEl) additionEl.value = '0';
+                if (discountEl) { discountEl.value = '0'; }
+                if (additionEl) { additionEl.value = '0'; }
                 if (obsEl) obsEl.value = '';
-                if (professionalEl) professionalEl.value = '';
+                if (typeof professionalEl !== 'undefined' && professionalEl) professionalEl.value = '';
                 const clientSelectEl = document.getElementById('clientSelect');
                 if (clientSelectEl) clientSelectEl.innerHTML = '<option value="">Selecione um cliente</option>';
                 const entryValEl = document.getElementById('entryValue');
@@ -13632,15 +13650,40 @@ ${container.innerHTML}
                 const searchClientSaleEl = document.getElementById('searchClientSale');
                 if (searchClientSaleEl) searchClientSaleEl.value = '';
                 if (statusEl) statusEl.value = 'orcamento';
-                // Reseta TODOS os campos de cada método de pagamento (novos IDs)
-                ['pixEntrada','cashEntrada','cashRecebido','creditEntrada','debitEntrada'].forEach(id => {
-                    const el = document.getElementById(id); if (el) el.value = '0';
+                // Oculta todos os painéis de pagamento
+                ['pixDetails','cashDetails','debitDetails','creditDetails','installmentDetails'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.classList.add('d-none'); el.style.display = ''; }
                 });
+                // Reseta checkboxes de desconto opcional
+                const pixCb = document.getElementById('pixDescontoAtivo');
+                if (pixCb) pixCb.checked = true;
+                const cashCb = document.getElementById('cashDescontoAtivo');
+                if (cashCb) cashCb.checked = true;
+                // Oculta alertas de retirada/troco
+                ['pixAlerta','cashAlerta','retiradaAlert'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.style.display = 'none';
+                });
+                // Reseta TODOS os campos de cada método de pagamento (novos IDs)
+                ['pixEntrada','cashEntrada','cashRecebido','creditEntrada','debitEntrada',
+                 'installmentCount','lateFee','dailyInterest'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (id === 'installmentCount') el.value = '2';
+                    else if (id === 'lateFee') el.value = '2';
+                    else if (id === 'dailyInterest') el.value = '0.033';
+                    else el.value = '0';
+                });
+                // Limpa tabela de parcelas
+                const instBody = document.getElementById('installmentsTableBody');
+                if (instBody) instBody.innerHTML = '';
                 // Displays de retirada/troco/valores (novos IDs)
                 ['pixRetirada','cashRetirada','cashTroco','creditRetirada','debitRetirada',
                  'pixBruto','pixDesconto','pixFinal',
                  'cashBruto','cashDesconto','cashFinal',
                  'debitTotal','creditTotal','creditParcelaVal',
+                 'installmentValue','totalSaleValue','entrySummary','balanceSummary',
+                 'pixAlertaVal','cashAlertaVal','retiradaValor',
                  // IDs antigos por compatibilidade legado
                  'pixRetiradaVal','cashRetiradaVal','cashChange','creditRetiradaVal','debitRetiradaVal',
                  'pixOriginalValue','pixDiscount','pixFinalValue',
@@ -13648,6 +13691,9 @@ ${container.innerHTML}
                 ].forEach(id => {
                     const el = document.getElementById(id); if (el) el.textContent = 'R$ 0,00';
                 });
+                // Reseta sumário de parcelas
+                const totalParcelsSummary = document.getElementById('totalParcelsSummary');
+                if (totalParcelsSummary) totalParcelsSummary.textContent = '0x';
                 
                 this.generateOsNumber();
                 this.setDefaultDates();
@@ -13807,7 +13853,7 @@ ${container.innerHTML}
                     </div>` : ''}
 
                     <!-- ── Parcelas ── -->
-                    ${parcelasRows ? `<div style="margin-bottom:14px;">
+                    ${(sale.paymentMethod === 'installment' && parcelasRows) ? `<div style="margin-bottom:14px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
                             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#6610f2;">💳 Parcelas do Crediário</div>
                             <div style="display:flex;gap:6px;flex-wrap:wrap;">
