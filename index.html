@@ -6899,7 +6899,7 @@ ORDER BY table_name;
                     const nomeCliente = client ? client.name : 'Cliente';
                     const parcelas = (sale.paymentDetails && sale.paymentDetails.parcels) ? sale.paymentDetails.parcels : [];
                     parcelas.forEach(p => {
-                        if (p.paid) return;
+                        if (p.paid || p.status === 'pago' || p.status === 'paid') return;
                         contasVendas.push({
                             id: 'venda_' + sale.id + '_p' + p.number,
                             tipo: 'receber',
@@ -6912,8 +6912,8 @@ ORDER BY table_name;
                             _readonly: true
                         });
                     });
-                    // Venda sem parcelamento e ainda não entregue
-                    if (parcelas.length === 0 && sale.total > 0 && sale.status !== 'entregue') {
+                    // Venda sem parcelamento e ainda não entregue/paga
+                    if (parcelas.length === 0 && sale.total > 0 && sale.status !== 'entregue' && sale.status !== 'pago' && sale.status !== 'finalizado') {
                         contasVendas.push({
                             id: 'venda_' + sale.id + '_total',
                             tipo: 'receber',
