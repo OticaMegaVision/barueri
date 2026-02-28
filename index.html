@@ -2140,7 +2140,7 @@
             
             .sidebar {
                 transform: translateX(-100%);
-                width: 260px;
+                width: 130px;
             }
             
             .sidebar.open {
@@ -3817,8 +3817,6 @@
                         <div class="date" id="currentDate"></div>
                     </div>
                     <div class="backup-buttons">
-                        <button class="btn btn-secondary btn-sm" onclick="App.exportBackup()" aria-label="Exportar backup"><i class="fas fa-download"></i> Backup</button>
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importBackup').click()" aria-label="Importar backup"><i class="fas fa-upload"></i> Restaurar</button>
                         <input type="file" id="importBackup" class="d-none" accept=".json" onchange="App.importBackup(event)" aria-hidden="true">
                         <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="SupaSync.syncDown()" title="Sincronizar com a nuvem" id="headerSyncBtn">
                             <i class="fas fa-cloud-arrow-down" id="headerSyncIcon"></i> Sync
@@ -5865,6 +5863,17 @@
                     <div class="form-container">
                         <h3 style="color: var(--primary); margin-bottom: 1.5rem;"><i class="fas fa-database"></i> Backup e Restauração</h3>
 
+                        <!-- AÇÕES RÁPIDAS -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+                            <button class="btn btn-primary" onclick="App.exportBackup()" style="padding:1rem;font-size:1rem;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                                <i class="fas fa-download" style="font-size:1.2rem;"></i> Fazer Backup
+                            </button>
+                            <button class="btn btn-secondary" onclick="document.getElementById('importBackupConfig').click()" style="padding:1rem;font-size:1rem;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                                <i class="fas fa-upload" style="font-size:1.2rem;"></i> Restaurar
+                            </button>
+                            <input type="file" id="importBackupConfig" class="d-none" accept=".json" onchange="App.importBackup(event)">
+                        </div>
+
                         <!-- SYNC RÁPIDO -->
                         <div style="background: linear-gradient(135deg, #1e1e2e, #2a2a3e); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
                             <div style="display:flex; align-items:center; gap:0.75rem;">
@@ -6371,6 +6380,37 @@ ORDER BY table_name;
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="Modal.close('confirmModal')">Cancelar</button>
                 <button class="btn btn-danger" id="confirmAction">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gerar O.S. após salvar venda -->
+    <div class="modal" id="osGeradoModal" role="dialog" aria-modal="true" aria-labelledby="osGeradoTitle">
+        <div class="modal-content" style="max-width:400px;text-align:center;">
+            <div class="modal-header" style="justify-content:center;border-bottom:none;padding-bottom:0;">
+                <div class="modal-title" id="osGeradoTitle" style="font-size:1.1rem;">✅ Venda Salva!</div>
+                <button class="modal-close" onclick="Modal.close('osGeradoModal')" aria-label="Fechar" style="position:absolute;right:1rem;top:1rem;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding:1.25rem 1.5rem 0.5rem;">
+                <div style="font-size:2.5rem;margin-bottom:0.5rem;">🖨️</div>
+                <p id="osGeradoNumero" style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;"></p>
+                <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1.25rem;">Deseja gerar a O.S. agora?</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.75rem;">
+                    <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')">
+                        <i class="fas fa-file-pdf"></i> Via Ótica
+                    </button>
+                    <button class="btn btn-success" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via2')">
+                        <i class="fas fa-file-pdf"></i> Via Cliente
+                    </button>
+                    <button class="btn btn-secondary" style="font-size:0.85rem;padding:0.6rem;grid-column:1/-1;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('ambas')">
+                        <i class="fas fa-file-pdf"></i> Ambas as Vias
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content:center;border-top:none;padding-top:0;">
+                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;" onclick="Modal.close('osGeradoModal')">
+                    Fechar sem imprimir
+                </button>
             </div>
         </div>
     </div>
@@ -6919,8 +6959,61 @@ ORDER BY table_name;
                 const contas = await this.getAll();
                 const hoje = new Date().toISOString().split('T')[0];
 
-                const receber = contas.filter(c => c.tipo === 'receber');
-                const pagar   = contas.filter(c => c.tipo === 'pagar');
+                // ── Injeta parcelas de vendas em Contas a Receber ──────────────
+                const contasVendas = [];
+                (state.sales || []).forEach(sale => {
+                    const client = (state.clients || []).find(c => c.id === sale.clientId);
+                    const nomeCliente = client ? client.name : 'Cliente';
+                    const parcelas = (sale.paymentDetails && sale.paymentDetails.parcels) ? sale.paymentDetails.parcels : [];
+                    parcelas.forEach(p => {
+                        if (p.paid) return;
+                        contasVendas.push({
+                            id: 'venda_' + sale.id + '_p' + p.number,
+                            tipo: 'receber',
+                            descricao: `OS ${sale.number} — Parcela ${p.number}/${parcelas.length}`,
+                            parte: nomeCliente,
+                            categoria: 'Venda',
+                            valor: parseFloat(p.value || 0),
+                            vencimento: p.dueDate || '',
+                            pago: false,
+                            _readonly: true
+                        });
+                    });
+                    // Venda sem parcelamento e ainda não entregue
+                    if (parcelas.length === 0 && sale.total > 0 && sale.status !== 'entregue') {
+                        contasVendas.push({
+                            id: 'venda_' + sale.id + '_total',
+                            tipo: 'receber',
+                            descricao: `OS ${sale.number} — Total`,
+                            parte: nomeCliente,
+                            categoria: 'Venda',
+                            valor: parseFloat(sale.total || 0),
+                            vencimento: sale.deliveryForecast || sale.date || '',
+                            pago: false,
+                            _readonly: true
+                        });
+                    }
+                });
+
+                // ── Injeta despesas pendentes em Contas a Pagar ────────────────
+                const contasDespesas = [];
+                (state.expenses || []).forEach(exp => {
+                    if (exp.status === 'pago' || exp.pago || exp.paid) return;
+                    contasDespesas.push({
+                        id: 'desp_' + exp.id,
+                        tipo: 'pagar',
+                        descricao: exp.desc || exp.description || 'Despesa',
+                        parte: exp.supplierId || '',
+                        categoria: exp.category || 'Despesa',
+                        valor: parseFloat(exp.value || 0),
+                        vencimento: exp.date || '',
+                        pago: false,
+                        _readonly: true
+                    });
+                });
+
+                const receber = [...contas.filter(c => c.tipo === 'receber'), ...contasVendas];
+                const pagar   = [...contas.filter(c => c.tipo === 'pagar'),   ...contasDespesas];
 
                 const totalRec = receber.filter(c=>!c.pago).reduce((s,c)=>s+parseFloat(c.valor||0),0);
                 const totalPag = pagar.filter(c=>!c.pago).reduce((s,c)=>s+parseFloat(c.valor||0),0);
@@ -6964,10 +7057,11 @@ ORDER BY table_name;
                         </div>
                         <span class="conta-item-valor">${this.fmt(c.valor)}</span>
                         <div class="conta-item-actions">
-                            ${!c.pago ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixa('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
-                            <button class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.75rem;" title="Comprovante" onclick="ContasManager.gerarComprovante('${c.id}')"><i class="fas fa-receipt"></i></button>
-                            <button class="btn btn-sm" style="background:#17a2b8;color:white;padding:4px 8px;font-size:0.75rem;" title="Editar" onclick="ContasManager.editarConta('${c.id}')"><i class="fas fa-pen"></i></button>
-                            <button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.75rem;" title="Excluir" onclick="ContasManager.excluirConta('${c.id}')"><i class="fas fa-trash"></i></button>
+                            ${!c.pago && !c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixa('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
+                            ${!c._readonly ? `<button class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.75rem;" title="Comprovante" onclick="ContasManager.gerarComprovante('${c.id}')"><i class="fas fa-receipt"></i></button>` : ''}
+                            ${!c._readonly ? `<button class="btn btn-sm" style="background:#17a2b8;color:white;padding:4px 8px;font-size:0.75rem;" title="Editar" onclick="ContasManager.editarConta('${c.id}')"><i class="fas fa-pen"></i></button>` : ''}
+                            ${!c._readonly ? `<button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.75rem;" title="Excluir" onclick="ContasManager.excluirConta('${c.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                            ${c._readonly ? `<span style="font-size:0.72rem;color:var(--gray);padding:4px 6px;" title="Gerado automaticamente">🔗 Auto</span>` : ''}
                         </div>
                     </div>`;
                 }).join('');
@@ -8461,12 +8555,12 @@ ORDER BY table_name;
             async upsertPrescricao(p) { return LocalFirst.pushItem('prescriptions', p); },
             async upsertDespesa(e)    { return LocalFirst.pushItem('expenses', e); },
             async upsertFornecedor(s) { return LocalFirst.pushItem('suppliers', s); },
-            async upsertServico(s)    {},
+            async upsertServico(s)    { return LocalFirst.pushItem('services', s); },
             async upsertConfig()      { return LocalFirst.pushConfig(); },
             async deletarCliente(id)  { return LocalFirst.deleteItem('clients', id); },
             async deletarProduto(id)  { return LocalFirst.deleteItem('products', id); },
             async deletarFornecedor(id) { return LocalFirst.deleteItem('suppliers', id); },
-            async deletarServico(id)  {},
+            async deletarServico(id)  { return LocalFirst.deleteItem('services', id); },
             async deletarDespesa(id)  { return LocalFirst.deleteItem('expenses', id); },
             async verificarTabelas() {
                 const tabelas = ['clients','products','sales','expenses','prescriptions','suppliers','services','config'];
@@ -8482,11 +8576,9 @@ ORDER BY table_name;
                 }
                 const erros = resultados.filter(r => !r.ok);
                 if (erros.length === 0) {
-                    Toast.show(`✅ Todas as 8 tabelas verificadas com sucesso!`, 'success', 4000);
+                    Toast.show(`✅ Todas as 8 tabelas verificadas com sucesso!`, 'success');
                 } else {
-                    const nomes = erros.map(r => r.tabela).join(', ');
-                    Toast.show(`⚠️ Problema nas tabelas: ${nomes}. Execute o SQL Setup.`, 'warning', 6000);
-                    console.table(resultados);
+                    Toast.show(`⚠️ Tabelas com problema: ${erros.map(r=>r.tabela).join(', ')}. Execute o SQL Setup.`, 'warning');
                 }
             },
             async syncDown() {
@@ -8634,7 +8726,6 @@ ORDER BY table_name;
 
             async saveData(silent = false) {
                 try {
-                    // Garante que todos os itens tenham updated_at para o conflict resolution
                     const now = new Date().toISOString();
                     ['clients','products','sales','expenses','prescriptions','suppliers','services'].forEach(key => {
                         if (Array.isArray(state[key])) {
@@ -8646,9 +8737,7 @@ ORDER BY table_name;
                     // Retroativamente adiciona id nos receituários antigos que não tinham
                     if (Array.isArray(state.prescriptions)) {
                         state.prescriptions.forEach(p => {
-                            if (!p.id && p.clientId) {
-                                p.id = 'PRESC-' + p.clientId;
-                            }
+                            if (!p.id && p.clientId) p.id = 'PRESC-' + p.clientId;
                         });
                     }
                     const dataStr = JSON.stringify(state);
@@ -8731,6 +8820,7 @@ ORDER BY table_name;
                         if (section === 'dashboard') Dashboard.update();
                         else if (section === 'sales') {
                             Sales.renderHistory();
+                            Sales.populateSaleSelects();
                             document.getElementById('saleNumber') && (document.getElementById('saleNumber').value = Sales.generateOsNumber());
                         }
                         else if (section === 'clients') Clients.renderTable();
@@ -11416,14 +11506,27 @@ ${container.innerHTML}
             generateOsNumber() {
                 const currentYear = new Date().getFullYear();
                 if (!state.lastOsCounter) state.lastOsCounter = {};
-                if (!state.lastOsCounter[currentYear]) state.lastOsCounter[currentYear] = 1;
-                
-                const sequential = String(state.lastOsCounter[currentYear]).padStart(4, '0');
+
+                // Recalcula o próximo número baseado nas vendas existentes para evitar duplicatas
+                const osPrefix = `OS-${currentYear}-`;
+                const usedNumbers = (state.sales || [])
+                    .map(s => s.number || '')
+                    .filter(n => n.startsWith(osPrefix))
+                    .map(n => parseInt(n.replace(osPrefix, ''), 10))
+                    .filter(n => !isNaN(n));
+
+                const maxUsed = usedNumbers.length > 0 ? Math.max(...usedNumbers) : 0;
+                const counterValue = state.lastOsCounter[currentYear] || 1;
+                const nextNumber = Math.max(counterValue, maxUsed + 1);
+
+                state.lastOsCounter[currentYear] = nextNumber;
+
+                const sequential = String(nextNumber).padStart(4, '0');
                 const osNumber = `OS-${currentYear}-${sequential}`;
-                
+
                 const el = document.getElementById('saleNumber');
                 if (el) el.value = osNumber;
-                
+
                 return osNumber;
             },
 
@@ -13443,13 +13546,10 @@ ${container.innerHTML}
                     state.editingSaleId = null;
                 } else {
                     state.sales.push(sale);
-                    // Incrementar contador de OS apenas se for nova venda
+                    // Avança o contador para o próximo número após salvar
                     const currentYear = new Date().getFullYear();
-                    if (state.lastOsCounter[currentYear]) {
-                        state.lastOsCounter[currentYear]++;
-                    } else {
-                        state.lastOsCounter[currentYear] = 1;
-                    }
+                    if (!state.lastOsCounter) state.lastOsCounter = {};
+                    state.lastOsCounter[currentYear] = (state.lastOsCounter[currentYear] || 1) + 1;
                 }
                 
                 App.saveData();
@@ -13457,6 +13557,10 @@ ${container.innerHTML}
                 this.clearForm();
                 this.renderHistory();
                 Toast.show('Venda salva com sucesso!');
+                // Modal para gerar O.S.
+                const osNumEl = document.getElementById('osGeradoNumero');
+                if (osNumEl) osNumEl.textContent = 'OS: ' + sale.number;
+                Modal.show('osGeradoModal');
             },
 
             clearForm() {
@@ -13495,6 +13599,8 @@ ${container.innerHTML}
                 if (additionEl) additionEl.value = '0';
                 if (obsEl) obsEl.value = '';
                 if (professionalEl) professionalEl.value = '';
+                const clientSelectEl = document.getElementById('clientSelect');
+                if (clientSelectEl) clientSelectEl.innerHTML = '<option value="">Selecione um cliente</option>';
                 const entryValEl = document.getElementById('entryValue');
                 if (entryValEl) entryValEl.value = '0';
                 const retiradaEntryEl = document.getElementById('retiradaEntry');
