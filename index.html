@@ -4258,68 +4258,132 @@
                     </div>
 
                     <!-- ITENS DA VENDA -->
-                    <div class="cliente-card">
-                        <h3>🛒 ITENS DA VENDA</h3>
-
-                        
-                        <div class="sale-items" id="saleItemsContainer">
-                            <!-- Itens serão inseridos via JavaScript -->
+                    <div class="cliente-card" style="padding:0;overflow:hidden;">
+                        <!-- Header -->
+                        <div style="background:linear-gradient(135deg,#ff6b00 0%,#e55a00 100%);padding:1rem 1.5rem;display:flex;align-items:center;gap:0.75rem;">
+                            <div style="background:rgba(255,255,255,0.2);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🛒</div>
+                            <div>
+                                <h3 style="color:white;margin:0;font-size:1rem;font-weight:700;letter-spacing:.3px;">ITENS DA VENDA</h3>
+                                <span style="color:rgba(255,255,255,0.75);font-size:0.75rem;">Lentes · Armações · Serviços</span>
+                            </div>
+                            <div style="margin-left:auto;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;color:white;font-size:0.78rem;font-weight:700;" id="itemCountBadge">0 itens</div>
                         </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="lenteSelect">Adicionar Lente</label>
-                                <select id="lenteSelect" class="form-control">
-                                    <option value="">Selecione uma lente</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="lenteQty">Qtd</label>
-                                <input type="number" id="lenteQty" class="form-control" value="1" min="1" style="width: 80px;">
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" style="margin-top: 25px;" onclick="Sales.addLente()">
-                                    <i class="fas fa-plus"></i> Adicionar Lente
-                                </button>
+
+                        <!-- Lista de itens adicionados -->
+                        <div id="saleItemsContainer" style="min-height:56px;padding:0.75rem 1.25rem;background:#fafafa;border-bottom:1px solid #f0f0f0;">
+                            <div id="emptyItemsMsg" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 0;color:#adb5bd;font-size:0.85rem;">
+                                <i class="fas fa-cart-plus" style="font-size:1.1rem;"></i> Nenhum item adicionado
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="armacaoSelect">Adicionar Armação</label>
-                                <select id="armacaoSelect" class="form-control">
-                                    <option value="">Selecione uma armação</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="armacaoQty">Qtd</label>
-                                <input type="number" id="armacaoQty" class="form-control" value="1" min="1" style="width: 80px;">
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" style="margin-top: 25px;" onclick="Sales.addArmacao()">
-                                    <i class="fas fa-plus"></i> Adicionar Armação
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Cards de adição -->
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:#e9ecef;">
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="servicoSelect">Adicionar Serviço</label>
-                                <select id="servicoSelect" class="form-control">
-                                    <option value="">Selecione um serviço</option>
-                                </select>
+                            <!-- Lente -->
+                            <div style="background:white;padding:1.1rem 1.25rem;">
+                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Lente</span>
+                                </div>
+                                <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+                                    <div style="flex:1;">
+                                        <select id="lenteSelect" class="form-control" style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;">
+                                            <option value="">Selecione uma lente</option>
+                                        </select>
+                                    </div>
+                                    <div style="width:60px;">
+                                        <input type="number" id="lenteQty" class="form-control" value="1" min="1"
+                                            style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 6px;"
+                                            title="Quantidade">
+                                    </div>
+                                    <button type="button" onclick="Sales.addLente()"
+                                        style="height:38px;padding:0 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:opacity .2s;display:flex;align-items:center;gap:5px;"
+                                        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                                        <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="servicoQty">Qtd</label>
-                                <input type="number" id="servicoQty" class="form-control" value="1" min="1" style="width: 80px;">
+
+                            <!-- Armação -->
+                            <div style="background:white;padding:1.1rem 1.25rem;">
+                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;">
+                                        <i class="fas fa-glasses"></i>
+                                    </div>
+                                    <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Armação</span>
+                                </div>
+                                <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+                                    <div style="flex:1;">
+                                        <select id="armacaoSelect" class="form-control" style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;">
+                                            <option value="">Selecione uma armação</option>
+                                        </select>
+                                    </div>
+                                    <div style="width:60px;">
+                                        <input type="number" id="armacaoQty" class="form-control" value="1" min="1"
+                                            style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 6px;"
+                                            title="Quantidade">
+                                    </div>
+                                    <button type="button" onclick="Sales.addArmacao()"
+                                        style="height:38px;padding:0 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:opacity .2s;display:flex;align-items:center;gap:5px;"
+                                        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                                        <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" style="margin-top: 25px;" onclick="Sales.addServico()">
-                                    <i class="fas fa-plus"></i> Adicionar Serviço
-                                </button>
+
+                            <!-- Serviço -->
+                            <div style="background:white;padding:1.1rem 1.25rem;">
+                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;">
+                                        <i class="fas fa-tools"></i>
+                                    </div>
+                                    <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Serviço</span>
+                                </div>
+                                <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+                                    <div style="flex:1;">
+                                        <select id="servicoSelect" class="form-control" style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;">
+                                            <option value="">Selecione um serviço</option>
+                                        </select>
+                                    </div>
+                                    <div style="width:60px;">
+                                        <input type="number" id="servicoQty" class="form-control" value="1" min="1"
+                                            style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 6px;"
+                                            title="Quantidade">
+                                    </div>
+                                    <button type="button" onclick="Sales.addServico()"
+                                        style="height:38px;padding:0 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:opacity .2s;display:flex;align-items:center;gap:5px;"
+                                        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                                        <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
+                                    </button>
+                                </div>
                             </div>
+
                         </div>
                     </div>
+
+                    <script>
+                    // Atualiza contador de itens
+                    (function(){
+                        const origRender = typeof Sales !== 'undefined' && Sales.renderItems;
+                        function updateBadge() {
+                            const badge = document.getElementById('itemCountBadge');
+                            const emptyMsg = document.getElementById('emptyItemsMsg');
+                            if (!badge) return;
+                            const items = (typeof state !== 'undefined' && state.currentSale && state.currentSale.items) ? state.currentSale.items : [];
+                            const count = items.reduce((s,i) => s + (parseInt(i.qty)||1), 0);
+                            badge.textContent = count + (count === 1 ? ' item' : ' itens');
+                            if (emptyMsg) emptyMsg.style.display = items.length === 0 ? 'flex' : 'none';
+                        }
+                        // Observa mudanças no container
+                        const obs = new MutationObserver(updateBadge);
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const c = document.getElementById('saleItemsContainer');
+                            if (c) obs.observe(c, { childList: true, subtree: true });
+                        });
+                    })();
+                    </script>
 
                     <!-- TOTAIS -->
                     <div class="cliente-card">
@@ -6237,9 +6301,39 @@ ORDER BY table_name;
         </div>
     </div>
 
+    <!-- Modal: Cliente salvo com sucesso -->
+    <div class="modal" id="clienteSalvoModal" role="dialog" aria-modal="true" aria-labelledby="clienteSalvoTitle">
+        <div class="modal-content" style="max-width:400px;text-align:center;overflow:hidden;padding:0;">
+            <!-- Header verde -->
+            <div style="background:linear-gradient(135deg,#28a745,#1e7e34);padding:1.5rem 1.5rem 1rem;position:relative;">
+                <button class="modal-close" onclick="Modal.close('clienteSalvoModal')" aria-label="Fechar"
+                    style="position:absolute;right:1rem;top:1rem;color:white;opacity:.8;font-size:1.3rem;background:none;border:none;cursor:pointer;">&times;</button>
+                <div style="width:60px;height:60px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 0.75rem;">✅</div>
+                <div id="clienteSalvoTitle" style="color:white;font-size:1.1rem;font-weight:800;margin-bottom:0.2rem;">Cliente Salvo!</div>
+                <div id="clienteSalvoNome" style="color:rgba(255,255,255,0.85);font-size:0.88rem;"></div>
+            </div>
+            <!-- Body -->
+            <div style="padding:1.25rem 1.5rem;">
+                <p style="color:#6c757d;font-size:0.85rem;margin-bottom:1.25rem;">O que deseja fazer agora?</p>
+
+                <button onclick="Clients._criarVendaParaCliente()"
+                    style="width:100%;padding:0.85rem;border-radius:10px;border:none;background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;font-size:0.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:0.6rem;box-shadow:0 4px 15px rgba(255,107,0,.35);transition:transform .15s;"
+                    onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <i class="fas fa-shopping-cart"></i> Criar Venda para este Cliente
+                </button>
+
+                <button onclick="Modal.close('clienteSalvoModal')"
+                    style="width:100%;padding:0.7rem;border-radius:10px;border:1px solid #dee2e6;background:white;color:#6c757d;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background .15s;"
+                    onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                    Continuar no Cadastro de Clientes
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Gerar O.S. após salvar venda -->
     <div class="modal" id="osGeradoModal" role="dialog" aria-modal="true" aria-labelledby="osGeradoTitle">
-        <div class="modal-content" style="max-width:420px;text-align:center;">
+        <div class="modal-content" style="max-width:400px;text-align:center;">
             <div class="modal-header" style="justify-content:center;border-bottom:none;padding-bottom:0;">
                 <div class="modal-title" id="osGeradoTitle" style="font-size:1.1rem;">✅ Venda Salva!</div>
                 <button class="modal-close" onclick="Modal.close('osGeradoModal')" aria-label="Fechar" style="position:absolute;right:1rem;top:1rem;">&times;</button>
@@ -6247,24 +6341,7 @@ ORDER BY table_name;
             <div class="modal-body" style="padding:1.25rem 1.5rem 0.5rem;">
                 <div style="font-size:2.5rem;margin-bottom:0.5rem;">🖨️</div>
                 <p id="osGeradoNumero" style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;"></p>
-
-                <!-- Situação do Pagamento -->
-                <div style="background:#f8f9fa;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid #e9ecef;">
-                    <p style="font-size:0.82rem;font-weight:700;color:#495057;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:.5px;">💰 Situação do Pagamento</p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-                        <button id="osGeradoBtnPago" onclick="Sales._setOsGeradoPagamento('pago')"
-                            style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #28a745;background:#28a745;color:white;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .2s;">
-                            ✅ PAGO
-                        </button>
-                        <button id="osGeradoBtnPendente" onclick="Sales._setOsGeradoPagamento('pendente')"
-                            style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all .2s;">
-                            ⏳ PENDENTE
-                        </button>
-                    </div>
-                    <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
-                </div>
-
-                <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1rem;">Deseja gerar a O.S.?</p>
+                <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1.25rem;">Deseja gerar a O.S. agora?</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.75rem;">
                     <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')">
                         <i class="fas fa-file-pdf"></i> Via Ótica
@@ -6916,7 +6993,7 @@ ORDER BY table_name;
                     const nomeCliente = client ? client.name : 'Cliente';
                     const parcelas = (sale.paymentDetails && sale.paymentDetails.parcels) ? sale.paymentDetails.parcels : [];
                     parcelas.forEach(p => {
-                        if (p.paid || p.status === 'pago' || p.status === 'paid') return;
+                        if (p.paid) return;
                         contasVendas.push({
                             id: 'venda_' + sale.id + '_p' + p.number,
                             tipo: 'receber',
@@ -6929,11 +7006,8 @@ ORDER BY table_name;
                             _readonly: true
                         });
                     });
-                    // Venda sem parcelamento e ainda não entregue/paga
-                    if (parcelas.length === 0 && sale.total > 0
-                        && sale.status !== 'entregue'
-                        && sale.status !== 'cancelado'
-                        && sale.paymentStatus !== 'pago') {
+                    // Venda sem parcelamento e ainda não entregue
+                    if (parcelas.length === 0 && sale.total > 0 && sale.status !== 'entregue') {
                         contasVendas.push({
                             id: 'venda_' + sale.id + '_total',
                             tipo: 'receber',
@@ -9489,7 +9563,43 @@ ORDER BY table_name;
                 }
                 this.clearForm();
                 this.renderTable();
-                Toast.show('Cliente salvo com sucesso!');
+                // Mostra modal com opção de criar venda
+                Clients._ultimoClienteSalvo = client;
+                const nomeEl = document.getElementById('clienteSalvoNome');
+                if (nomeEl) nomeEl.textContent = client.name || '';
+                Modal.show('clienteSalvoModal');
+            },
+
+            _ultimoClienteSalvo: null,
+
+            _criarVendaParaCliente() {
+                Modal.close('clienteSalvoModal');
+                const client = Clients._ultimoClienteSalvo;
+                // Navega para seção Vendas
+                const menuSales = document.querySelector('.menu-item[data-section="sales"]');
+                if (menuSales) menuSales.click();
+                // Aguarda renderização e pré-seleciona o cliente
+                setTimeout(() => {
+                    if (!client) return;
+                    // Preenche o campo de busca com o nome do cliente
+                    const searchEl = document.getElementById('searchClientSale');
+                    if (searchEl) {
+                        searchEl.value = client.name;
+                        searchEl.dispatchEvent(new Event('input'));
+                        // Tenta selecionar automaticamente após um pequeno delay
+                        setTimeout(() => {
+                            if (typeof Sales !== 'undefined' && Sales.selectClient) {
+                                Sales.selectClient(client.id);
+                            } else {
+                                // Fallback: clica no primeiro resultado
+                                const firstResult = document.querySelector('#clientSearchResults .client-result, #clientSearchResults li, #clientSearchResults div[onclick]');
+                                if (firstResult) firstResult.click();
+                            }
+                        }, 300);
+                    }
+                    Toast.show('Cliente ' + client.name + ' selecionado! Adicione os itens da venda.', 'success');
+                }, 400);
+            },
             },
 
             edit(id) {
@@ -13724,15 +13834,6 @@ ${container.innerHTML}
                 Toast.show('Venda salva com sucesso!');
                 const osNumEl = document.getElementById('osGeradoNumero');
                 if (osNumEl) osNumEl.textContent = 'OS: ' + sale.number;
-                // Guarda o id da venda para o modal de pagamento
-                Sales._osGeradoSaleId = sale.id;
-                // Reset dos botões de pagamento no modal
-                const btnPago = document.getElementById('osGeradoBtnPago');
-                const btnPendente = document.getElementById('osGeradoBtnPendente');
-                const lblPagto = document.getElementById('osGeradoPagtoLabel');
-                if (btnPago) { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
-                if (btnPendente) { btnPendente.style.background='#fff'; btnPendente.style.color='#555'; btnPendente.style.borderColor='#ddd'; }
-                if (lblPagto) lblPagto.textContent = 'Selecione a situação — isso remove da lista de Contas a Receber';
                 Modal.show('osGeradoModal');
             },
 
@@ -13849,61 +13950,6 @@ ${container.innerHTML}
                 Modal.showConfirm('Finalizar venda?', () => {
                     this.save();
                 });
-            },
-
-            _osGeradoSaleId: null,
-
-            _setOsGeradoPagamento(situacao) {
-                const saleId = Sales._osGeradoSaleId;
-                if (!saleId) return;
-                const sale = state.sales.find(s => s.id === saleId);
-                if (!sale) return;
-
-                const btnPago     = document.getElementById('osGeradoBtnPago');
-                const btnPendente = document.getElementById('osGeradoBtnPendente');
-                const lbl         = document.getElementById('osGeradoPagtoLabel');
-
-                if (situacao === 'pago') {
-                    // Marca venda como paga
-                    sale.paymentStatus = 'pago';
-                    sale.paidAt = new Date().toISOString();
-                    // Marca todas as parcelas como pagas
-                    if (sale.paymentDetails && sale.paymentDetails.parcels) {
-                        sale.paymentDetails.parcels.forEach(p => {
-                            p.status = 'pago';
-                            p.paid = true;
-                            p.paidDate = sale.paidAt.slice(0,10);
-                            p.paidValue = p.paidValue || p.value;
-                        });
-                    }
-                    // Estilo botões
-                    if (btnPago)     { btnPago.style.background='#28a745'; btnPago.style.color='white'; btnPago.style.borderColor='#28a745'; }
-                    if (btnPendente) { btnPendente.style.background='#fff'; btnPendente.style.color='#555'; btnPendente.style.borderColor='#ddd'; }
-                    if (lbl) lbl.textContent = '✅ Marcado como PAGO — não aparece em Contas a Receber';
-                } else {
-                    // Pendente — remove paymentStatus pago
-                    sale.paymentStatus = 'pendente';
-                    delete sale.paidAt;
-                    // Parcelas voltam a aberto
-                    if (sale.paymentDetails && sale.paymentDetails.parcels) {
-                        sale.paymentDetails.parcels.forEach(p => {
-                            p.status = 'aberto';
-                            p.paid = false;
-                            delete p.paidDate;
-                            delete p.paidValue;
-                        });
-                    }
-                    if (btnPago)     { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
-                    if (btnPendente) { btnPendente.style.background='#ffc107'; btnPendente.style.color='#333'; btnPendente.style.borderColor='#ffc107'; }
-                    if (lbl) lbl.textContent = '⏳ Marcado como PENDENTE — aparece em Contas a Receber';
-                }
-
-                // Atualiza no state
-                const idx = state.sales.findIndex(s => s.id === saleId);
-                if (idx !== -1) state.sales[idx] = sale;
-                App.saveData();
-                if (typeof ContasManager !== 'undefined') ContasManager.renderAll();
-                Toast.show(situacao === 'pago' ? '✅ Venda marcada como PAGA!' : '⏳ Venda marcada como PENDENTE', situacao === 'pago' ? 'success' : 'warning');
             },
 
             view(id) {
