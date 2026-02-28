@@ -4259,7 +4259,6 @@
 
                     <!-- ITENS DA VENDA -->
                     <div class="cliente-card" style="padding:0;overflow:hidden;">
-                        <!-- Header -->
                         <div style="background:linear-gradient(135deg,#ff6b00 0%,#e55a00 100%);padding:1rem 1.5rem;display:flex;align-items:center;gap:0.75rem;">
                             <div style="background:rgba(255,255,255,0.2);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🛒</div>
                             <div>
@@ -4268,86 +4267,54 @@
                             </div>
                             <div id="itemCountBadge" style="margin-left:auto;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;color:white;font-size:0.78rem;font-weight:700;">0 itens</div>
                         </div>
-
-                        <!-- Lista de itens adicionados -->
                         <div id="saleItemsContainer" style="min-height:56px;padding:0.75rem 1.25rem;background:#fafafa;border-bottom:1px solid #f0f0f0;">
                             <div id="emptyItemsMsg" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 0;color:#adb5bd;font-size:0.85rem;">
                                 <i class="fas fa-cart-plus" style="font-size:1.1rem;"></i> Nenhum item adicionado
                             </div>
                         </div>
-
-                        <!-- Cards de adição -->
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:#e9ecef;">
-
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1px;background:#e9ecef;">
                             <!-- Lente -->
                             <div style="background:white;padding:1.1rem 1.25rem;">
                                 <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;">
-                                        <i class="fas fa-eye"></i>
-                                    </div>
+                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;"><i class="fas fa-eye"></i></div>
                                     <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Lente</span>
                                 </div>
                                 <div style="display:flex;gap:0.5rem;align-items:center;">
-                                    <div style="flex:1;">
-                                        <select id="lenteSelect" class="form-control" style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;">
-                                            <option value="">Selecione uma lente</option>
-                                        </select>
-                                    </div>
-                                    <input type="number" id="lenteQty" class="form-control" value="1" min="1" title="Quantidade"
-                                        style="width:56px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 6px;">
-                                    <button type="button" onclick="Sales.addLente()"
-                                        style="height:38px;padding:0 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;">
+                                    <select id="lenteSelect" class="form-control" style="flex:1;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;"><option value="">Selecione uma lente</option></select>
+                                    <input type="number" id="lenteQty" class="form-control" value="1" min="1" title="Qtd" style="width:54px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 4px;">
+                                    <button type="button" onclick="Sales.addLente()" style="height:38px;padding:0 13px;border-radius:8px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;">
                                         <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
                                     </button>
                                 </div>
                             </div>
-
                             <!-- Armação -->
                             <div style="background:white;padding:1.1rem 1.25rem;">
                                 <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;">
-                                        <i class="fas fa-glasses"></i>
-                                    </div>
+                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;"><i class="fas fa-glasses"></i></div>
                                     <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Armação</span>
                                 </div>
                                 <div style="display:flex;gap:0.5rem;align-items:center;">
-                                    <div style="flex:1;">
-                                        <select id="armacaoSelect" class="form-control" style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;">
-                                            <option value="">Selecione uma armação</option>
-                                        </select>
-                                    </div>
-                                    <input type="number" id="armacaoQty" class="form-control" value="1" min="1" title="Quantidade"
-                                        style="width:56px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 6px;">
-                                    <button type="button" onclick="Sales.addArmacao()"
-                                        style="height:38px;padding:0 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;">
+                                    <select id="armacaoSelect" class="form-control" style="flex:1;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;"><option value="">Selecione uma armação</option></select>
+                                    <input type="number" id="armacaoQty" class="form-control" value="1" min="1" title="Qtd" style="width:54px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 4px;">
+                                    <button type="button" onclick="Sales.addArmacao()" style="height:38px;padding:0 13px;border-radius:8px;border:none;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;">
                                         <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
                                     </button>
                                 </div>
                             </div>
-
                             <!-- Serviço -->
                             <div style="background:white;padding:1.1rem 1.25rem;">
                                 <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;">
-                                        <i class="fas fa-tools"></i>
-                                    </div>
+                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;"><i class="fas fa-tools"></i></div>
                                     <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Serviço</span>
                                 </div>
                                 <div style="display:flex;gap:0.5rem;align-items:center;">
-                                    <div style="flex:1;">
-                                        <select id="servicoSelect" class="form-control" style="font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;">
-                                            <option value="">Selecione um serviço</option>
-                                        </select>
-                                    </div>
-                                    <input type="number" id="servicoQty" class="form-control" value="1" min="1" title="Quantidade"
-                                        style="width:56px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 6px;">
-                                    <button type="button" onclick="Sales.addServico()"
-                                        style="height:38px;padding:0 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;">
+                                    <select id="servicoSelect" class="form-control" style="flex:1;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;"><option value="">Selecione um serviço</option></select>
+                                    <input type="number" id="servicoQty" class="form-control" value="1" min="1" title="Qtd" style="width:54px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 4px;">
+                                    <button type="button" onclick="Sales.addServico()" style="height:38px;padding:0 13px;border-radius:8px;border:none;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;">
                                         <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
                                     </button>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -5919,10 +5886,13 @@
                                 <i class="fas fa-database"></i> Setup do Banco de Dados (Supabase)
                             </h4>
                             <p style="color: #1e429f; font-size: 0.85rem; margin-bottom: 1rem;">
-                                Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>8 tabelas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code>, <code>services</code> e <code>config</code>. Estrutura Local-First: <code>_data</code> em <strong>JSONB</strong> com <code>created_at</code> + <code>updated_at</code> automáticos. Seguro executar novamente — usa IF NOT EXISTS e migração sem perda de dados.
+                                Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>8 tabelas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code>, <code>services</code> e <code>config</code>. Estrutura Local-First: <code>_data</code> em <strong>JSONB</strong> com <code>created_at</code> + <code>updated_at</code> automáticos. Seguro executar novamente — usa <code>IF NOT EXISTS</code> e ignora erros de publicação já existente.
                             </p>
-                            <div style="background:#1e1e2e;color:#a6e3a1;font-family:monospace;font-size:0.72rem;padding:1rem;border-radius:8px;max-height:320px;overflow-y:auto;line-height:1.5;margin-bottom:1rem;white-space:pre;" id="sqlSetup">-- ╔══════════════════════════════════════════════════════════════════╗
--- ║  ÓticaVision Pro — SQL Setup v2 (Local-First Sync)              ║
+
+                            <!-- Bloco SQL -->
+                            <div style="position:relative;margin-bottom:1rem;">
+                                <div style="background:#1e1e2e;color:#a6e3a1;font-family:monospace;font-size:0.72rem;padding:1rem;border-radius:8px;max-height:340px;overflow-y:auto;line-height:1.5;white-space:pre;" id="sqlSetup">-- ╔══════════════════════════════════════════════════════════════════╗
+-- ║  ÓticaVision Pro — SQL Setup v3 (Local-First Sync)              ║
 -- ║  Estrutura: id TEXT PK + _data JSONB + created_at + updated_at  ║
 -- ║  Tabelas (8): clients, products, sales, expenses,               ║
 -- ║               prescriptions, suppliers, services, config        ║
@@ -5984,42 +5954,74 @@ BEGIN
   END LOOP;
 END $$;
 
--- ── 3. REALTIME — habilita replicação em tempo real ──────────────
+-- ── 3. REALTIME — habilita replicação (ignora se já adicionado) ──
 DO $$ DECLARE t TEXT;
 BEGIN
   FOR t IN SELECT unnest(ARRAY[
     'clients','products','sales','expenses',
     'prescriptions','suppliers','services','config'
   ]) LOOP
-    BEGIN
-      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE %I', t);
-    EXCEPTION WHEN others THEN NULL; END; -- ignora se já adicionado
+    -- Só adiciona se a tabela ainda NÃO está na publicação (evita erro 42710)
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_publication_tables
+      WHERE pubname = 'supabase_realtime' AND tablename = t
+    ) THEN
+      BEGIN
+        EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE %I', t);
+      EXCEPTION WHEN others THEN NULL;
+      END;
+    END IF;
   END LOOP;
 END $$;
 
 -- ── 4. VERIFICAÇÃO FINAL ─────────────────────────────────────────
 SELECT
-  table_name,
+  t.table_name,
   (SELECT count(*) FROM information_schema.columns c
-   WHERE c.table_name = t.table_name AND c.table_schema = 'public') AS total_colunas
+   WHERE c.table_name = t.table_name AND c.table_schema = 'public') AS colunas,
+  CASE WHEN p.tablename IS NOT NULL THEN '✅ Realtime ON' ELSE '⚠️ Realtime OFF' END AS realtime
 FROM information_schema.tables t
-WHERE table_schema = 'public'
-  AND table_name IN (
+LEFT JOIN pg_publication_tables p
+  ON p.tablename = t.table_name AND p.pubname = 'supabase_realtime'
+WHERE t.table_schema = 'public'
+  AND t.table_name IN (
     'clients','products','sales','expenses',
     'prescriptions','suppliers','services','config'
   )
-ORDER BY table_name;
--- Resultado esperado: 8 linhas, cada uma com 4 colunas (id, _data, created_at, updated_at)</div>
-                            <button class="btn btn-primary" onclick="
-                                const sql = document.getElementById('sqlSetup').innerText;
-                                navigator.clipboard.writeText(sql).then(() => Toast.show('SQL copiado! Cole no Supabase SQL Editor.', 'success', 4000));
-                            ">
-                                <i class="fas fa-copy"></i> Copiar SQL Completo
-                            </button>
-                            <a href="https://supabase.com/dashboard/project/qhscxyistzlmxxnjrqao/sql/new" target="_blank" class="btn btn-secondary" style="margin-left:0.5rem;">
-                                <i class="fas fa-external-link-alt"></i> Abrir SQL Editor
-                            </a>
-                            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
+ORDER BY t.table_name;
+-- Resultado esperado: 8 linhas · 4 colunas · Realtime ON em todas</div>
+
+                                <!-- Botão flutuante de copiar sobre o bloco -->
+                                <button id="btnCopiarSQL"
+                                    onclick="
+                                        const sql = document.getElementById('sqlSetup').innerText;
+                                        navigator.clipboard.writeText(sql).then(() => {
+                                            const btn = document.getElementById('btnCopiarSQL');
+                                            btn.innerHTML = '<i class=\'fas fa-check\'></i> Copiado!';
+                                            btn.style.background = '#28a745';
+                                            setTimeout(() => {
+                                                btn.innerHTML = '<i class=\'fas fa-copy\'></i> Copiar SQL';
+                                                btn.style.background = '#ff6b00';
+                                            }, 2500);
+                                            Toast.show('✅ SQL copiado! Cole no Supabase SQL Editor.', 'success', 4000);
+                                        }).catch(() => {
+                                            const t = document.createElement('textarea');
+                                            t.value = document.getElementById('sqlSetup').innerText;
+                                            document.body.appendChild(t); t.select();
+                                            document.execCommand('copy');
+                                            document.body.removeChild(t);
+                                            Toast.show('✅ SQL copiado!', 'success', 3000);
+                                        });
+                                    "
+                                    style="position:absolute;top:10px;right:10px;background:#ff6b00;color:white;border:none;border-radius:6px;padding:6px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s;z-index:2;">
+                                    <i class="fas fa-copy"></i> Copiar SQL
+                                </button>
+                            </div>
+
+                            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.5rem;">
+                                <a href="https://supabase.com/dashboard/project/qhscxyistzlmxxnjrqao/sql/new" target="_blank" class="btn btn-secondary">
+                                    <i class="fas fa-external-link-alt"></i> Abrir SQL Editor
+                                </a>
                                 <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="SupaSync.syncDown()">
                                     <i class="fas fa-cloud-download-alt"></i> Sync Agora
                                 </button>
@@ -6301,8 +6303,6 @@ ORDER BY table_name;
             <div class="modal-body" style="padding:1.25rem 1.5rem 0.5rem;">
                 <div style="font-size:2.5rem;margin-bottom:0.5rem;">🖨️</div>
                 <p id="osGeradoNumero" style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;"></p>
-
-                <!-- Situação do Pagamento -->
                 <div style="background:#f8f9fa;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid #e9ecef;">
                     <p style="font-size:0.82rem;font-weight:700;color:#495057;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:.5px;">💰 Situação do Pagamento</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
@@ -6317,7 +6317,6 @@ ORDER BY table_name;
                     </div>
                     <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
                 </div>
-
                 <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1rem;">Deseja gerar a O.S.?</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.75rem;">
                     <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')">
@@ -9556,7 +9555,6 @@ ORDER BY table_name;
                 }
                 this.clearForm();
                 this.renderTable();
-                // Mostra modal com opção de criar venda
                 Clients._ultimoClienteSalvo = client;
                 const nomeEl = document.getElementById('clienteSalvoNome');
                 if (nomeEl) nomeEl.textContent = client.name || '';
@@ -9568,10 +9566,8 @@ ORDER BY table_name;
             _criarVendaParaCliente() {
                 Modal.close('clienteSalvoModal');
                 const client = Clients._ultimoClienteSalvo;
-                // Navega para seção Vendas
                 const menuSales = document.querySelector('.menu-item[data-section="sales"]');
                 if (menuSales) menuSales.click();
-                // Aguarda renderização e pré-seleciona o cliente
                 setTimeout(() => {
                     if (!client) return;
                     const searchEl = document.getElementById('searchClientSale');
@@ -13823,7 +13819,6 @@ ${container.innerHTML}
                 Toast.show('Venda salva com sucesso!');
                 const osNumEl = document.getElementById('osGeradoNumero');
                 if (osNumEl) osNumEl.textContent = 'OS: ' + sale.number;
-                // Guarda id da venda para o modal de pagamento
                 Sales._osGeradoSaleId = sale.id;
                 const btnPago = document.getElementById('osGeradoBtnPago');
                 const btnPendente = document.getElementById('osGeradoBtnPendente');
@@ -13956,19 +13951,15 @@ ${container.innerHTML}
                 if (!saleId) return;
                 const sale = state.sales.find(s => s.id === saleId);
                 if (!sale) return;
-
                 const btnPago     = document.getElementById('osGeradoBtnPago');
                 const btnPendente = document.getElementById('osGeradoBtnPendente');
                 const lbl         = document.getElementById('osGeradoPagtoLabel');
-
                 if (situacao === 'pago') {
                     sale.paymentStatus = 'pago';
                     sale.paidAt = new Date().toISOString();
-                    // Marca todas as parcelas como pagas
                     if (sale.paymentDetails && sale.paymentDetails.parcels) {
                         sale.paymentDetails.parcels.forEach(p => {
-                            p.status = 'pago';
-                            p.paid = true;
+                            p.status = 'pago'; p.paid = true;
                             p.paidDate = sale.paidAt.slice(0,10);
                             p.paidValue = p.paidValue || p.value;
                         });
@@ -13981,17 +13972,14 @@ ${container.innerHTML}
                     delete sale.paidAt;
                     if (sale.paymentDetails && sale.paymentDetails.parcels) {
                         sale.paymentDetails.parcels.forEach(p => {
-                            p.status = 'aberto';
-                            p.paid = false;
-                            delete p.paidDate;
-                            delete p.paidValue;
+                            p.status = 'aberto'; p.paid = false;
+                            delete p.paidDate; delete p.paidValue;
                         });
                     }
                     if (btnPago)     { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
                     if (btnPendente) { btnPendente.style.background='#ffc107'; btnPendente.style.color='#333'; btnPendente.style.borderColor='#ffc107'; }
                     if (lbl) lbl.textContent = '⏳ Marcado como PENDENTE — aparece em Contas a Receber';
                 }
-
                 const idx = state.sales.findIndex(s => s.id === saleId);
                 if (idx !== -1) state.sales[idx] = sale;
                 App.saveData();
