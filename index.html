@@ -14,22 +14,23 @@
     <meta name="apple-mobile-web-app-title" content="ÓticaVision">
     <meta name="msapplication-TileColor" content="#ff6b00">
     <meta name="msapplication-tap-highlight" content="no">
-    <!-- Manifest inline para evitar erro de ícone 144x144 não encontrado -->
+    <!-- Manifest inline com URLs absolutas (resolve erro de blob URL com paths relativos) -->
     <script>
     (function() {
+        var base = location.href.replace(/\/[^\/]*$/, '/');
         var manifest = {
             name: "ÓticaVision Pro",
             short_name: "ÓticaVision",
             description: "Sistema Profissional de Gestão para Óticas",
-            start_url: "./",
-            scope: "./",
+            start_url: base,
+            scope: base,
             display: "standalone",
             background_color: "#ffffff",
             theme_color: "#ff6b00",
             orientation: "portrait-primary",
             icons: [
-                { src: "icons/icon-192x192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                { src: "icons/icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                { src: base + "icons/icon-192x192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                { src: base + "icons/icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
             ]
         };
         var blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
@@ -6511,9 +6512,8 @@ ORDER BY table_name;
             },
 
             // ── SYNC PRINCIPAL ────────────────────────────────────────────────
-            // Push: envia registros dirty + processa fila de deleções pendentes
-            // Pull: traz do Supabase registros mais novos que o último sync
-            //       Remove localmente qualquer item com _deleted=true (soft-delete)
+            // Push: registros dirty + flush da fila de deleções offline
+            // Pull: mescla dados remotos; detecta tombstones (_deleted=true) e remove localmente
             async sync(reason = 'manual') {
                 if (this._syncing) return;
                 if (!navigator.onLine) { this._updatePanel(); return; }
@@ -6527,8 +6527,6 @@ ORDER BY table_name;
                     const now = new Date().toISOString();
 
                     let pushed = 0, pulled = 0;
-
-                    // Captura e limpa dirty set antes de iterar (evita race condition)
                     const dirtyNow = new Set(this._dirtyKeys);
 
                     for (const [stateKey, table] of Object.entries(this._TABLES)) {
@@ -6538,34 +6536,27 @@ ORDER BY table_name;
                         const pendingDeletes = await this._getPending(deletedKey);
                         if (pendingDeletes.length > 0) {
                             this._pushing = true;
-                            const flushedDeletes = [];
+                            const flushed = [];
                             for (const delId of pendingDeletes) {
                                 try {
-                                    const tombstone = {
-                                        id: delId,
-                                        _data: JSON.stringify({ id: delId, _deleted: true }),
-                                        updated_at: new Date().toISOString()
-                                    };
                                     const { error } = await supabaseClient
                                         .from(table)
-                                        .upsert(tombstone, { onConflict: 'id' });
-                                    if (!error) {
-                                        flushedDeletes.push(delId);
-                                        pushed++;
-                                        console.log('[LocalFirst] flush delete OK:', table, delId);
-                                    }
+                                        .upsert({
+                                            id: delId,
+                                            _data: JSON.stringify({ id: delId, _deleted: true }),
+                                            updated_at: new Date().toISOString()
+                                        }, { onConflict: 'id' });
+                                    if (!error) { flushed.push(delId); pushed++; console.log('[LocalFirst] flush delete:', table, delId); }
                                 } catch(e) {}
                             }
-                            if (flushedDeletes.length > 0) {
-                                const remaining = pendingDeletes.filter(id => !flushedDeletes.includes(id));
-                                await IDB.set(deletedKey, remaining);
+                            if (flushed.length > 0) {
+                                await IDB.set(deletedKey, pendingDeletes.filter(id => !flushed.includes(id)));
                             }
                             await new Promise(r => setTimeout(r, 300));
                             this._pushing = false;
                         }
 
-                        // ── PUSH: apenas se o stateKey tem mudanças locais pendentes ──
-                        // Razões 'realtime'/'interval' NÃO fazem push — evitam loop e spam
+                        // ── PUSH: registros locais modificados ────────────────────
                         const shouldPush = (reason !== 'realtime') && dirtyNow.has(stateKey);
                         if (shouldPush) {
                             const pendingKey = 'lf_pending_' + stateKey;
@@ -6585,14 +6576,11 @@ ORDER BY table_name;
                                     .upsert(rows, { onConflict: 'id' });
                                 if (!error) {
                                     pushed += localItems.length;
-                                    // Remove IDs enviados da fila pendente
-                                    const remaining = pendingIds.filter(id => !pendingSet.has(id));
-                                    await IDB.set(pendingKey, remaining);
+                                    await IDB.set(pendingKey, pendingIds.filter(id => !pendingSet.has(id)));
                                     this._dirtyKeys.delete(stateKey);
                                 } else {
                                     console.warn('[LocalFirst] Push erro em', table, error.message);
                                 }
-                                // Aguarda 300ms para o Realtime "esvaziar" antes de liberar flag
                                 await new Promise(r => setTimeout(r, 300));
                                 this._pushing = false;
                             } else {
@@ -6600,7 +6588,7 @@ ORDER BY table_name;
                             }
                         }
 
-                        // ── PULL: traz do Supabase registros mais novos que lastSync ──
+                        // ── PULL: registros remotos mais novos que lastSync ───────
                         const { data, error: pullErr } = await supabaseClient
                             .from(table)
                             .select('id, _data, updated_at')
@@ -6609,30 +6597,28 @@ ORDER BY table_name;
                         if (pullErr) { console.warn('[LocalFirst] Pull erro em', table, pullErr.message); continue; }
                         if (!data || data.length === 0) continue;
 
-                        // Mescla: mais recente vence — usa _supabase_at para comparar
                         const localMap = {};
                         (state[stateKey] || []).forEach(item => { localMap[item.id] = item; });
 
                         let deletedCount = 0;
                         data.forEach(remote => {
                             try {
-                                const remoteItem = typeof remote._data === 'string' ? JSON.parse(remote._data) : remote._data;
+                                const remoteItem = typeof remote._data === 'string'
+                                    ? JSON.parse(remote._data) : remote._data;
 
-                                // ── SOFT DELETE: item marcado como deletado → remove do estado local ──
+                                // Tombstone: remove do estado local
                                 if (remoteItem && remoteItem._deleted === true) {
                                     if (localMap[remote.id]) {
                                         delete localMap[remote.id];
                                         deletedCount++;
-                                        console.log('[LocalFirst] Soft-delete aplicado:', table, remote.id);
+                                        console.log('[LocalFirst] Deleção remota aplicada:', table, remote.id);
                                     }
-                                    return; // não adiciona ao localMap
+                                    return;
                                 }
 
-                                // Guarda o timestamp do Supabase no item para pull futuro
                                 remoteItem._supabase_at = remote.updated_at;
                                 const local = localMap[remote.id];
                                 const remoteTs = remote.updated_at;
-                                // Só substitui se o remoto é genuinamente mais novo que o local
                                 const localTs  = local?._supabase_at || local?.updated_at || '0';
                                 if (!local || remoteTs > localTs) {
                                     localMap[remote.id] = remoteItem;
@@ -6643,14 +6629,13 @@ ORDER BY table_name;
 
                         state[stateKey] = Object.values(localMap);
 
-                        // Se houve deleções remotas, atualiza a UI correspondente
+                        // Atualiza a UI se houve deleções remotas
                         if (deletedCount > 0) {
                             pulled += deletedCount;
                             this._refreshTableUI(stateKey);
                         }
                     }
 
-                    // Salva estado mesclado no IDB
                     if (pulled > 0) {
                         await App.saveData(true);
                         Dashboard.update?.();
@@ -6673,7 +6658,7 @@ ORDER BY table_name;
                 }
             },
 
-            // ── Atualiza a UI da tabela após deleção remota ──────────────────
+            // ── Atualiza UI da tabela após deleção remota ────────────────────
             _refreshTableUI(stateKey) {
                 try {
                     switch(stateKey) {
@@ -6740,42 +6725,40 @@ ORDER BY table_name;
                 }
             },
 
-            // ── DELETE (soft-delete: marca _deleted=true + enfileira para sync) ──
-            // Funciona offline: enfileira em lf_deleted_<table> e sincroniza quando online
+            // ── DELETE: soft-delete com fila offline ──────────────────────────
+            // Grava tombstone _deleted=true no Supabase (aparece no PULL dos outros devices)
+            // Se offline: enfileira em lf_deleted_<table> e envia no próximo sync
             async deleteItem(table, id) {
                 if (!id) return;
                 const deletedKey = 'lf_deleted_' + table;
 
-                // Enfileira o ID na lista de deleções pendentes (persiste offline)
+                // Salva na fila de deleções pendentes (persiste offline via IDB)
                 try {
                     const existing = await this._getPending(deletedKey);
                     if (!existing.includes(id)) existing.push(id);
                     await IDB.set(deletedKey, existing);
                 } catch(e) {}
 
-                this._markDirty(table);
-
                 if (!navigator.onLine) {
-                    console.warn('[LocalFirst] deleteItem offline — enfileirado para sync:', table, id);
+                    console.warn('[LocalFirst] deleteItem offline — enfileirado:', table, id);
                     return;
                 }
 
-                // Online: envia soft-delete para Supabase imediatamente
+                // Online: envia tombstone imediatamente
                 try {
                     this._pushing = true;
                     const tombstone = {
                         id: id,
-                        _data: JSON.stringify({ id, _deleted: true }),
+                        _data: JSON.stringify({ id: id, _deleted: true }),
                         updated_at: new Date().toISOString()
                     };
                     const { error } = await supabaseClient
                         .from(this._TABLES[table] || table)
                         .upsert(tombstone, { onConflict: 'id' });
                     if (!error) {
-                        // Remove da fila de pendentes de deleção
                         const remaining = (await this._getPending(deletedKey)).filter(x => x !== id);
                         await IDB.set(deletedKey, remaining);
-                        console.log('[LocalFirst] deleteItem OK (soft-delete):', table, id);
+                        console.log('[LocalFirst] deleteItem OK (tombstone):', table, id);
                     } else {
                         console.warn('[LocalFirst] deleteItem falhou:', error.message);
                     }
