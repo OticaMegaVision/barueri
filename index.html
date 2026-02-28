@@ -6239,7 +6239,7 @@ ORDER BY table_name;
 
     <!-- Modal: Gerar O.S. após salvar venda -->
     <div class="modal" id="osGeradoModal" role="dialog" aria-modal="true" aria-labelledby="osGeradoTitle">
-        <div class="modal-content" style="max-width:400px;text-align:center;">
+        <div class="modal-content" style="max-width:420px;text-align:center;">
             <div class="modal-header" style="justify-content:center;border-bottom:none;padding-bottom:0;">
                 <div class="modal-title" id="osGeradoTitle" style="font-size:1.1rem;">✅ Venda Salva!</div>
                 <button class="modal-close" onclick="Modal.close('osGeradoModal')" aria-label="Fechar" style="position:absolute;right:1rem;top:1rem;">&times;</button>
@@ -6247,7 +6247,24 @@ ORDER BY table_name;
             <div class="modal-body" style="padding:1.25rem 1.5rem 0.5rem;">
                 <div style="font-size:2.5rem;margin-bottom:0.5rem;">🖨️</div>
                 <p id="osGeradoNumero" style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;"></p>
-                <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1.25rem;">Deseja gerar a O.S. agora?</p>
+
+                <!-- Situação do Pagamento -->
+                <div style="background:#f8f9fa;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid #e9ecef;">
+                    <p style="font-size:0.82rem;font-weight:700;color:#495057;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:.5px;">💰 Situação do Pagamento</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                        <button id="osGeradoBtnPago" onclick="Sales._setOsGeradoPagamento('pago')"
+                            style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #28a745;background:#28a745;color:white;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .2s;">
+                            ✅ PAGO
+                        </button>
+                        <button id="osGeradoBtnPendente" onclick="Sales._setOsGeradoPagamento('pendente')"
+                            style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all .2s;">
+                            ⏳ PENDENTE
+                        </button>
+                    </div>
+                    <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
+                </div>
+
+                <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1rem;">Deseja gerar a O.S.?</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.75rem;">
                     <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')">
                         <i class="fas fa-file-pdf"></i> Via Ótica
@@ -6913,7 +6930,10 @@ ORDER BY table_name;
                         });
                     });
                     // Venda sem parcelamento e ainda não entregue/paga
-                    if (parcelas.length === 0 && sale.total > 0 && sale.status !== 'entregue' && sale.status !== 'pago' && sale.status !== 'finalizado') {
+                    if (parcelas.length === 0 && sale.total > 0
+                        && sale.status !== 'entregue'
+                        && sale.status !== 'cancelado'
+                        && sale.paymentStatus !== 'pago') {
                         contasVendas.push({
                             id: 'venda_' + sale.id + '_total',
                             tipo: 'receber',
@@ -13704,6 +13724,15 @@ ${container.innerHTML}
                 Toast.show('Venda salva com sucesso!');
                 const osNumEl = document.getElementById('osGeradoNumero');
                 if (osNumEl) osNumEl.textContent = 'OS: ' + sale.number;
+                // Guarda o id da venda para o modal de pagamento
+                Sales._osGeradoSaleId = sale.id;
+                // Reset dos botões de pagamento no modal
+                const btnPago = document.getElementById('osGeradoBtnPago');
+                const btnPendente = document.getElementById('osGeradoBtnPendente');
+                const lblPagto = document.getElementById('osGeradoPagtoLabel');
+                if (btnPago) { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
+                if (btnPendente) { btnPendente.style.background='#fff'; btnPendente.style.color='#555'; btnPendente.style.borderColor='#ddd'; }
+                if (lblPagto) lblPagto.textContent = 'Selecione a situação — isso remove da lista de Contas a Receber';
                 Modal.show('osGeradoModal');
             },
 
@@ -13820,6 +13849,61 @@ ${container.innerHTML}
                 Modal.showConfirm('Finalizar venda?', () => {
                     this.save();
                 });
+            },
+
+            _osGeradoSaleId: null,
+
+            _setOsGeradoPagamento(situacao) {
+                const saleId = Sales._osGeradoSaleId;
+                if (!saleId) return;
+                const sale = state.sales.find(s => s.id === saleId);
+                if (!sale) return;
+
+                const btnPago     = document.getElementById('osGeradoBtnPago');
+                const btnPendente = document.getElementById('osGeradoBtnPendente');
+                const lbl         = document.getElementById('osGeradoPagtoLabel');
+
+                if (situacao === 'pago') {
+                    // Marca venda como paga
+                    sale.paymentStatus = 'pago';
+                    sale.paidAt = new Date().toISOString();
+                    // Marca todas as parcelas como pagas
+                    if (sale.paymentDetails && sale.paymentDetails.parcels) {
+                        sale.paymentDetails.parcels.forEach(p => {
+                            p.status = 'pago';
+                            p.paid = true;
+                            p.paidDate = sale.paidAt.slice(0,10);
+                            p.paidValue = p.paidValue || p.value;
+                        });
+                    }
+                    // Estilo botões
+                    if (btnPago)     { btnPago.style.background='#28a745'; btnPago.style.color='white'; btnPago.style.borderColor='#28a745'; }
+                    if (btnPendente) { btnPendente.style.background='#fff'; btnPendente.style.color='#555'; btnPendente.style.borderColor='#ddd'; }
+                    if (lbl) lbl.textContent = '✅ Marcado como PAGO — não aparece em Contas a Receber';
+                } else {
+                    // Pendente — remove paymentStatus pago
+                    sale.paymentStatus = 'pendente';
+                    delete sale.paidAt;
+                    // Parcelas voltam a aberto
+                    if (sale.paymentDetails && sale.paymentDetails.parcels) {
+                        sale.paymentDetails.parcels.forEach(p => {
+                            p.status = 'aberto';
+                            p.paid = false;
+                            delete p.paidDate;
+                            delete p.paidValue;
+                        });
+                    }
+                    if (btnPago)     { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
+                    if (btnPendente) { btnPendente.style.background='#ffc107'; btnPendente.style.color='#333'; btnPendente.style.borderColor='#ffc107'; }
+                    if (lbl) lbl.textContent = '⏳ Marcado como PENDENTE — aparece em Contas a Receber';
+                }
+
+                // Atualiza no state
+                const idx = state.sales.findIndex(s => s.id === saleId);
+                if (idx !== -1) state.sales[idx] = sale;
+                App.saveData();
+                if (typeof ContasManager !== 'undefined') ContasManager.renderAll();
+                Toast.show(situacao === 'pago' ? '✅ Venda marcada como PAGA!' : '⏳ Venda marcada como PENDENTE', situacao === 'pago' ? 'success' : 'warning');
             },
 
             view(id) {
