@@ -4257,62 +4257,138 @@
                         </div>
                     </div>
 
-                    <!-- ITENS DA VENDA -->
+                    <!-- ITENS DA VENDA — REDESIGN PROFISSIONAL -->
                     <div class="cliente-card" style="padding:0;overflow:hidden;">
-                        <div style="background:linear-gradient(135deg,#ff6b00 0%,#e55a00 100%);padding:1rem 1.5rem;display:flex;align-items:center;gap:0.75rem;">
-                            <div style="background:rgba(255,255,255,0.2);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🛒</div>
-                            <div>
-                                <h3 style="color:white;margin:0;font-size:1rem;font-weight:700;letter-spacing:.3px;">ITENS DA VENDA</h3>
-                                <span style="color:rgba(255,255,255,0.75);font-size:0.75rem;">Lentes · Armações · Serviços</span>
+
+                        <!-- Header da seção -->
+                        <div style="background:linear-gradient(135deg,#ff6b00 0%,#e55a00 100%);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:34px;height:34px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-shopping-cart" style="color:#fff;font-size:15px;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight:800;color:#fff;font-size:0.95rem;letter-spacing:0.3px;">ITENS DA VENDA</div>
+                                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);">Lentes, armações e serviços</div>
+                                </div>
                             </div>
-                            <div id="itemCountBadge" style="margin-left:auto;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;color:white;font-size:0.78rem;font-weight:700;">0 itens</div>
+                            <div id="itemCountBadge" style="background:rgba(255,255,255,0.2);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;">0 itens</div>
                         </div>
-                        <div id="saleItemsContainer" style="min-height:56px;padding:0.75rem 1.25rem;background:#fafafa;border-bottom:1px solid #f0f0f0;">
-                            <div id="emptyItemsMsg" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 0;color:#adb5bd;font-size:0.85rem;">
-                                <i class="fas fa-cart-plus" style="font-size:1.1rem;"></i> Nenhum item adicionado
-                            </div>
+
+                        <!-- Lista de itens adicionados -->
+                        <div id="saleItemsContainer" style="min-height:52px;padding:0 16px;">
+                            <!-- Itens inseridos via JS -->
                         </div>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1px;background:#e9ecef;">
-                            <!-- Lente -->
-                            <div style="background:white;padding:1.1rem 1.25rem;">
-                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;"><i class="fas fa-eye"></i></div>
-                                    <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Lente</span>
-                                </div>
-                                <div style="display:flex;gap:0.5rem;align-items:center;">
-                                    <select id="lenteSelect" class="form-control" style="flex:1;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;"><option value="">Selecione uma lente</option></select>
-                                    <input type="number" id="lenteQty" class="form-control" value="1" min="1" title="Qtd" style="width:54px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 4px;">
-                                    <button type="button" onclick="Sales.addLente()" style="height:38px;padding:0 13px;border-radius:8px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;">
-                                        <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
-                                    </button>
+
+                        <!-- Empty state -->
+                        <div id="emptyItemsHint" style="text-align:center;padding:16px 0 4px;color:#aaa;font-size:0.82rem;display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <i class="fas fa-arrow-down" style="color:#ffb347;"></i> Adicione produtos abaixo
+                        </div>
+
+                        <!-- Separador -->
+                        <div style="height:1px;background:linear-gradient(90deg,transparent,#f0f0f0,transparent);margin:0 16px 14px;"></div>
+
+                        <!-- Painel de adição — 3 tabs -->
+                        <div style="padding:0 16px 16px;">
+                            <!-- Tab buttons -->
+                            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                                <button type="button" onclick="Sales.showItemTab('lente')" id="tabBtnLente"
+                                    style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid #ff6b00;background:#ff6b00;color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:3px;">
+                                    <i class="fas fa-eye" style="font-size:14px;"></i>Lente
+                                </button>
+                                <button type="button" onclick="Sales.showItemTab('armacao')" id="tabBtnArmacao"
+                                    style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid #ddd;background:#fff;color:#888;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:3px;">
+                                    <i class="fas fa-glasses" style="font-size:14px;"></i>Armação
+                                </button>
+                                <button type="button" onclick="Sales.showItemTab('servico')" id="tabBtnServico"
+                                    style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid #ddd;background:#fff;color:#888;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:3px;">
+                                    <i class="fas fa-tools" style="font-size:14px;"></i>Serviço
+                                </button>
+                            </div>
+
+                            <!-- Painel Lente -->
+                            <div id="itemTabLente" style="animation:fadeIn 0.2s ease;">
+                                <div style="background:#f9f9f9;border:1.5px solid #ffe0b2;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                                        <div style="width:28px;height:28px;background:#fff3e0;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-eye" style="color:#ff6b00;font-size:12px;"></i>
+                                        </div>
+                                        <span style="font-weight:700;font-size:0.82rem;color:#e65100;">Selecionar Lente</span>
+                                    </div>
+                                    <select id="lenteSelect" class="form-control" style="border-radius:8px;border-color:#ffcc80;background:#fff;font-size:0.85rem;">
+                                        <option value="">🔍 Escolha uma lente...</option>
+                                    </select>
+                                    <div style="display:flex;gap:10px;align-items:center;">
+                                        <div style="flex:1;">
+                                            <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Quantidade</label>
+                                            <div style="display:flex;align-items:center;gap:0;border:1.5px solid #ffcc80;border-radius:8px;overflow:hidden;background:#fff;width:fit-content;">
+                                                <button type="button" onclick="Sales.changeQty('lenteQty',-1)" style="width:34px;height:34px;border:none;background:#fff3e0;color:#e65100;font-size:16px;font-weight:700;cursor:pointer;">−</button>
+                                                <input type="number" id="lenteQty" value="1" min="1" style="width:44px;height:34px;border:none;text-align:center;font-size:0.9rem;font-weight:700;color:#333;outline:none;">
+                                                <button type="button" onclick="Sales.changeQty('lenteQty',1)" style="width:34px;height:34px;border:none;background:#fff3e0;color:#e65100;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" onclick="Sales.addLente()"
+                                            style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#ff6b00,#e55a00);color:#fff;font-weight:700;font-size:0.83rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(255,107,0,0.3);">
+                                            <i class="fas fa-plus-circle"></i> Adicionar Lente
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Armação -->
-                            <div style="background:white;padding:1.1rem 1.25rem;">
-                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;"><i class="fas fa-glasses"></i></div>
-                                    <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Armação</span>
-                                </div>
-                                <div style="display:flex;gap:0.5rem;align-items:center;">
-                                    <select id="armacaoSelect" class="form-control" style="flex:1;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;"><option value="">Selecione uma armação</option></select>
-                                    <input type="number" id="armacaoQty" class="form-control" value="1" min="1" title="Qtd" style="width:54px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 4px;">
-                                    <button type="button" onclick="Sales.addArmacao()" style="height:38px;padding:0 13px;border-radius:8px;border:none;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;">
-                                        <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
-                                    </button>
+
+                            <!-- Painel Armação -->
+                            <div id="itemTabArmacao" style="display:none;animation:fadeIn 0.2s ease;">
+                                <div style="background:#f9f9f9;border:1.5px solid #c8e6c9;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                                        <div style="width:28px;height:28px;background:#e8f5e9;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-glasses" style="color:#2e7d32;font-size:12px;"></i>
+                                        </div>
+                                        <span style="font-weight:700;font-size:0.82rem;color:#2e7d32;">Selecionar Armação</span>
+                                    </div>
+                                    <select id="armacaoSelect" class="form-control" style="border-radius:8px;border-color:#a5d6a7;background:#fff;font-size:0.85rem;">
+                                        <option value="">🔍 Escolha uma armação...</option>
+                                    </select>
+                                    <div style="display:flex;gap:10px;align-items:center;">
+                                        <div style="flex:1;">
+                                            <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Quantidade</label>
+                                            <div style="display:flex;align-items:center;gap:0;border:1.5px solid #a5d6a7;border-radius:8px;overflow:hidden;background:#fff;width:fit-content;">
+                                                <button type="button" onclick="Sales.changeQty('armacaoQty',-1)" style="width:34px;height:34px;border:none;background:#e8f5e9;color:#2e7d32;font-size:16px;font-weight:700;cursor:pointer;">−</button>
+                                                <input type="number" id="armacaoQty" value="1" min="1" style="width:44px;height:34px;border:none;text-align:center;font-size:0.9rem;font-weight:700;color:#333;outline:none;">
+                                                <button type="button" onclick="Sales.changeQty('armacaoQty',1)" style="width:34px;height:34px;border:none;background:#e8f5e9;color:#2e7d32;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" onclick="Sales.addArmacao()"
+                                            style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#43a047,#2e7d32);color:#fff;font-weight:700;font-size:0.83rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(46,125,50,0.25);">
+                                            <i class="fas fa-plus-circle"></i> Adicionar Armação
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Serviço -->
-                            <div style="background:white;padding:1.1rem 1.25rem;">
-                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-                                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;"><i class="fas fa-tools"></i></div>
-                                    <span style="font-weight:700;font-size:0.82rem;color:#495057;text-transform:uppercase;letter-spacing:.5px;">Serviço</span>
-                                </div>
-                                <div style="display:flex;gap:0.5rem;align-items:center;">
-                                    <select id="servicoSelect" class="form-control" style="flex:1;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;"><option value="">Selecione um serviço</option></select>
-                                    <input type="number" id="servicoQty" class="form-control" value="1" min="1" title="Qtd" style="width:54px;font-size:0.83rem;border-radius:8px;border-color:#dee2e6;height:38px;text-align:center;padding:0 4px;">
-                                    <button type="button" onclick="Sales.addServico()" style="height:38px;padding:0 13px;border-radius:8px;border:none;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;font-weight:700;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;">
-                                        <i class="fas fa-plus" style="font-size:.7rem;"></i> Add
-                                    </button>
+
+                            <!-- Painel Serviço -->
+                            <div id="itemTabServico" style="display:none;animation:fadeIn 0.2s ease;">
+                                <div style="background:#f9f9f9;border:1.5px solid #b3e5fc;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                                        <div style="width:28px;height:28px;background:#e1f5fe;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-tools" style="color:#0277bd;font-size:12px;"></i>
+                                        </div>
+                                        <span style="font-weight:700;font-size:0.82rem;color:#0277bd;">Selecionar Serviço</span>
+                                    </div>
+                                    <select id="servicoSelect" class="form-control" style="border-radius:8px;border-color:#81d4fa;background:#fff;font-size:0.85rem;">
+                                        <option value="">🔍 Escolha um serviço...</option>
+                                    </select>
+                                    <div style="display:flex;gap:10px;align-items:center;">
+                                        <div style="flex:1;">
+                                            <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Quantidade</label>
+                                            <div style="display:flex;align-items:center;gap:0;border:1.5px solid #81d4fa;border-radius:8px;overflow:hidden;background:#fff;width:fit-content;">
+                                                <button type="button" onclick="Sales.changeQty('servicoQty',-1)" style="width:34px;height:34px;border:none;background:#e1f5fe;color:#0277bd;font-size:16px;font-weight:700;cursor:pointer;">−</button>
+                                                <input type="number" id="servicoQty" value="1" min="1" style="width:44px;height:34px;border:none;text-align:center;font-size:0.9rem;font-weight:700;color:#333;outline:none;">
+                                                <button type="button" onclick="Sales.changeQty('servicoQty',1)" style="width:34px;height:34px;border:none;background:#e1f5fe;color:#0277bd;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" onclick="Sales.addServico()"
+                                            style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#039be5,#0277bd);color:#fff;font-weight:700;font-size:0.83rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(2,119,189,0.25);">
+                                            <i class="fas fa-plus-circle"></i> Adicionar Serviço
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4376,7 +4452,84 @@
                             </div>
                         </div>
 
+                        <!-- ── TOGGLE: pagamento único / duplo ── -->
+                        <div style="display:flex;align-items:center;gap:10px;margin:10px 0 4px;">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--gray);">Modo:</label>
+                            <button type="button" id="btnModoSimples" onclick="Sales.setDualMode(false)"
+                                style="padding:5px 14px;border-radius:20px;border:2px solid var(--primary);background:var(--primary);color:#fff;font-size:0.78rem;font-weight:700;cursor:pointer;">
+                                💳 Simples
+                            </button>
+                            <button type="button" id="btnModoDuplo" onclick="Sales.setDualMode(true)"
+                                style="padding:5px 14px;border-radius:20px;border:2px solid var(--primary);background:#fff;color:var(--primary);font-size:0.78rem;font-weight:700;cursor:pointer;">
+                                💳+💳 2 Formas
+                            </button>
+                        </div>
 
+                        <!-- ── PAINEL PAGAMENTO DUPLO ── -->
+                        <div id="dualPaymentPanel" style="display:none;background:#fff8f0;border:2px solid #ffcc80;border-radius:12px;padding:14px;margin-top:8px;">
+                            <div style="font-weight:700;color:#e65100;font-size:0.88rem;margin-bottom:10px;">⚡ Dividir em 2 formas de pagamento</div>
+
+                            <!-- Forma 1 -->
+                            <div style="margin-bottom:10px;">
+                                <div style="font-size:0.78rem;font-weight:600;color:#666;margin-bottom:4px;">1ª Forma</div>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <select id="dual1Method" class="form-control" style="flex:1.2;font-size:0.83rem;" onchange="Sales.calcDual()">
+                                        <option value="pix">PIX</option>
+                                        <option value="cash">Dinheiro</option>
+                                        <option value="debit">Débito</option>
+                                        <option value="credit">Crédito</option>
+                                        <option value="installment">Crediário</option>
+                                    </select>
+                                    <input type="number" id="dual1Value" class="form-control" placeholder="R$ 0,00" min="0" step="0.01"
+                                        style="flex:1;font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
+                                </div>
+                                <div id="dual1Crediario" style="display:none;margin-top:8px;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px;">
+                                    <div style="font-size:0.78rem;font-weight:600;color:#e65100;margin-bottom:6px;">📅 Crediário — 1ª forma</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                                        <div><label style="font-size:11px;color:#666;">Entrada (R$)</label><input type="number" id="dual1Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Retirada (R$)</label><input type="number" id="dual1Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Nº Parcelas</label><input type="number" id="dual1Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                    </div>
+                                    <div style="margin-top:6px;font-size:0.78rem;color:#e65100;" id="dual1ParcelaInfo">—</div>
+                                </div>
+                            </div>
+
+                            <!-- Forma 2 -->
+                            <div style="margin-bottom:10px;">
+                                <div style="font-size:0.78rem;font-weight:600;color:#666;margin-bottom:4px;">2ª Forma</div>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <select id="dual2Method" class="form-control" style="flex:1.2;font-size:0.83rem;" onchange="Sales.calcDual()">
+                                        <option value="pix">PIX</option>
+                                        <option value="cash" selected>Dinheiro</option>
+                                        <option value="debit">Débito</option>
+                                        <option value="credit">Crédito</option>
+                                        <option value="installment">Crediário</option>
+                                    </select>
+                                    <input type="number" id="dual2Value" class="form-control" placeholder="R$ 0,00" min="0" step="0.01"
+                                        style="flex:1;font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
+                                </div>
+                                <div id="dual2Crediario" style="display:none;margin-top:8px;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px;">
+                                    <div style="font-size:0.78rem;font-weight:600;color:#e65100;margin-bottom:6px;">📅 Crediário — 2ª forma</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                                        <div><label style="font-size:11px;color:#666;">Entrada (R$)</label><input type="number" id="dual2Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Retirada (R$)</label><input type="number" id="dual2Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Nº Parcelas</label><input type="number" id="dual2Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                    </div>
+                                    <div style="margin-top:6px;font-size:0.78rem;color:#e65100;" id="dual2ParcelaInfo">—</div>
+                                </div>
+                            </div>
+
+                            <!-- Resumo -->
+                            <div style="background:#fff;border-radius:8px;border:1px solid #ffe0b2;padding:10px;font-size:0.83rem;">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Total da OS:</span><strong id="dualTotalOS">R$ 0,00</strong></div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Total distribuído:</span><strong id="dualTotalDistrib">R$ 0,00</strong></div>
+                                <div id="dualDiffRow" style="display:none;justify-content:space-between;padding:4px 8px;border-radius:6px;background:#ffebee;">
+                                    <span style="color:#c62828;font-weight:700;">Falta / Excede:</span>
+                                    <strong id="dualDiffVal" style="color:#c62828;">R$ 0,00</strong>
+                                </div>
+                                <div id="dualOkRow" style="display:none;padding:4px 8px;border-radius:6px;background:#e8f5e9;text-align:center;font-weight:700;color:#2e7d32;">✅ Valores conferem!</div>
+                            </div>
+                        </div>
 
                         <!-- ════════════════════════════════════════
                              PAINÉIS DE PAGAMENTO — reconstruídos zero
@@ -5886,12 +6039,9 @@
                                 <i class="fas fa-database"></i> Setup do Banco de Dados (Supabase)
                             </h4>
                             <p style="color: #1e429f; font-size: 0.85rem; margin-bottom: 1rem;">
-                                Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>8 tabelas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code>, <code>services</code> e <code>config</code>. Estrutura Local-First: <code>_data</code> em <strong>JSONB</strong> com <code>created_at</code> + <code>updated_at</code> automáticos. Seguro executar novamente — usa <code>IF NOT EXISTS</code> e ignora erros de publicação já existente.
+                                Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>8 tabelas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code>, <code>services</code> e <code>config</code>. Estrutura Local-First: <code>_data</code> em <strong>JSONB</strong> com <code>created_at</code> + <code>updated_at</code> automáticos. Seguro executar novamente — usa IF NOT EXISTS e migração sem perda de dados.
                             </p>
-
-                            <!-- Bloco SQL -->
-                            <div style="position:relative;margin-bottom:1rem;">
-                                <div style="background:#1e1e2e;color:#a6e3a1;font-family:monospace;font-size:0.72rem;padding:1rem;border-radius:8px;max-height:340px;overflow-y:auto;line-height:1.5;white-space:pre;" id="sqlSetup">-- ╔══════════════════════════════════════════════════════════════════╗
+                            <div style="background:#1e1e2e;color:#a6e3a1;font-family:monospace;font-size:0.72rem;padding:1rem;border-radius:8px;max-height:320px;overflow-y:auto;line-height:1.5;margin-bottom:1rem;white-space:pre;" id="sqlSetup">-- ╔══════════════════════════════════════════════════════════════════╗
 -- ║  ÓticaVision Pro — SQL Setup v3 (Local-First Sync)              ║
 -- ║  Estrutura: id TEXT PK + _data JSONB + created_at + updated_at  ║
 -- ║  Tabelas (8): clients, products, sales, expenses,               ║
@@ -5954,14 +6104,14 @@ BEGIN
   END LOOP;
 END $$;
 
--- ── 3. REALTIME — habilita replicação (ignora se já adicionado) ──
+-- ── 3. REALTIME — só adiciona se ainda NÃO está na publicação ──────
+--    (evita erro 42710: relation already member of publication)
 DO $$ DECLARE t TEXT;
 BEGIN
   FOR t IN SELECT unnest(ARRAY[
     'clients','products','sales','expenses',
     'prescriptions','suppliers','services','config'
   ]) LOOP
-    -- Só adiciona se a tabela ainda NÃO está na publicação (evita erro 42710)
     IF NOT EXISTS (
       SELECT 1 FROM pg_publication_tables
       WHERE pubname = 'supabase_realtime' AND tablename = t
@@ -5989,39 +6139,22 @@ WHERE t.table_schema = 'public'
     'prescriptions','suppliers','services','config'
   )
 ORDER BY t.table_name;
--- Resultado esperado: 8 linhas · 4 colunas · Realtime ON em todas</div>
-
-                                <!-- Botão flutuante de copiar sobre o bloco -->
-                                <button id="btnCopiarSQL"
-                                    onclick="
-                                        const sql = document.getElementById('sqlSetup').innerText;
-                                        navigator.clipboard.writeText(sql).then(() => {
-                                            const btn = document.getElementById('btnCopiarSQL');
-                                            btn.innerHTML = '<i class=\'fas fa-check\'></i> Copiado!';
-                                            btn.style.background = '#28a745';
-                                            setTimeout(() => {
-                                                btn.innerHTML = '<i class=\'fas fa-copy\'></i> Copiar SQL';
-                                                btn.style.background = '#ff6b00';
-                                            }, 2500);
-                                            Toast.show('✅ SQL copiado! Cole no Supabase SQL Editor.', 'success', 4000);
-                                        }).catch(() => {
-                                            const t = document.createElement('textarea');
-                                            t.value = document.getElementById('sqlSetup').innerText;
-                                            document.body.appendChild(t); t.select();
-                                            document.execCommand('copy');
-                                            document.body.removeChild(t);
-                                            Toast.show('✅ SQL copiado!', 'success', 3000);
-                                        });
-                                    "
-                                    style="position:absolute;top:10px;right:10px;background:#ff6b00;color:white;border:none;border-radius:6px;padding:6px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s;z-index:2;">
+-- Resultado esperado: 8 linhas · 4 colunas · ✅ Realtime ON em todas</div>
+                            <div style="position:relative;display:inline-block;margin-bottom:0.5rem;">
+                                <button id="btnCopiarSQL" onclick="
+                                    var sql = document.getElementById('sqlSetup').innerText;
+                                    var btn = document.getElementById('btnCopiarSQL');
+                                    function _ok(){ btn.innerHTML='<i class=\'fas fa-check\'></i> Copiado!'; btn.style.background='#28a745'; setTimeout(function(){ btn.innerHTML='<i class=\'fas fa-copy\'></i> Copiar SQL'; btn.style.background=''; btn.className='btn btn-primary'; },2500); Toast.show('✅ SQL copiado! Cole no Supabase SQL Editor.','success',4000); }
+                                    if(navigator.clipboard){ navigator.clipboard.writeText(sql).then(_ok).catch(function(){ var t=document.createElement('textarea'); t.value=sql; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); _ok(); }); }
+                                    else { var t=document.createElement('textarea'); t.value=sql; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); _ok(); }
+                                " class="btn btn-primary">
                                     <i class="fas fa-copy"></i> Copiar SQL
                                 </button>
                             </div>
-
-                            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.5rem;">
-                                <a href="https://supabase.com/dashboard/project/qhscxyistzlmxxnjrqao/sql/new" target="_blank" class="btn btn-secondary">
-                                    <i class="fas fa-external-link-alt"></i> Abrir SQL Editor
-                                </a>
+                            <a href="https://supabase.com/dashboard/project/qhscxyistzlmxxnjrqao/sql/new" target="_blank" class="btn btn-secondary" style="margin-left:0.5rem;">
+                                <i class="fas fa-external-link-alt"></i> Abrir SQL Editor
+                            </a>
+                            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
                                 <button class="btn btn-sm" style="background:#3ecf8e;color:#000;font-weight:700;" onclick="SupaSync.syncDown()">
                                     <i class="fas fa-cloud-download-alt"></i> Sync Agora
                                 </button>
@@ -6273,20 +6406,17 @@ ORDER BY t.table_name;
     <div class="modal" id="clienteSalvoModal" role="dialog" aria-modal="true" aria-labelledby="clienteSalvoTitle">
         <div class="modal-content" style="max-width:400px;text-align:center;overflow:hidden;padding:0;">
             <div style="background:linear-gradient(135deg,#28a745,#1e7e34);padding:1.5rem 1.5rem 1rem;position:relative;">
-                <button class="modal-close" onclick="Modal.close('clienteSalvoModal')" aria-label="Fechar"
-                    style="position:absolute;right:1rem;top:1rem;color:white;opacity:.8;font-size:1.3rem;background:none;border:none;cursor:pointer;">&times;</button>
+                <button onclick="Modal.close('clienteSalvoModal')" style="position:absolute;right:1rem;top:1rem;color:white;font-size:1.3rem;background:none;border:none;cursor:pointer;">&times;</button>
                 <div style="width:60px;height:60px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 0.75rem;">✅</div>
                 <div id="clienteSalvoTitle" style="color:white;font-size:1.1rem;font-weight:800;margin-bottom:0.2rem;">Cliente Salvo!</div>
                 <div id="clienteSalvoNome" style="color:rgba(255,255,255,0.85);font-size:0.88rem;"></div>
             </div>
             <div style="padding:1.25rem 1.5rem;">
                 <p style="color:#6c757d;font-size:0.85rem;margin-bottom:1.25rem;">O que deseja fazer agora?</p>
-                <button onclick="Clients._criarVendaParaCliente()"
-                    style="width:100%;padding:0.85rem;border-radius:10px;border:none;background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;font-size:0.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:0.6rem;box-shadow:0 4px 15px rgba(255,107,0,.35);">
+                <button onclick="Clients._criarVendaParaCliente()" style="width:100%;padding:0.85rem;border-radius:10px;border:none;background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;font-size:0.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:0.6rem;box-shadow:0 4px 15px rgba(255,107,0,.35);">
                     <i class="fas fa-shopping-cart"></i> Criar Venda para este Cliente
                 </button>
-                <button onclick="Modal.close('clienteSalvoModal')"
-                    style="width:100%;padding:0.7rem;border-radius:10px;border:1px solid #dee2e6;background:white;color:#6c757d;font-size:0.85rem;font-weight:600;cursor:pointer;">
+                <button onclick="Modal.close('clienteSalvoModal')" style="width:100%;padding:0.7rem;border-radius:10px;border:1px solid #dee2e6;background:white;color:#6c757d;font-size:0.85rem;font-weight:600;cursor:pointer;">
                     Continuar no Cadastro de Clientes
                 </button>
             </div>
@@ -6306,34 +6436,20 @@ ORDER BY t.table_name;
                 <div style="background:#f8f9fa;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid #e9ecef;">
                     <p style="font-size:0.82rem;font-weight:700;color:#495057;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:.5px;">💰 Situação do Pagamento</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-                        <button id="osGeradoBtnPago" onclick="Sales._setOsGeradoPagamento('pago')"
-                            style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .2s;">
-                            ✅ PAGO
-                        </button>
-                        <button id="osGeradoBtnPendente" onclick="Sales._setOsGeradoPagamento('pendente')"
-                            style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all .2s;">
-                            ⏳ PENDENTE
-                        </button>
+                        <button id="osGeradoBtnPago" onclick="Sales._setOsGeradoPagamento('pago')" style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all .2s;">✅ PAGO</button>
+                        <button id="osGeradoBtnPendente" onclick="Sales._setOsGeradoPagamento('pendente')" style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all .2s;">⏳ PENDENTE</button>
                     </div>
                     <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
                 </div>
                 <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1rem;">Deseja gerar a O.S.?</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.75rem;">
-                    <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')">
-                        <i class="fas fa-file-pdf"></i> Via Ótica
-                    </button>
-                    <button class="btn btn-success" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via2')">
-                        <i class="fas fa-file-pdf"></i> Via Cliente
-                    </button>
-                    <button class="btn btn-secondary" style="font-size:0.85rem;padding:0.6rem;grid-column:1/-1;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('ambas')">
-                        <i class="fas fa-file-pdf"></i> Ambas as Vias
-                    </button>
+                    <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')"><i class="fas fa-file-pdf"></i> Via Ótica</button>
+                    <button class="btn btn-success" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via2')"><i class="fas fa-file-pdf"></i> Via Cliente</button>
+                    <button class="btn btn-secondary" style="font-size:0.85rem;padding:0.6rem;grid-column:1/-1;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> Ambas as Vias</button>
                 </div>
             </div>
             <div class="modal-footer" style="justify-content:center;border-top:none;padding-top:0;">
-                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;" onclick="Modal.close('osGeradoModal')">
-                    Fechar sem imprimir
-                </button>
+                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;" onclick="Modal.close('osGeradoModal')">Fechar sem imprimir</button>
             </div>
         </div>
     </div>
@@ -6487,7 +6603,8 @@ ORDER BY t.table_name;
                 expenses:      'expenses',
                 prescriptions: 'prescriptions',
                 suppliers:     'suppliers',
-                services:      'services'
+                services:      'services',
+                config:        'config'
             },
 
             // ── INICIALIZAÇÃO ─────────────────────────────────────────────────
@@ -6601,6 +6718,12 @@ ORDER BY t.table_name;
 
                     for (const [stateKey, table] of Object.entries(this._TABLES)) {
 
+                        // Config tem tratamento especial via pullConfig/pushConfig
+                        if (stateKey === 'config') {
+                            await this.pullConfig();
+                            continue;
+                        }
+
                         // ── FLUSH DELEÇÕES PENDENTES (fila offline) ───────────────
                         const deletedKey = 'lf_deleted_' + stateKey;
                         const pendingDeletes = await this._getPending(deletedKey);
@@ -6702,6 +6825,9 @@ ORDER BY t.table_name;
                         // Atualiza a UI se houve deleções remotas
                         if (deletedCount > 0) {
                             pulled += deletedCount;
+                        }
+                        // Atualiza UI sempre que houve qualquer pull nesta tabela
+                        if (data && data.length > 0) {
                             this._refreshTableUI(stateKey);
                         }
                     }
@@ -6709,6 +6835,9 @@ ORDER BY t.table_name;
                     if (pulled > 0) {
                         await App.saveData(true);
                         Dashboard.update?.();
+                        if (typeof ContasManager !== 'undefined') {
+                            try { ContasManager.renderAll?.(); } catch(e) {}
+                        }
                     }
 
                     await IDB.set(this._TS_KEY, now);
@@ -6732,17 +6861,52 @@ ORDER BY t.table_name;
             _refreshTableUI(stateKey) {
                 try {
                     switch(stateKey) {
-                        case 'clients':   if (typeof Clients   !== 'undefined') Clients.renderTable();   break;
-                        case 'products':  if (typeof Products  !== 'undefined') Products.renderTable();  break;
-                        case 'sales':     if (typeof Sales     !== 'undefined') Sales.renderHistory();   break;
-                        case 'services':  if (typeof Services  !== 'undefined') Services.renderTable();  break;
-                        case 'suppliers': if (typeof Suppliers !== 'undefined') Suppliers.renderTable(); break;
+                        case 'clients':
+                            if (typeof Clients !== 'undefined') Clients.renderTable();
+                            break;
+                        case 'products':
+                            if (typeof Products !== 'undefined') Products.renderTable();
+                            break;
+                        case 'sales':
+                            if (typeof Sales !== 'undefined') Sales.renderHistory();
+                            if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
+                            break;
+                        case 'services':
+                            if (typeof Services !== 'undefined') Services.renderTable();
+                            break;
+                        case 'suppliers':
+                            if (typeof Suppliers !== 'undefined') Suppliers.renderTable();
+                            if (typeof App !== 'undefined') App.updateSupplierSelect?.();
+                            break;
                         case 'expenses':
                             if (typeof Expenses !== 'undefined') {
                                 Expenses.renderTable();
                                 if (typeof Expenses.updateSummary === 'function') Expenses.updateSummary();
                             }
+                            if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
                             break;
+                        case 'prescriptions':
+                            if (typeof Presc !== 'undefined' && typeof Presc.renderForm === 'function') {
+                                try { Presc.renderForm(); } catch(e) {}
+                            }
+                            break;
+                        case 'expenses':
+                            if (typeof Expenses !== 'undefined') {
+                                Expenses.renderTable();
+                                if (typeof Expenses.updateSummary === 'function') Expenses.updateSummary();
+                            }
+                            if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
+                            break;
+                        case 'prescriptions':
+                            // Receituários são exibidos na tela do cliente — atualiza se cliente aberto
+                            if (typeof Presc !== 'undefined' && typeof Presc.renderForm === 'function') {
+                                try { Presc.renderForm(); } catch(e) {}
+                            }
+                            break;
+                    }
+                    // Sempre atualiza o dashboard após qualquer mudança remota
+                    if (typeof Dashboard !== 'undefined') {
+                        try { Dashboard.update?.(); } catch(e) {}
                     }
                 } catch(e) {}
             },
@@ -6847,33 +7011,45 @@ ORDER BY t.table_name;
                     await supabaseClient.from('config').upsert({
                         id: 'empresa',
                         _data: JSON.stringify({
-                            company:       state.company,
-                            notificacoes:  state.notificacoes,
-                            wppMensagens:  state.wppMensagens,
-                            backupConfig:  state.backupConfig
+                            company:        state.company,
+                            notificacoes:   state.notificacoes,
+                            wppMensagens:   state.wppMensagens,
+                            backupConfig:   state.backupConfig,
+                            lastOsCounter:  state.lastOsCounter
                         }),
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'id' });
+                    console.log('[LocalFirst] pushConfig OK');
                 } catch(e) { console.warn('[LocalFirst] pushConfig:', e.message); }
             },
 
             async pullConfig() {
                 try {
                     const { data, error } = await supabaseClient
-                        .from('config').select('_data').eq('id', 'empresa').maybeSingle();
+                        .from('config').select('_data, updated_at').eq('id', 'empresa').maybeSingle();
                     if (error || !data) return;
+
                     const cfg = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
-                    if (cfg.company)      Object.assign(state.company, cfg.company);
+                    if (!cfg) return;
+
+                    // Só aplica se remoto for mais novo que local
+                    const remoteTs = data.updated_at || '0';
+                    const localTs  = state.company._supabase_at || '0';
+                    if (remoteTs <= localTs) return;
+
+                    if (cfg.company)      { Object.assign(state.company, cfg.company); state.company._supabase_at = remoteTs; }
                     if (cfg.notificacoes) Object.assign(state.notificacoes, cfg.notificacoes);
                     if (cfg.wppMensagens) Object.assign(state.wppMensagens, cfg.wppMensagens);
                     if (cfg.backupConfig) Object.assign(state.backupConfig, cfg.backupConfig);
-                    // Atualiza form e display após sync
+                    if (cfg.lastOsCounter) Object.assign(state.lastOsCounter || {}, cfg.lastOsCounter);
+
+                    // Atualiza UI após sync
                     await App.saveData(true);
                     App.updateCompanyDisplay();
                     if (typeof Config !== 'undefined') Config.load();
                     if (state.company.primaryColor) document.documentElement.style.setProperty('--primary', state.company.primaryColor);
                     if (state.company.secondaryColor) document.documentElement.style.setProperty('--secondary', state.company.secondaryColor);
-                    console.log('[LocalFirst] Config sincronizada da nuvem');
+                    console.log('[LocalFirst] Config sincronizada da nuvem (ts:', remoteTs, ')');
                 } catch(e) { console.warn('[LocalFirst] pullConfig:', e.message); }
             },
 
@@ -6963,30 +7139,138 @@ ORDER BY t.table_name;
                 const hoje = new Date().toISOString().split('T')[0];
 
                 // ── Injeta parcelas de vendas em Contas a Receber ──────────────
-                const contasVendas = [];
+                const metodosAVista = ['pix', 'cash', 'debit', 'credit'];
+                const metodoLabel   = {pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário'};
+                const contasVendas  = [];
+
                 (state.sales || []).forEach(sale => {
-                    const client = (state.clients || []).find(c => c.id === sale.clientId);
-                    const nomeCliente = client ? client.name : 'Cliente';
-                    const parcelas = (sale.paymentDetails && sale.paymentDetails.parcels) ? sale.paymentDetails.parcels : [];
-                    parcelas.forEach(p => {
-                        if (p.paid || p.status === 'pago' || p.status === 'paid') return;
-                        contasVendas.push({
-                            id: 'venda_' + sale.id + '_p' + p.number,
-                            tipo: 'receber',
-                            descricao: `OS ${sale.number} — Parcela ${p.number}/${parcelas.length}`,
-                            parte: nomeCliente,
-                            categoria: 'Venda',
-                            valor: parseFloat(p.value || 0),
-                            vencimento: p.dueDate || '',
-                            pago: false,
-                            _readonly: true
+                    if (sale.status === 'cancelado') return;
+                    if (sale.paymentStatus === 'pago') return;
+
+                    const client       = (state.clients || []).find(c => c.id === sale.clientId);
+                    const nomeCliente  = client ? client.name : 'Cliente';
+                    const det          = sale.paymentDetails || {};
+                    const parcelas     = det.parcels || [];
+                    const method       = sale.paymentMethod || '';
+
+                    // ── Pagamento Duplo (2 formas) ─────────────────────────────
+                    if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
+                        sale.dualPayments.forEach((slot, idx) => {
+                            const slotLabel = idx === 0 ? '1ª' : '2ª';
+                            const mLbl = {pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'}[slot.method] || slot.method;
+                            if (slot.method === 'installment') {
+                                // Parcelas do crediário desta forma
+                                (slot.parcelas || []).forEach(p => {
+                                    if (p.paid || p.status === 'pago' || p.status === 'paid') return;
+                                    contasVendas.push({
+                                        id: `venda_${sale.id}_dual${idx}_p${p.number}`,
+                                        tipo: 'receber',
+                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (Crediário) Parcela ${p.number}/${slot.nParcelas||slot.parcelas.length}`,
+                                        parte: nomeCliente,
+                                        categoria: 'Crediário',
+                                        valor: parseFloat(p.value || 0),
+                                        vencimento: p.dueDate || '',
+                                        pago: false,
+                                        _readonly: true
+                                    });
+                                });
+                                // Retirada desta forma de crediário
+                                if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) {
+                                    contasVendas.push({
+                                        id: `venda_${sale.id}_dual${idx}_retirada`,
+                                        tipo: 'receber',
+                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (Crediário) Retirada`,
+                                        parte: nomeCliente,
+                                        categoria: 'Retirada',
+                                        valor: parseFloat(slot.retirada),
+                                        vencimento: sale.deliveryForecast || sale.date || '',
+                                        pago: false,
+                                        _readonly: true
+                                    });
+                                }
+                            } else {
+                                // À vista com retirada pendente
+                                if ((slot.retirada || 0) > 0.01 && (slot.entry || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) {
+                                    contasVendas.push({
+                                        id: `venda_${sale.id}_dual${idx}_retirada`,
+                                        tipo: 'receber',
+                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (${mLbl}) Retirada`,
+                                        parte: nomeCliente,
+                                        categoria: 'Retirada',
+                                        valor: parseFloat(slot.retirada),
+                                        vencimento: sale.deliveryForecast || sale.date || '',
+                                        pago: false,
+                                        _readonly: true
+                                    });
+                                }
+                            }
                         });
-                    });
-                    // Venda sem parcelamento e ainda não entregue/paga
-                    if (parcelas.length === 0 && sale.total > 0
-                        && sale.status !== 'entregue'
-                        && sale.status !== 'cancelado'
-                        && sale.paymentStatus !== 'pago') {
+                        return;
+                    }
+
+                    // ── Crediário ──────────────────────────────────────────────
+                    if (method === 'installment') {
+                        // Parcelas pendentes
+                        parcelas.forEach(p => {
+                            if (p.paid || p.status === 'pago' || p.status === 'paid') return;
+                            contasVendas.push({
+                                id: 'venda_' + sale.id + '_p' + p.number,
+                                tipo: 'receber',
+                                descricao: `OS ${sale.number} — Parcela ${p.number}/${parcelas.length}`,
+                                parte: nomeCliente,
+                                categoria: 'Crediário',
+                                valor: parseFloat(p.value || 0),
+                                vencimento: p.dueDate || '',
+                                pago: false,
+                                _readonly: true
+                            });
+                        });
+
+                        // Valor na retirada do crediário
+                        // Pode estar salvo em det.retiradaEntry (instFromValue) OU det.retiradaValue (instFromPercent)
+                        const retiradaCrediario = parseFloat(det.retiradaEntry || 0) || parseFloat(det.retiradaValue || 0);
+                        if (retiradaCrediario > 0.01 && !sale.retiradaPaga) {
+                            contasVendas.push({
+                                id: 'venda_' + sale.id + '_retirada',
+                                tipo: 'receber',
+                                descricao: `OS ${sale.number} — Pagamento na Retirada`,
+                                parte: nomeCliente,
+                                categoria: 'Retirada',
+                                valor: retiradaCrediario,
+                                vencimento: sale.deliveryForecast || sale.date || '',
+                                pago: false,
+                                _readonly: true
+                            });
+                        }
+                        return;
+                    }
+
+                    // ── À vista (PIX / Dinheiro / Débito / Crédito) ────────────
+                    if (metodosAVista.includes(method)) {
+                        if (sale.status === 'entregue') return;
+                        // Só gera conta a receber se foi explicitamente salvo um saldo de retirada
+                        // (det.retiradaValue > 0) E a entrada foi menor que o total
+                        const retiradaAVista = parseFloat(det.retiradaValue || 0);
+                        const entradaAVista  = parseFloat(det.entradaValue  || 0);
+                        if (retiradaAVista > 0.01 && entradaAVista > 0 && !sale.retiradaPaga) {
+                            contasVendas.push({
+                                id: 'venda_' + sale.id + '_retirada',
+                                tipo: 'receber',
+                                descricao: `OS ${sale.number} — Saldo na Retirada (${metodoLabel[method]||method})`,
+                                parte: nomeCliente,
+                                categoria: 'Retirada',
+                                valor: retiradaAVista,
+                                vencimento: sale.deliveryForecast || sale.date || '',
+                                pago: false,
+                                _readonly: true
+                            });
+                        }
+                        // PIX/Dinheiro/Débito/Crédito integralmente pago → não gera nada
+                        return;
+                    }
+
+                    // ── Outros métodos sem parcelamento ────────────────────────
+                    if (parcelas.length === 0 && sale.total > 0 && sale.status !== 'entregue') {
                         contasVendas.push({
                             id: 'venda_' + sale.id + '_total',
                             tipo: 'receber',
@@ -7064,10 +7348,11 @@ ORDER BY t.table_name;
                         <span class="conta-item-valor">${this.fmt(c.valor)}</span>
                         <div class="conta-item-actions">
                             ${!c.pago && !c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixa('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
+                            ${!c.pago && c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixaVenda('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
                             ${!c._readonly ? `<button class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.75rem;" title="Comprovante" onclick="ContasManager.gerarComprovante('${c.id}')"><i class="fas fa-receipt"></i></button>` : ''}
                             ${!c._readonly ? `<button class="btn btn-sm" style="background:#17a2b8;color:white;padding:4px 8px;font-size:0.75rem;" title="Editar" onclick="ContasManager.editarConta('${c.id}')"><i class="fas fa-pen"></i></button>` : ''}
                             ${!c._readonly ? `<button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.75rem;" title="Excluir" onclick="ContasManager.excluirConta('${c.id}')"><i class="fas fa-trash"></i></button>` : ''}
-                            ${c._readonly ? `<span style="font-size:0.72rem;color:var(--gray);padding:4px 6px;" title="Gerado automaticamente">🔗 Auto</span>` : ''}
+                            ${c._readonly ? `<span style="font-size:0.72rem;color:var(--gray);padding:4px 6px;" title="Gerado automaticamente pela venda">🔗 Auto</span>` : ''}
                         </div>
                     </div>`;
                 }).join('');
@@ -7141,6 +7426,84 @@ ORDER BY t.table_name;
                     Toast.show('Baixa registrada!','success');
                     this.renderAll();
                     this.gerarComprovante(id);
+                }
+            },
+
+            // Dar baixa em parcela ou retirada gerada automaticamente pela venda
+            darBaixaVenda(itemId) {
+                // Formato dos IDs:
+                //   venda_{saleId}_p{N}       → parcela N do crediário
+                //   venda_{saleId}_retirada   → pagamento na retirada
+                //   venda_{saleId}_total      → total da venda (outros métodos)
+                if (!confirm('Confirmar baixa neste item? Esta ação marca o pagamento como recebido.')) return;
+                const parts = itemId.split('_');
+                // parts: ["venda", saleId, "pN" | "retirada" | "total"]
+                if (parts.length < 3) return;
+                const saleId = parts[1];
+                const tipo   = parts.slice(2).join('_'); // "p1", "p2", "retirada", "total"
+                const sale   = (state.sales || []).find(s => s.id === saleId);
+                if (!sale) { Toast.show('Venda não encontrada','warning'); return; }
+
+                // Suporte ao modo dual: venda_{id}_dual{N}_p{M} ou venda_{id}_dual{N}_retirada
+                if (tipo.startsWith('dual')) {
+                    const dualParts = tipo.split('_'); // ['dual0','p1'] ou ['dual0','retirada']
+                    const dualIdx   = parseInt(dualParts[0].replace('dual',''));
+                    const dualSub   = dualParts.slice(1).join('_');
+                    if (dualSub.startsWith('p') && /^p\d+$/.test(dualSub)) {
+                        const num = parseInt(dualSub.slice(1));
+                        if (sale.dualPayments?.[dualIdx]?.parcelas) {
+                            const parc = sale.dualPayments[dualIdx].parcelas.find(p => p.number === num);
+                            if (parc) {
+                                parc.paid = true; parc.status = 'pago'; parc.paidDate = new Date().toISOString().slice(0,10);
+                                App.saveData();
+                                Toast.show(`Parcela ${num} quitada! ✅`, 'success');
+                                this.renderAll();
+                            }
+                        }
+                    } else if (dualSub === 'retirada') {
+                        sale[`retiradaPaga_dual${dualIdx}`] = true;
+                        App.saveData();
+                        Toast.show('Retirada registrada! ✅', 'success');
+                        this.renderAll();
+                    }
+                    return;
+                }
+
+                if (tipo.startsWith('p') && /^p\d+$/.test(tipo)) {
+                    // Parcela de crediário
+                    const num = parseInt(tipo.slice(1));
+                    if (sale.paymentDetails && sale.paymentDetails.parcels) {
+                        const parc = sale.paymentDetails.parcels.find(p => p.number === num);
+                        if (parc) {
+                            parc.paid     = true;
+                            parc.status   = 'pago';
+                            parc.paidDate = new Date().toISOString().slice(0,10);
+                            // Verifica se todas as parcelas foram pagas
+                            const todasPagas = sale.paymentDetails.parcels.every(p => p.paid || p.status === 'pago' || p.status === 'paid');
+                            if (todasPagas && !sale.paymentDetails.retiradaEntry) {
+                                sale.paymentStatus = 'pago';
+                            }
+                            App.saveData();
+                            Toast.show(`Parcela ${num} quitada! ✅`, 'success');
+                            this.renderAll();
+                        }
+                    }
+                } else if (tipo === 'retirada') {
+                    // Valor na retirada (crediário ou à vista com saldo)
+                    if (sale.paymentDetails && sale.paymentDetails.retiradaEntry) {
+                        sale.retiradaPaga = true;
+                    } else if (sale.paymentDetails && sale.paymentDetails.retiradaValue) {
+                        sale.paymentDetails.retiradaValue = 0;
+                        sale.paymentStatus = 'pago';
+                    }
+                    App.saveData();
+                    Toast.show('Pagamento na retirada registrado! ✅', 'success');
+                    this.renderAll();
+                } else if (tipo === 'total') {
+                    sale.paymentStatus = 'pago';
+                    App.saveData();
+                    Toast.show('Pagamento registrado! ✅', 'success');
+                    this.renderAll();
                 }
             },
 
@@ -8812,19 +9175,6 @@ ORDER BY t.table_name;
             },
 
             initNavigation() {
-                // Observa mudanças no container de itens para atualizar o badge
-                const itemObs = new MutationObserver(() => {
-                    const badge = document.getElementById('itemCountBadge');
-                    const emptyMsg = document.getElementById('emptyItemsMsg');
-                    if (!badge) return;
-                    const items = (typeof state !== 'undefined' && state.currentSale && state.currentSale.items) ? state.currentSale.items : [];
-                    const count = items.reduce((s, i) => s + (parseInt(i.qty) || 1), 0);
-                    badge.textContent = count + (count === 1 ? ' item' : ' itens');
-                    if (emptyMsg) emptyMsg.style.display = items.length === 0 ? 'flex' : 'none';
-                });
-                const saleItemsEl = document.getElementById('saleItemsContainer');
-                if (saleItemsEl) itemObs.observe(saleItemsEl, { childList: true, subtree: true });
-
                 document.querySelectorAll('.menu-item').forEach(item => {
                     item.addEventListener('click', () => {
                         const section = item.dataset.section;
@@ -9501,7 +9851,8 @@ ORDER BY t.table_name;
                     complement: document.getElementById('clientComplement').value,
                     neighborhood: document.getElementById('clientNeighborhood').value,
                     city: document.getElementById('clientCity').value,
-                    state: document.getElementById('clientState').value
+                    state: document.getElementById('clientState').value,
+                    updated_at: new Date().toISOString()
                 };
                 
                 if (state.editingId) {
@@ -9556,8 +9907,8 @@ ORDER BY t.table_name;
                 this.clearForm();
                 this.renderTable();
                 Clients._ultimoClienteSalvo = client;
-                const nomeEl = document.getElementById('clienteSalvoNome');
-                if (nomeEl) nomeEl.textContent = client.name || '';
+                var _nEl = document.getElementById('clienteSalvoNome');
+                if (_nEl) _nEl.textContent = client.name || '';
                 Modal.show('clienteSalvoModal');
             },
 
@@ -9565,25 +9916,22 @@ ORDER BY t.table_name;
 
             _criarVendaParaCliente() {
                 Modal.close('clienteSalvoModal');
-                const client = Clients._ultimoClienteSalvo;
-                const menuSales = document.querySelector('.menu-item[data-section="sales"]');
+                var client = Clients._ultimoClienteSalvo;
+                var menuSales = document.querySelector('.menu-item[data-section="sales"]');
                 if (menuSales) menuSales.click();
-                setTimeout(() => {
+                setTimeout(function() {
                     if (!client) return;
-                    const searchEl = document.getElementById('searchClientSale');
+                    var searchEl = document.getElementById('searchClientSale');
                     if (searchEl) {
                         searchEl.value = client.name;
                         searchEl.dispatchEvent(new Event('input'));
-                        setTimeout(() => {
+                        setTimeout(function() {
                             if (typeof Sales !== 'undefined' && Sales.selectClient) {
                                 Sales.selectClient(client.id);
-                            } else {
-                                const firstResult = document.querySelector('#clientSearchResults .client-result, #clientSearchResults li, #clientSearchResults div[onclick]');
-                                if (firstResult) firstResult.click();
                             }
                         }, 300);
                     }
-                    Toast.show('Cliente ' + client.name + ' selecionado! Adicione os itens da venda.', 'success');
+                    Toast.show('Cliente ' + client.name + ' selecionado!', 'success');
                 }, 400);
             },
 
@@ -10004,7 +10352,8 @@ ORDER BY t.table_name;
                     price: Utils.parseMoney(document.getElementById('productPrice').value) || 0,
                     qty: parseInt(document.getElementById('productQty').value) || 0,
                     minQty: parseInt(document.getElementById('productMinQty').value) || 5,
-                    image: document.getElementById('productImageInput').dataset.image || null
+                    image: document.getElementById('productImageInput').dataset.image || null,
+                    updated_at: new Date().toISOString()
                 };
                 
                 if (product.price <= 0) {
@@ -10106,7 +10455,8 @@ ORDER BY t.table_name;
                     code: document.getElementById('serviceCode').value,
                     name: document.getElementById('serviceName').value,
                     value: parseFloat(document.getElementById('serviceValue').value) || 0,
-                    desc: document.getElementById('serviceDesc').value
+                    desc: document.getElementById('serviceDesc').value,
+                    updated_at: new Date().toISOString()
                 };
                 
                 if (service.value <= 0) {
@@ -10200,7 +10550,8 @@ ORDER BY t.table_name;
                     neighborhood: document.getElementById('supplierNeighborhood').value,
                     city: document.getElementById('supplierCity').value,
                     state: document.getElementById('supplierState').value,
-                    products: document.getElementById('supplierProducts').value
+                    products: document.getElementById('supplierProducts').value,
+                    updated_at: new Date().toISOString()
                 };
                 
                 if (state.editingId) {
@@ -10323,7 +10674,8 @@ ORDER BY t.table_name;
                     value: Utils.parseMoney(document.getElementById('expenseValue').value) || 0,
                     paymentMethod: document.getElementById('expensePaymentMethod').value,
                     status: document.getElementById('expenseStatus').value,
-                    notes: document.getElementById('expenseNotes').value
+                    notes: document.getElementById('expenseNotes').value,
+                    updated_at: new Date().toISOString()
                 };
                 
                 if (expense.value <= 0) {
@@ -10739,6 +11091,7 @@ ORDER BY t.table_name;
                 
                 App.saveData();
                 Utils.updatePixKey();
+                SupaSync.upsertConfig().catch(() => {});
                 Toast.show('Configurações financeiras salvas!');
             },
 
@@ -10752,6 +11105,7 @@ ORDER BY t.table_name;
                 state.backupConfig.autoEnabled = enabled;
                 state.backupConfig.hour        = hour;
                 state.backupConfig.keepDays    = keepDays;
+                SupaSync.upsertConfig().catch(() => {});
 
                 App.saveData(true);
 
@@ -10883,6 +11237,7 @@ ORDER BY t.table_name;
                 
                 IDB.set('notificacoes', JSON.stringify(state.notificacoes)).catch(() => {});
                 App.saveData(true);
+                SupaSync.upsertConfig().catch(() => {});
                 Toast.show('Configurações de notificações salvas!');
             },
 
@@ -10898,6 +11253,7 @@ ORDER BY t.table_name;
                         state.company.logo = e.target.result;
                         App.saveData();
                         App.updateCompanyDisplay();
+                        SupaSync.upsertConfig().catch(() => {});
                         Toast.show('Logo atualizada com sucesso!');
                     };
                     reader.readAsDataURL(file);
@@ -11781,27 +12137,78 @@ ${container.innerHTML}
             renderItems() {
                 const container = document.getElementById('saleItemsContainer');
                 if (!container) return;
-                
-                if (state.currentSale.items.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--gray);">Nenhum item adicionado</p>';
+                const hint = document.getElementById('emptyItemsHint');
+                const badge = document.getElementById('itemCountBadge');
+                const count = state.currentSale.items.length;
+                if (badge) badge.textContent = count + (count === 1 ? ' item' : ' itens');
+
+                if (count === 0) {
+                    container.innerHTML = '';
+                    if (hint) hint.style.display = 'flex';
                     return;
                 }
-                
-                let html = '<div class="sale-item sale-item-header" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; padding: 0.5rem; background: var(--light-gray); border-radius: 8px; margin-bottom: 0.5rem;"><div>Item</div><div>Qtd</div><div>Unitário</div><div>Subtotal</div><div>Ações</div></div>';
-                
+                if (hint) hint.style.display = 'none';
+
+                const typeIcon = { lente:'fa-eye', armacao:'fa-glasses', servico:'fa-tools', default:'fa-tag' };
+                const typeColor = { lente:'#ff6b00', armacao:'#2e7d32', servico:'#0277bd', default:'#888' };
+                const typeBg   = { lente:'#fff3e0', armacao:'#e8f5e9', servico:'#e1f5fe', default:'#f5f5f5' };
+
+                let html = `<div style="padding:8px 0 4px;">`;
                 state.currentSale.items.forEach((item, i) => {
+                    const t     = item.type || 'default';
+                    const icon  = typeIcon[t]  || typeIcon.default;
+                    const color = typeColor[t] || typeColor.default;
+                    const bg    = typeBg[t]    || typeBg.default;
                     html += `
-                        <div class="sale-item" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--light-gray);">
-                            <div>${Utils.sanitizeHTML(item.name)}</div>
-                            <div>${item.qty}</div>
-                            <div>${Utils.formatCurrency(item.price)}</div>
-                            <div>${Utils.formatCurrency(item.subtotal)}</div>
-                            <div><button class="btn-icon btn-delete" onclick="Sales.removeItem(${i})" title="Remover"><i class="fas fa-trash"></i></button></div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f0f0;animation:fadeIn 0.2s ease;">
+                        <div style="width:34px;height:34px;border-radius:10px;background:${bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas ${icon}" style="color:${color};font-size:13px;"></i>
                         </div>
-                    `;
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:700;font-size:0.83rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${Utils.sanitizeHTML(item.name)}</div>
+                            <div style="font-size:0.72rem;color:#888;margin-top:1px;">${item.qty}× ${Utils.formatCurrency(item.price)}</div>
+                        </div>
+                        <div style="font-weight:800;font-size:0.9rem;color:${color};white-space:nowrap;">${Utils.formatCurrency(item.subtotal)}</div>
+                        <button onclick="Sales.removeItem(${i})" title="Remover"
+                            style="width:28px;height:28px;border-radius:8px;border:none;background:#fff0f0;color:#dc3545;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-trash" style="font-size:11px;"></i>
+                        </button>
+                    </div>`;
                 });
-                
+                html += `</div>`;
                 container.innerHTML = html;
+            },
+
+            // Controle de quantidade com botões +/−
+            changeQty(inputId, delta) {
+                const el = document.getElementById(inputId);
+                if (!el) return;
+                const val = parseInt(el.value) || 1;
+                el.value = Math.max(1, val + delta);
+            },
+
+            // Troca de aba de item (lente / armação / serviço)
+            showItemTab(tab) {
+                const tabs   = { lente:'itemTabLente', armacao:'itemTabArmacao', servico:'itemTabServico' };
+                const btns   = { lente:'tabBtnLente',  armacao:'tabBtnArmacao',  servico:'tabBtnServico' };
+                const colors = { lente:['#ff6b00','#ff6b00'], armacao:['#43a047','#2e7d32'], servico:['#039be5','#0277bd'] };
+                Object.keys(tabs).forEach(key => {
+                    const panel = document.getElementById(tabs[key]);
+                    const btn   = document.getElementById(btns[key]);
+                    if (!panel || !btn) return;
+                    if (key === tab) {
+                        panel.style.display = 'block';
+                        const [c1, c2] = colors[key];
+                        btn.style.background = `linear-gradient(135deg,${c1},${c2})`;
+                        btn.style.borderColor = c2;
+                        btn.style.color = '#fff';
+                    } else {
+                        panel.style.display = 'none';
+                        btn.style.background = '#fff';
+                        btn.style.borderColor = '#ddd';
+                        btn.style.color = '#888';
+                    }
+                });
             },
 
             addLente() {
@@ -12263,6 +12670,119 @@ ${container.innerHTML}
                 const labels = { pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário' };
                 return (state.currentSale.mixedPayments || [])
                     .map(r => `${labels[r.method]||r.method}: ${Utils.formatCurrency(r.value)}`).join(' + ');
+            },
+
+            // ── PAGAMENTO DUPLO ──────────────────────────────────────────────
+            setDualMode(isDual) {
+                const panel  = document.getElementById('dualPaymentPanel');
+                const single = document.getElementById('paymentSingleMode');
+                const btnS   = document.getElementById('btnModoSimples');
+                const btnD   = document.getElementById('btnModoDuplo');
+                state.currentSale._dualMode = isDual;
+                if (isDual) {
+                    if (panel)  panel.style.display  = 'block';
+                    if (single) single.style.display = 'none';
+                    if (btnS) { btnS.style.background='#fff'; btnS.style.color='var(--primary)'; }
+                    if (btnD) { btnD.style.background='var(--primary)'; btnD.style.color='#fff'; }
+                    // Oculta painéis individuais de pagamento
+                    ['pixDetails','cashDetails','debitDetails','creditDetails','installmentDetails']
+                        .forEach(id => document.getElementById(id)?.classList.add('d-none'));
+                    this.calcDual();
+                } else {
+                    if (panel)  panel.style.display  = 'none';
+                    if (single) single.style.display = 'block';
+                    if (btnS) { btnS.style.background='var(--primary)'; btnS.style.color='#fff'; }
+                    if (btnD) { btnD.style.background='#fff'; btnD.style.color='var(--primary)'; }
+                    state.currentSale._dualPayments = null;
+                    this.selectPayment(state.currentSale.paymentMethod || 'installment');
+                }
+            },
+
+            calcDual() {
+                const lbl   = {pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'};
+                const total = state.currentSale._grossTotal || state.currentSale.total || 0;
+                const m1    = document.getElementById('dual1Method')?.value || 'pix';
+                const m2    = document.getElementById('dual2Method')?.value || 'cash';
+                const v1    = parseFloat(document.getElementById('dual1Value')?.value) || 0;
+                const v2    = parseFloat(document.getElementById('dual2Value')?.value) || 0;
+                const sum   = v1 + v2;
+                const diff  = total - sum;
+
+                // Mostra/oculta painel crediário por forma
+                const c1 = document.getElementById('dual1Crediario');
+                const c2 = document.getElementById('dual2Crediario');
+                if (c1) c1.style.display = (m1 === 'installment') ? 'block' : 'none';
+                if (c2) c2.style.display = (m2 === 'installment') ? 'block' : 'none';
+
+                // Resumo crediário forma 1
+                if (m1 === 'installment' && v1 > 0) {
+                    const entry1    = parseFloat(document.getElementById('dual1Entry')?.value) || 0;
+                    const ret1      = parseFloat(document.getElementById('dual1Retirada')?.value) || 0;
+                    const nparc1    = parseInt(document.getElementById('dual1Parcelas')?.value) || 2;
+                    const saldo1    = Math.max(0, v1 - entry1 - ret1);
+                    const parcVal1  = nparc1 > 0 ? saldo1 / nparc1 : 0;
+                    const el1 = document.getElementById('dual1ParcelaInfo');
+                    if (el1) el1.textContent = `Entrada: R$ ${entry1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} | ${nparc1}x de R$ ${parcVal1.toFixed(2).replace('.',',')}`;
+                }
+                // Resumo crediário forma 2
+                if (m2 === 'installment' && v2 > 0) {
+                    const entry2    = parseFloat(document.getElementById('dual2Entry')?.value) || 0;
+                    const ret2      = parseFloat(document.getElementById('dual2Retirada')?.value) || 0;
+                    const nparc2    = parseInt(document.getElementById('dual2Parcelas')?.value) || 2;
+                    const saldo2    = Math.max(0, v2 - entry2 - ret2);
+                    const parcVal2  = nparc2 > 0 ? saldo2 / nparc2 : 0;
+                    const el2 = document.getElementById('dual2ParcelaInfo');
+                    if (el2) el2.textContent = `Entrada: R$ ${entry2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} | ${nparc2}x de R$ ${parcVal2.toFixed(2).replace('.',',')}`;
+                }
+
+                // Resumo geral
+                const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+                const eTotalOS     = document.getElementById('dualTotalOS');
+                const eTotalDistrib= document.getElementById('dualTotalDistrib');
+                const eDiffRow     = document.getElementById('dualDiffRow');
+                const eDiffVal     = document.getElementById('dualDiffVal');
+                const eOkRow       = document.getElementById('dualOkRow');
+                if (eTotalOS)      eTotalOS.textContent      = fmt(total);
+                if (eTotalDistrib) eTotalDistrib.textContent = fmt(sum);
+                if (Math.abs(diff) > 0.01) {
+                    if (eDiffRow) eDiffRow.style.display = 'flex';
+                    if (eOkRow)  eOkRow.style.display   = 'none';
+                    if (eDiffVal) eDiffVal.textContent   = fmt(Math.abs(diff)) + (diff > 0 ? ' faltando' : ' excedendo');
+                } else {
+                    if (eDiffRow) eDiffRow.style.display = 'none';
+                    if (eOkRow)  eOkRow.style.display   = 'block';
+                }
+
+                // Salva no state para o save() usar
+                state.currentSale._dualPayments = [
+                    { method: m1, value: v1,
+                      entry: parseFloat(document.getElementById('dual1Entry')?.value) || 0,
+                      retirada: parseFloat(document.getElementById('dual1Retirada')?.value) || 0,
+                      parcelas: parseInt(document.getElementById('dual1Parcelas')?.value) || 2 },
+                    { method: m2, value: v2,
+                      entry: parseFloat(document.getElementById('dual2Entry')?.value) || 0,
+                      retirada: parseFloat(document.getElementById('dual2Retirada')?.value) || 0,
+                      parcelas: parseInt(document.getElementById('dual2Parcelas')?.value) || 2 }
+                ];
+            },
+
+            // Gera parcelas para uma das formas do pagamento duplo
+            _gerarParcelasDual(slot, firstDateStr) {
+                if (!slot || slot.method !== 'installment' || slot.value <= 0) return [];
+                const saldo    = Math.max(0, slot.value - (slot.entry || 0) - (slot.retirada || 0));
+                const nParc    = slot.parcelas || 2;
+                const parcVal  = nParc > 0 ? saldo / nParc : 0;
+                const parcelas = [];
+                for (let i = 1; i <= nParc; i++) {
+                    const due = new Date(firstDateStr + 'T12:00:00');
+                    due.setMonth(due.getMonth() + (i - 1));
+                    parcelas.push({
+                        number: i, dueDate: due.toISOString().slice(0,10),
+                        value: parcVal, paidDate: null, paidValue: null,
+                        status: 'aberto', daysLate: 0, lateFee: 2, dailyInterest: 0.033, multaJuros: 0
+                    });
+                }
+                return parcelas;
             },
 
             // Calcula com base no % da entrada (quando o usuário altera o %)
@@ -13773,6 +14293,56 @@ ${container.innerHTML}
                     methodDiscount = grossTotal * 0.03;
                 // Total final já foi aplicado pelo PAY object
                 const finalTotal = state.currentSale.total;
+
+                // ── MODO PAGAMENTO DUPLO ────────────────────────────────────
+                const isDual = state.currentSale._dualMode && state.currentSale._dualPayments?.length === 2;
+                let paymentDetailsToSave = null;
+                let dualPaymentsToSave   = null;
+                const metodosAVista = ['pix', 'cash', 'debit', 'credit'];
+
+                if (isDual) {
+                    // Valida que a soma bate com o total
+                    const dp = state.currentSale._dualPayments;
+                    const soma = (dp[0].value || 0) + (dp[1].value || 0);
+                    const totalRef = state.currentSale._grossTotal || state.currentSale.total || 0;
+                    if (Math.abs(soma - totalRef) > 0.05) {
+                        Toast.show('A soma das 2 formas não corresponde ao total da OS', 'warning');
+                        return;
+                    }
+                    // Gera parcelas para cada forma que for crediário
+                    const firstDate = new Date();
+                    firstDate.setDate(firstDate.getDate() + 30);
+                    const firstDateStr = firstDate.toISOString().slice(0,10);
+                    dualPaymentsToSave = dp.map(slot => ({
+                        method:   slot.method,
+                        value:    slot.value,
+                        entry:    slot.entry    || 0,
+                        retirada: slot.retirada || 0,
+                        parcelas: slot.method === 'installment' ? this._gerarParcelasDual(slot, firstDateStr) : [],
+                        nParcelas: slot.method === 'installment' ? (slot.parcelas || 2) : 0,
+                        parcValue: slot.method === 'installment'
+                            ? Math.max(0, slot.value - (slot.entry||0) - (slot.retirada||0)) / (slot.parcelas || 2) : 0
+                    }));
+                    paymentDetailsToSave = { dual: true, slots: dualPaymentsToSave };
+
+                } else {
+                    // ── MODO SIMPLES ─────────────────────────────────────────
+                    // Captura retirada para métodos à vista com entrada parcial
+                    paymentDetailsToSave = state.currentSale.paymentDetails
+                        ? JSON.parse(JSON.stringify(state.currentSale.paymentDetails)) : null;
+                    if (metodosAVista.includes(method)) {
+                        const entradaIds = { pix:'pixEntrada', cash:'cashEntrada', debit:'debitEntrada', credit:'creditEntrada' };
+                        const entradaEl  = document.getElementById(entradaIds[method]);
+                        const entradaVal = entradaEl ? (parseFloat(entradaEl.value) || 0) : 0;
+                        const totalFinal = state.currentSale.total || 0;
+                        const retiradaVal = Math.max(0, totalFinal - entradaVal);
+                        if (entradaVal > 0.01 && retiradaVal > 0.01) {
+                            paymentDetailsToSave = paymentDetailsToSave || {};
+                            paymentDetailsToSave.retiradaValue = retiradaVal;
+                            paymentDetailsToSave.entradaValue  = entradaVal;
+                        }
+                    }
+                }
                 
                 const sale = {
                     id: state.editingSaleId || Utils.generateId('SALE'),
@@ -13791,9 +14361,10 @@ ${container.innerHTML}
                     methodDiscount,      // desconto do método (PIX/Dinheiro)
                     total: finalTotal,   // total final (com desconto de método)
                     paymentMethod: method,
-                    paymentMode: state.currentSale.paymentMode || 'single',
+                    paymentMode: isDual ? 'dual' : (state.currentSale.paymentMode || 'single'),
                     mixedPayments: state.currentSale.mixedPayments ? [...state.currentSale.mixedPayments] : null,
-                    paymentDetails: state.currentSale.paymentDetails ? JSON.parse(JSON.stringify(state.currentSale.paymentDetails)) : null,
+                    paymentDetails: paymentDetailsToSave,
+                    dualPayments: dualPaymentsToSave,
                     observations: document.getElementById('saleObservations').value,
                     status: document.getElementById('saleStatus').value,
                     statusHistory: [{ date: new Date().toISOString(), status: 'Criada' }]
@@ -13819,13 +14390,14 @@ ${container.innerHTML}
                 Toast.show('Venda salva com sucesso!');
                 const osNumEl = document.getElementById('osGeradoNumero');
                 if (osNumEl) osNumEl.textContent = 'OS: ' + sale.number;
+                // Reset botões de situação
                 Sales._osGeradoSaleId = sale.id;
-                const btnPago = document.getElementById('osGeradoBtnPago');
-                const btnPendente = document.getElementById('osGeradoBtnPendente');
-                const lblPagto = document.getElementById('osGeradoPagtoLabel');
-                if (btnPago)    { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
-                if (btnPendente){ btnPendente.style.background='#fff'; btnPendente.style.color='#555'; btnPendente.style.borderColor='#ddd'; }
-                if (lblPagto)   lblPagto.textContent = 'Selecione a situação — isso remove da lista de Contas a Receber';
+                ['osGeradoBtnPago','osGeradoBtnPendente'].forEach(function(id){
+                    var b=document.getElementById(id);
+                    if(b){b.style.background='#fff';b.style.color='#555';b.style.borderColor='#ddd';}
+                });
+                var lbl=document.getElementById('osGeradoPagtoLabel');
+                if(lbl) lbl.textContent='Selecione a situação — isso remove da lista de Contas a Receber';
                 Modal.show('osGeradoModal');
             },
 
@@ -13936,6 +14508,20 @@ ${container.innerHTML}
                 const mixedRows = document.getElementById('mixedPaymentRows');
                 if (mixedRows) mixedRows.innerHTML = '';
                 state.editingSaleId = null;
+                // Reset modo duplo
+                state.currentSale._dualMode = false;
+                state.currentSale._dualPayments = null;
+                this.setDualMode(false);
+                // Limpa campos do painel duplo
+                ['dual1Value','dual2Value','dual1Entry','dual1Retirada','dual2Entry','dual2Retirada'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.value = '';
+                });
+                ['dual1Parcelas','dual2Parcelas'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.value = '2';
+                });
+                ['dual1ParcelaInfo','dual2ParcelaInfo'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.textContent = '—';
+                });
             },
 
             finalize() {
@@ -13947,44 +14533,48 @@ ${container.innerHTML}
             _osGeradoSaleId: null,
 
             _setOsGeradoPagamento(situacao) {
-                const saleId = Sales._osGeradoSaleId;
+                var saleId = Sales._osGeradoSaleId;
                 if (!saleId) return;
-                const sale = state.sales.find(s => s.id === saleId);
+                var sale = state.sales.find(function(s){ return s.id === saleId; });
                 if (!sale) return;
-                const btnPago     = document.getElementById('osGeradoBtnPago');
-                const btnPendente = document.getElementById('osGeradoBtnPendente');
-                const lbl         = document.getElementById('osGeradoPagtoLabel');
+                var btnP = document.getElementById('osGeradoBtnPago');
+                var btnPend = document.getElementById('osGeradoBtnPendente');
+                var lbl = document.getElementById('osGeradoPagtoLabel');
                 if (situacao === 'pago') {
                     sale.paymentStatus = 'pago';
                     sale.paidAt = new Date().toISOString();
+                    sale.updated_at = sale.paidAt;
                     if (sale.paymentDetails && sale.paymentDetails.parcels) {
-                        sale.paymentDetails.parcels.forEach(p => {
-                            p.status = 'pago'; p.paid = true;
-                            p.paidDate = sale.paidAt.slice(0,10);
-                            p.paidValue = p.paidValue || p.value;
+                        sale.paymentDetails.parcels.forEach(function(p){
+                            p.status='pago'; p.paid=true;
+                            p.paidDate=sale.paidAt.slice(0,10);
+                            p.paidValue=p.paidValue||p.value;
                         });
                     }
-                    if (btnPago)     { btnPago.style.background='#28a745'; btnPago.style.color='white'; btnPago.style.borderColor='#28a745'; }
-                    if (btnPendente) { btnPendente.style.background='#fff'; btnPendente.style.color='#555'; btnPendente.style.borderColor='#ddd'; }
-                    if (lbl) lbl.textContent = '✅ Marcado como PAGO — não aparece em Contas a Receber';
+                    if(btnP){btnP.style.background='#28a745';btnP.style.color='white';btnP.style.borderColor='#28a745';}
+                    if(btnPend){btnPend.style.background='#fff';btnPend.style.color='#555';btnPend.style.borderColor='#ddd';}
+                    if(lbl) lbl.textContent='✅ Marcado como PAGO — não aparece em Contas a Receber';
                 } else {
                     sale.paymentStatus = 'pendente';
+                    sale.updated_at = new Date().toISOString();
                     delete sale.paidAt;
                     if (sale.paymentDetails && sale.paymentDetails.parcels) {
-                        sale.paymentDetails.parcels.forEach(p => {
-                            p.status = 'aberto'; p.paid = false;
+                        sale.paymentDetails.parcels.forEach(function(p){
+                            p.status='aberto'; p.paid=false;
                             delete p.paidDate; delete p.paidValue;
                         });
                     }
-                    if (btnPago)     { btnPago.style.background='#fff'; btnPago.style.color='#555'; btnPago.style.borderColor='#ddd'; }
-                    if (btnPendente) { btnPendente.style.background='#ffc107'; btnPendente.style.color='#333'; btnPendente.style.borderColor='#ffc107'; }
-                    if (lbl) lbl.textContent = '⏳ Marcado como PENDENTE — aparece em Contas a Receber';
+                    if(btnP){btnP.style.background='#fff';btnP.style.color='#555';btnP.style.borderColor='#ddd';}
+                    if(btnPend){btnPend.style.background='#ffc107';btnPend.style.color='#333';btnPend.style.borderColor='#ffc107';}
+                    if(lbl) lbl.textContent='⏳ Marcado como PENDENTE — aparece em Contas a Receber';
                 }
-                const idx = state.sales.findIndex(s => s.id === saleId);
+                var idx = state.sales.findIndex(function(s){ return s.id === saleId; });
                 if (idx !== -1) state.sales[idx] = sale;
                 App.saveData();
-                if (typeof ContasManager !== 'undefined') ContasManager.renderAll();
-                Toast.show(situacao === 'pago' ? '✅ Venda marcada como PAGA!' : '⏳ Venda marcada como PENDENTE', situacao === 'pago' ? 'success' : 'warning');
+                SupaSync.inserirVenda(sale); // push atualização ao Supabase
+                if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e){} }
+                Toast.show(situacao==='pago' ? '✅ Venda marcada como PAGA!' : '⏳ Venda marcada como PENDENTE',
+                           situacao==='pago' ? 'success' : 'warning');
             },
 
             view(id) {
