@@ -5352,11 +5352,6 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     <div class="valor" id="pixAlertaVal">R$ 0,00</div></div>
                                 </div>
                             </div>
-                            <div class="btn-group" style="margin-top:12px;justify-content:center;gap:8px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> Via Ótica</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> Via Cliente</button>
-                            </div>
                         </div>
 
                         <!-- ── DINHEIRO ── -->
@@ -5406,11 +5401,6 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     <div class="valor" id="cashAlertaVal">R$ 0,00</div></div>
                                 </div>
                             </div>
-                            <div class="btn-group" style="margin-top:12px;justify-content:center;gap:8px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> Via Ótica</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> Via Cliente</button>
-                            </div>
                         </div>
 
                         <!-- ── DÉBITO ── -->
@@ -5451,11 +5441,6 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     <div><div style="font-size:12px;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada</div>
                                     <div class="valor" id="debitAlertaVal">R$ 0,00</div></div>
                                 </div>
-                            </div>
-                            <div class="btn-group" style="margin-top:12px;justify-content:center;gap:8px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> Via Ótica</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> Via Cliente</button>
                             </div>
                         </div>
 
@@ -5522,11 +5507,6 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     <div><div style="font-size:12px;font-weight:700;color:#e65100;text-transform:uppercase;">⚠️ Cobrar na retirada</div>
                                     <div class="valor" id="creditAlertaVal">R$ 0,00</div></div>
                                 </div>
-                            </div>
-                            <div class="btn-group" style="margin-top:12px;justify-content:center;gap:8px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> Via Ótica</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> Via Cliente</button>
                             </div>
                         </div>
 
@@ -5635,11 +5615,6 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     <tbody id="installmentsTableBody"></tbody>
                                 </table>
                             </div>
-                            <div class="btn-group" style="margin-top:12px;justify-content:center;gap:8px;flex-wrap:wrap;">
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> PDF OS (ambas)</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via1')" style="background:#ff6b00;"><i class="fas fa-file-pdf"></i> Via Ótica</button>
-                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_OS('via2')" style="background:#28a745;"><i class="fas fa-file-pdf"></i> Via Cliente</button>
-                            </div>
                         </div>
 
                     </div>
@@ -5706,6 +5681,7 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 <th>Status</th>
                                 <th>Data</th>
                                 <th>Ações</th>
+                                <th><i class="fas fa-file-pdf" style="color:#dc3545"></i></th>
                                 <th><i class="fab fa-whatsapp" style="color:#25d366"></i></th>
                             </tr>
                         </thead>
@@ -7857,7 +7833,7 @@ ORDER BY t.table_name;
                 <button class="modal-close" onclick="Modal.close('osGeradoModal')" aria-label="Fechar" style="position:absolute;right:1rem;top:1rem;">&times;</button>
             </div>
             <div class="modal-body" style="padding:1.25rem 1.5rem 0.5rem;">
-                <div style="font-size:2.5rem;margin-bottom:0.5rem;">🖨️</div>
+                <div style="font-size:2.5rem;margin-bottom:0.5rem;">✅</div>
                 <p id="osGeradoNumero" style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;"></p>
                 <div style="background:#f8f9fa;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid #e9ecef;">
                     <p style="font-size:0.82rem;font-weight:700;color:#495057;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:.5px;">💰 Situação do Pagamento</p>
@@ -7867,15 +7843,9 @@ ORDER BY t.table_name;
                     </div>
                     <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
                 </div>
-                <p style="color:var(--gray);font-size:0.88rem;margin-bottom:1rem;">Deseja gerar a O.S.?</p>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.75rem;">
-                    <button class="btn btn-primary" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via1')"><i class="fas fa-file-pdf"></i> Via Ótica</button>
-                    <button class="btn btn-success" style="font-size:0.85rem;padding:0.6rem;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('via2')"><i class="fas fa-file-pdf"></i> Via Cliente</button>
-                    <button class="btn btn-secondary" style="font-size:0.85rem;padding:0.6rem;grid-column:1/-1;" onclick="Modal.close('osGeradoModal');Sales.gerarPDF_OS('ambas')"><i class="fas fa-file-pdf"></i> Ambas as Vias</button>
-                </div>
             </div>
             <div class="modal-footer" style="justify-content:center;border-top:none;padding-top:0;">
-                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;" onclick="Modal.close('osGeradoModal')">Fechar sem imprimir</button>
+                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;" onclick="Modal.close('osGeradoModal')">Fechar</button>
             </div>
         </div>
     </div>
@@ -13434,7 +13404,7 @@ ${container.innerHTML}
 
                 tbody.innerHTML = '';
                 if (filtered.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--gray);">
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--gray);">
                         <i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.3;"></i>
                         Nenhuma OS encontrada com esses filtros.
                     </td></tr>`;
@@ -13457,6 +13427,10 @@ ${container.innerHTML}
                             <button class="btn-icon btn-view" onclick="Sales.view('${s.id}')" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="btn-icon btn-edit" onclick="Sales.edit('${s.id}')" title="Editar"><i class="fas fa-edit"></i></button>
                             <button class="btn-icon btn-delete" onclick="Sales.delete('${s.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </td>
+                        <td class="action-buttons">
+                            <button class="btn-icon" style="background:rgba(255,107,0,0.12);color:#ff6b00;" onclick="Sales._setPdfTarget('${s.id}');Sales.gerarPDF_OS('via1')" title="PDF Via Ótica"><i class="fas fa-file-pdf"></i></button>
+                            <button class="btn-icon" style="background:rgba(40,167,69,0.12);color:#28a745;" onclick="Sales._setPdfTarget('${s.id}');Sales.gerarPDF_OS('via2')" title="PDF Via Cliente"><i class="fas fa-file-pdf"></i></button>
                         </td>
                         <td class="action-buttons">
                             <button class="btn-icon" style="background:${hasPhone ? 'rgba(37,211,102,0.15)' : 'rgba(0,0,0,0.05)'};color:${hasPhone ? '#25d366' : '#aaa'};"
@@ -14647,6 +14621,13 @@ ${container.innerHTML}
             },
 
             // ========== FUNÇÕES DE PDF - MODELOS EXATOS ==========
+
+            // Permite gerar PDF de uma OS específica do histórico (sem editar)
+            _setPdfTarget(saleId) {
+                const sale = state.sales.find(s => s.id === saleId);
+                if (sale) state.currentSale = JSON.parse(JSON.stringify(sale));
+            },
+
             gerarPDF_OS(tipo) {
                 const client  = state.clients.find(c => c.id === state.currentSale.clientId);
                 const presc   = state.prescriptions.find(p => p.clientId === client?.id);
@@ -16179,6 +16160,24 @@ ${container.innerHTML}
                             style="background:#f0f0f0;color:#555;border:1px solid #ddd;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">
                             ✖ Fechar
                         </button>
+                    </div>
+                    <!-- ── Gerar O.S. PDF ── -->
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #ebebeb;">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#dc3545;margin-bottom:8px;">🖨️ Gerar O.S. (PDF)</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                            <button onclick="Sales.gerarPDF_OS('via1')"
+                                style="background:#ff6b00;color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                                <i class="fas fa-file-pdf"></i> Via Ótica
+                            </button>
+                            <button onclick="Sales.gerarPDF_OS('via2')"
+                                style="background:#28a745;color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                                <i class="fas fa-file-pdf"></i> Via Cliente
+                            </button>
+                            <button onclick="Sales.gerarPDF_OS('ambas')"
+                                style="background:#dc3545;color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;grid-column:1/-1;">
+                                <i class="fas fa-file-pdf"></i> Ambas as Vias
+                            </button>
+                        </div>
                     </div>
                 </div>`;
 
