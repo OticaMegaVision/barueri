@@ -187,22 +187,6 @@
             background: #111111;
         }
 
-        .dark-mode .header-left h1 {
-            color: #e0e0e0;
-        }
-
-        .dark-mode .section-title {
-            color: #cccccc;
-        }
-
-        .dark-mode .card-value {
-            color: #e8e8e8;
-        }
-
-        .dark-mode .card {
-            border-top-color: #444;
-        }
-
         .dark-mode .badge {
             opacity: 0.9;
         }
@@ -3390,8 +3374,6 @@
         .carne-totalizador-label { font-size: 7px; opacity: 0.88; text-transform: uppercase; letter-spacing: 0.8px; display: block; margin-bottom: 0.5mm; font-weight: 700; }
         .carne-totalizador-val   { font-size: 14px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
-        /* COMPROVANTE */
-        /* COMPROVANTE */
         /* ===== COMPROVANTE — cupom 80mm, 1 via, tamanho real ===== */
         .comprovante-wrapper {
             width: 80mm;
@@ -6026,10 +6008,10 @@
                                 <p style="margin-bottom: 1rem; color: var(--gray); font-size:0.88rem;">
                                     Restaure dados a partir de um arquivo JSON de backup.
                                 </p>
-                                <button class="btn btn-secondary" onclick="document.getElementById('importBackupConfig').click()" style="width: 100%;">
+                                <button class="btn btn-secondary" onclick="document.getElementById('importBackupConfig2').click()" style="width: 100%;">
                                     <i class="fas fa-upload"></i> Selecionar Arquivo
                                 </button>
-                                <input type="file" id="importBackupConfig" class="d-none" accept=".json" onchange="App.importBackup(event)">
+                                <input type="file" id="importBackupConfig2" class="d-none" accept=".json" onchange="App.importBackup(event)">
                             </div>
                         </div>
 
@@ -8278,13 +8260,12 @@ ORDER BY t.table_name;
                 } else {
                     // ── Multi-página: captura região exata de cada página ──
                     for (let pg = 0; pg < pagesNeeded; pg++) {
-                        const clipY_px  = pg * PAGE_H_PX * PX_PER_MM / PX_PER_MM; // mantém coordenada px
+                        const clipY_px  = pg * PAGE_H_PX; // coordenada Y em pixels para a página atual
                         const clipH_px  = Math.min(PAGE_H_PX, totalH_px - pg * PAGE_H_PX);
-                        const clipY     = pg * PAGE_H_PX;
 
                         const canvas = await _capturarCanvas(elemento, {
                             larguraMM: PAGE_W_MM,
-                            x: 0, y: clipY,
+                            x: 0, y: clipY_px,
                             width: PAGE_W_PX, height: clipH_px
                         });
                         const { data, format } = _canvasParaImagem(canvas);
@@ -10193,10 +10174,11 @@ ORDER BY t.table_name;
                 rows.forEach(row => {
                     // Escapar aspas e ponto e vírgula
                     const escapedRow = row.map(cell => {
-                        if (cell.includes(';') || cell.includes('"') || cell.includes('\n')) {
-                            return `"${cell.replace(/"/g, '""')}"`;
+                        const cellStr = String(cell ?? '');
+                        if (cellStr.includes(';') || cellStr.includes('"') || cellStr.includes('\n')) {
+                            return `"${cellStr.replace(/"/g, '""')}"`;
                         }
-                        return cell;
+                        return cellStr;
                     });
                     csvContent += escapedRow.join(';') + '\n';
                 });
