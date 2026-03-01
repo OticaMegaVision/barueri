@@ -6610,7 +6610,7 @@ ORDER BY t.table_name;
                 }, this._SYNC_INTERVAL_MS);
 
                 // Sync inicial ao abrir (sem bloquear a UI)
-                setTimeout(() => this._triggerSync('boot'), 1500);
+                setTimeout(() => this._triggerSync('boot'), 3000); // Aguarda push inicial antes de fazer pull
 
                 // ── REALTIME: escuta mudancas em todas as tabelas ──
                 this._initRealtime();
@@ -6692,7 +6692,13 @@ ORDER BY t.table_name;
                 if (btn) { btn.classList.add('syncing'); btn.title = 'Sincronizando...'; }
 
                 try {
-                    const lastSync = (await IDB.get(this._TS_KEY)) || '1970-01-01T00:00:00.000Z';
+                    // Se o estado local está vazio, força full sync para recuperar tudo do Supabase
+                    const localIsEmpty = (!state.sales || state.sales.length === 0) && (!state.clients || state.clients.length === 0);
+                    const storedSync = await IDB.get(this._TS_KEY);
+                    const lastSync = (localIsEmpty || !storedSync) ? '1970-01-01T00:00:00.000Z' : storedSync;
+                    if (localIsEmpty && storedSync) {
+                        console.log('[LocalFirst] Estado local vazio — forçando full sync do Supabase');
+                    }
                     const now = new Date().toISOString();
 
                     let pushed = 0, pulled = 0;
@@ -6775,15 +6781,18 @@ ORDER BY t.table_name;
                         const localMap = {};
                         (state[stateKey] || []).forEach(item => { localMap[item.id] = item; });
 
+                        // Itens locais pendentes de push — nunca sobrescrever com dados remotos
+                        const pendingIds = new Set(await this._getPending('lf_pending_' + stateKey));
+
                         let deletedCount = 0;
                         data.forEach(remote => {
                             try {
                                 const remoteItem = typeof remote._data === 'string'
                                     ? JSON.parse(remote._data) : remote._data;
 
-                                // Tombstone: remove do estado local
+                                // Tombstone: remove do estado local (só se não for pendente local)
                                 if (remoteItem && remoteItem._deleted === true) {
-                                    if (localMap[remote.id]) {
+                                    if (localMap[remote.id] && !pendingIds.has(remote.id)) {
                                         delete localMap[remote.id];
                                         deletedCount++;
                                         console.log('[LocalFirst] Deleção remota aplicada:', table, remote.id);
@@ -6795,6 +6804,8 @@ ORDER BY t.table_name;
                                 const local = localMap[remote.id];
                                 const remoteTs = remote.updated_at;
                                 const localTs  = local?._supabase_at || local?.updated_at || '0';
+                                // Nunca sobrescrever item que está na fila de push local
+                                if (pendingIds.has(remote.id)) return;
                                 if (!local || remoteTs > localTs) {
                                     localMap[remote.id] = remoteItem;
                                     pulled++;
@@ -6816,10 +6827,11 @@ ORDER BY t.table_name;
 
                     if (pulled > 0) {
                         await App.saveData(true);
-                        Dashboard.update?.();
-                        if (typeof ContasManager !== 'undefined') {
-                            try { ContasManager.renderAll?.(); } catch(e) {}
-                        }
+                    }
+                    // Sempre atualiza o dashboard após sync
+                    try { Dashboard.update?.(); } catch(e) {}
+                    if (pulled > 0 && typeof ContasManager !== 'undefined') {
+                        try { ContasManager.renderAll?.(); } catch(e) {}
                     }
 
                     await IDB.set(this._TS_KEY, now);
@@ -6859,18 +6871,6 @@ ORDER BY t.table_name;
                         case 'suppliers':
                             if (typeof Suppliers !== 'undefined') Suppliers.renderTable();
                             if (typeof App !== 'undefined') App.updateSupplierSelect?.();
-                            break;
-                        case 'expenses':
-                            if (typeof Expenses !== 'undefined') {
-                                Expenses.renderTable();
-                                if (typeof Expenses.updateSummary === 'function') Expenses.updateSummary();
-                            }
-                            if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
-                            break;
-                        case 'prescriptions':
-                            if (typeof Presc !== 'undefined' && typeof Presc.renderForm === 'function') {
-                                try { Presc.renderForm(); } catch(e) {}
-                            }
                             break;
                         case 'expenses':
                             if (typeof Expenses !== 'undefined') {
@@ -7031,6 +7031,7 @@ ORDER BY t.table_name;
                     if (typeof Config !== 'undefined') Config.load();
                     if (state.company.primaryColor) document.documentElement.style.setProperty('--primary', state.company.primaryColor);
                     if (state.company.secondaryColor) document.documentElement.style.setProperty('--secondary', state.company.secondaryColor);
+                    try { Dashboard.update?.(); } catch(e) {}
                     console.log('[LocalFirst] Config sincronizada da nuvem (ts:', remoteTs, ')');
                 } catch(e) { console.warn('[LocalFirst] pullConfig:', e.message); }
             },
@@ -9132,6 +9133,8 @@ ORDER BY t.table_name;
                     { id: 'SUP-001', code: 'SUP-001', name: 'Fornecedor Exemplo', cnpj: '12.345.678/0001-99', phone: '(11) 99999-8888', city: 'São Paulo', state: 'SP' }
                 ];
                 state.expenses = [];
+                state.sales = [];
+                state.prescriptions = [];
                 Utils.updatePixKey();
             },
 
@@ -9433,7 +9436,7 @@ ORDER BY t.table_name;
             _filteredSales() {
                 const now  = new Date();
                 const p    = this._period;
-                return state.sales.filter(s => {
+                return (state.sales || []).filter(s => {
                     const d = new Date(s.date + 'T12:00:00');
                     if (p === 'today') {
                         return d.toDateString() === now.toDateString();
@@ -9458,7 +9461,7 @@ ORDER BY t.table_name;
             _filteredExpenses() {
                 const now = new Date();
                 const p   = this._period;
-                return state.expenses.filter(e => {
+                return (state.expenses || []).filter(e => {
                     const d = new Date(e.date + 'T12:00:00');
                     if (p === 'today')  return d.toDateString() === now.toDateString();
                     if (p === 'week')   { const s=new Date(now); s.setDate(now.getDate()-now.getDay()); s.setHours(0,0,0,0); return d>=s; }
@@ -9501,7 +9504,9 @@ ORDER BY t.table_name;
                 list.innerHTML = aniversariantes.map(c => {
                     const phone = (c.whatsapp || c.phone || '').replace(/\D/g, '');
                     const hasPhone = !!phone;
-                    const idade = today.getFullYear() - new Date(c.birthDate + 'T12:00:00').getFullYear();
+                    const bDate = new Date(c.birthDate + 'T12:00:00');
+                    const idade = today.getFullYear() - bDate.getFullYear() - 
+                        (today < new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate()) ? 1 : 0);
                     return `
                         <div class="dash-alert-item">
                             <div>
@@ -9550,8 +9555,8 @@ ORDER BY t.table_name;
 
                 const ENTREGUES = ['entregue', 'delivered'];
 
-                const vencidos = state.sales
-                    .filter(s => ENTREGUES.includes(s.status) && new Date(s.date) < oneYearAgo)
+                const vencidos = (state.sales || [])
+                    .filter(s => ENTREGUES.includes(s.status) && new Date(s.date + 'T12:00:00') < oneYearAgo)
                     .map(s => ({
                         sale:   s,
                         client: state.clients.find(c => c.id === s.clientId)
@@ -9621,9 +9626,11 @@ ORDER BY t.table_name;
             },
 
             updateCards() {
+                console.log('[Dashboard] updateCards — state.sales:', (state.sales||[]).length, 'itens, período:', this._period);
                 const sales    = this._filteredSales();
                 const expenses = this._filteredExpenses();
                 const label    = this._periodLabel();
+                console.log('[Dashboard] vendas filtradas:', sales.length, '| despesas:', expenses.length);
 
                 const totalSales    = sales.reduce((a, s) => a + (s.total || 0), 0);
                 const totalExpenses = expenses.reduce((a, e) => a + (e.value || 0), 0);
@@ -9675,22 +9682,6 @@ ORDER BY t.table_name;
                         <div class="card-value" style="color:#0ea5e9;">${salesPendentes}</div>
                         <div style="font-size:0.76rem;color:var(--gray);">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
                     </div>
-                    <div class="card" style="--card-accent:#8b5cf6;">
-                        <div class="card-header">
-                            <span class="card-title">Clientes</span>
-                            <div class="card-icon" style="background:#f5f3ff;color:#8b5cf6;"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="card-value" style="color:#8b5cf6;">${totalClients}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${totalPresc} receituário${totalPresc !== 1 ? 's' : ''}</div>
-                    </div>
-                    <div class="card" style="--card-accent:#f59e0b;">
-                        <div class="card-header">
-                            <span class="card-title">Pagamento Top</span>
-                            <div class="card-icon" style="background:#fffbeb;color:#f59e0b;"><i class="fas fa-award"></i></div>
-                        </div>
-                        <div class="card-value" style="color:#f59e0b;font-size:1.3rem;">${topPay ? payLabels[topPay[0]]||topPay[0] : '—'}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${topPay ? topPay[1]+' venda'+(topPay[1]!==1?'s':'') : 'Sem vendas'}</div>
-                    </div>
                     <div class="card" style="--card-accent:#10b981;grid-column:span 2;">
                         <div class="card-header">
                             <span class="card-title" style="font-size:0.8rem;font-weight:700;color:var(--dark);">${company.name || 'ÓticaVision Pro'}</span>
@@ -9722,9 +9713,9 @@ ORDER BY t.table_name;
                     const day = new Date(); 
                     day.setDate(day.getDate() - (6 - idx));
                     const dayStr = day.toDateString();
-                    return state.sales
-                        .filter(s => new Date(s.date).toDateString() === dayStr)
-                        .reduce((acc, s) => acc + s.total, 0);
+                    return (state.sales || [])
+                        .filter(s => new Date(s.date + 'T12:00:00').toDateString() === dayStr)
+                        .reduce((acc, s) => acc + (s.total || 0), 0);
                 });
                 
                 const max = Math.max(...salesData) || 1;
@@ -9743,8 +9734,8 @@ ORDER BY t.table_name;
                 chart.innerHTML = '';
                 
                 const prodCount = {};
-                state.sales.forEach(s => s.items.forEach(item => {
-                    if (item.name) prodCount[item.name] = (prodCount[item.name] || 0) + item.qty;
+                (state.sales || []).forEach(s => (s.items || []).forEach(item => {
+                    if (item && item.name) prodCount[item.name] = (prodCount[item.name] || 0) + (item.qty || 0);
                 }));
                 
                 const sorted = Object.entries(prodCount).sort((a,b) => b[1] - a[1]).slice(0,5);
@@ -9768,7 +9759,10 @@ ORDER BY t.table_name;
                 if (!tbody) return;
                 tbody.innerHTML = '';
                 
-                state.sales.slice(-5).reverse().forEach(s => {
+                const recentSales = [...(state.sales || [])]
+                    .sort((a, b) => new Date(b.date + 'T12:00:00') - new Date(a.date + 'T12:00:00'))
+                    .slice(0, 5);
+                recentSales.forEach(s => {
                     const client = state.clients.find(c => c.id === s.clientId)?.name || '';
                     tbody.innerHTML += `<tr>
                         <td>${s.number}</td>
@@ -14365,11 +14359,14 @@ ${container.innerHTML}
                     state.lastOsCounter[currentYear] = (state.lastOsCounter[currentYear] || 1) + 1;
                 }
                 
-                App.saveData();
+                // Salva localmente de forma assíncrona mas garante que state já está atualizado
+                App.saveData(true); // silent=true evita toast duplicado
                 SupaSync.inserirVenda(sale);
                 this.clearForm();
                 this.renderHistory();
-                Toast.show('Venda salva com sucesso!');
+                // Atualiza o dashboard imediatamente com os dados já em memória (state.sales)
+                try { Dashboard.update(); } catch(e) {}
+                Toast.show('Venda salva com sucesso! ✅', 'success');
                 const osNumEl = document.getElementById('osGeradoNumero');
                 if (osNumEl) osNumEl.textContent = 'OS: ' + sale.number;
                 // Reset botões de situação
@@ -14555,6 +14552,7 @@ ${container.innerHTML}
                 App.saveData();
                 SupaSync.inserirVenda(sale); // push atualização ao Supabase
                 if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e){} }
+                try { Dashboard.update(); } catch(e) {}
                 Toast.show(situacao==='pago' ? '✅ Venda marcada como PAGA!' : '⏳ Venda marcada como PENDENTE',
                            situacao==='pago' ? 'success' : 'warning');
             },
@@ -14769,6 +14767,7 @@ ${container.innerHTML}
                 sale.status = novoStatus;
                 App.saveData();
                 Sales.renderHistory();
+                try { Dashboard.update(); } catch(e) {}
                 Toast.show('Status: ' + btnEl.textContent.trim(), 'success');
             },
 
@@ -14781,6 +14780,7 @@ ${container.innerHTML}
                 if (!sale) return;
                 sale.status = sel.value;
                 App.saveData(); Sales.renderHistory();
+                try { Dashboard.update(); } catch(e) {}
                 Toast.show('Status atualizado!', 'success');
                 Modal.close('viewModal');
             },
@@ -14791,6 +14791,7 @@ ${container.innerHTML}
                     App.saveData();
                     LocalFirst.deleteItem('sales', id);
                     this.renderHistory();
+                    try { Dashboard.update(); } catch(e) {}
                     Toast.show('Venda excluída com sucesso!');
                 });
             }
