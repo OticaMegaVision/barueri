@@ -4589,6 +4589,8 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                 <div class="menu-item" data-section="expenses" role="button" tabindex="0"><i class="fas fa-money-bill-wave"></i><span>Despesas</span></div>
                 <div class="menu-item" data-section="reports" role="button" tabindex="0"><i class="fas fa-chart-bar"></i><span>Relatórios</span></div>
                 <div class="menu-item" data-section="config" role="button" tabindex="0"><i class="fas fa-cog"></i><span>Configurações</span></div>
+                <div class="sidebar-section-label">Fiscal</div>
+                <div class="menu-item" data-section="nfe" role="button" tabindex="0"><i class="fas fa-file-invoice"></i><span>NF-e</span></div>
             </nav>
             <div class="sidebar-footer">
                 <button class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro"><i class="fas fa-moon"></i><span>Modo Escuro</span></button>
@@ -6360,6 +6362,9 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                     <button class="btn btn-secondary" onclick="Config.showTab('wppMensagens', event); ConfigWpp.init()">
                         <i class="fab fa-whatsapp" style="color:#25d366"></i> Mensagens WhatsApp
                     </button>
+                    <button class="btn btn-secondary" onclick="Config.showTab('fiscal', event)">
+                        <i class="fas fa-file-invoice"></i> Fiscal / NF-e
+                    </button>
                 </div>
 
                 <!-- Aba Empresa -->
@@ -7105,7 +7110,661 @@ ORDER BY t.table_name;
                         </div><!-- /grid -->
                     </div>
                 </div>
+
+                <!-- ── ABA FISCAL / NF-e ── -->
+                <div id="tabFiscal" class="config-tab" style="display:none;">
+                    <div class="form-container">
+
+                        <!-- AMBIENTE SEFAZ -->
+                        <div class="cliente-card">
+                            <h3><i class="fas fa-server"></i> Ambiente SEFAZ</h3>
+                            <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1.5px solid #ffcc00;border-left:4px solid #ff6b00;border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.83rem;color:#8a5000;">
+                                <i class="fas fa-exclamation-triangle" style="color:#ff6b00;margin-right:0.4rem;"></i>
+                                <strong>Atenção:</strong> Configure o ambiente de Homologação primeiro para testes. Só mude para Produção quando a emissão estiver validada.
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Ambiente</label>
+                                    <select id="cfgNfeAmbiente" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option value="2">🧪 Homologação (Testes)</option>
+                                        <option value="1">🚀 Produção</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>UF Emitente</label>
+                                    <select id="cfgNfeUF" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                                        <option>PR</option><option>SC</option><option>BA</option><option>CE</option>
+                                        <option>GO</option><option>PE</option><option>ES</option><option>AM</option>
+                                        <option>PA</option><option>MT</option><option>MS</option><option>DF</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Versão do Layout</label>
+                                    <select id="cfgNfeVersao" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option value="4.00">NF-e 4.00 (atual)</option>
+                                        <option value="3.10">NF-e 3.10</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex:2;">
+                                    <label>URL Webservice SEFAZ (SOAP)</label>
+                                    <input type="url" id="cfgNfeUrlSefaz" class="form-control" placeholder="https://nfe.fazenda.sp.gov.br/ws/NfeAutorizacao4.asmx" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Token / Chave de API</label>
+                                    <input type="password" id="cfgNfeToken" class="form-control" placeholder="Chave de acesso da API NF-e" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex:2;">
+                                    <label>URL Servidor Intermediário (proxy/emissor)</label>
+                                    <input type="url" id="cfgNfeUrlProxy" class="form-control" placeholder="https://seu-emissor.com.br/api/nfe" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group" style="max-width:140px;">
+                                    <label>Série Padrão</label>
+                                    <input type="text" id="cfgNfeSerie" class="form-control" value="001" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CERTIFICADO DIGITAL A1 -->
+                        <div class="cliente-card">
+                            <h3><i class="fas fa-certificate"></i> Certificado Digital A1</h3>
+                            <div style="background:rgba(23,162,184,0.08);border:1.5px solid rgba(23,162,184,0.25);border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.82rem;color:#0d7a8a;">
+                                <i class="fas fa-info-circle" style="margin-right:0.4rem;"></i>
+                                O certificado A1 é um arquivo <strong>.pfx ou .p12</strong> emitido por uma AC credenciada (Serasa, Certisign, etc.). Ele é necessário para assinar e transmitir NF-e para a SEFAZ.
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex:2;">
+                                    <label>Arquivo do Certificado (.pfx / .p12)</label>
+                                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                                        <input type="file" id="cfgCertFile" accept=".pfx,.p12" class="form-control" style="flex:1;" onchange="ConfigFiscal.carregarCertificado(event)">
+                                        <span id="cfgCertStatus" style="font-size:0.78rem;color:#888;white-space:nowrap;">Nenhum certificado carregado</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Senha do Certificado</label>
+                                    <div style="position:relative;">
+                                        <input type="password" id="cfgCertSenha" class="form-control" placeholder="••••••••" onchange="ConfigFiscal.salvarConfig()" style="padding-right:2.5rem;">
+                                        <button onclick="ConfigFiscal.toggleSenha()" type="button"
+                                            style="position:absolute;right:0.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;font-size:0.9rem;">
+                                            <i class="fas fa-eye" id="cfgCertSenhaIcon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Validade do Certificado</label>
+                                    <input type="text" id="cfgCertValidade" class="form-control" placeholder="Preenchido automaticamente" readonly style="background:#f5f5f5;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Titular (CN)</label>
+                                    <input type="text" id="cfgCertTitular" class="form-control" placeholder="Preenchido automaticamente" readonly style="background:#f5f5f5;">
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                                <button class="btn btn-info btn-sm" onclick="ConfigFiscal.testarCertificado()">
+                                    <i class="fas fa-flask"></i> Testar Certificado
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="ConfigFiscal.removerCertificado()">
+                                    <i class="fas fa-trash-alt"></i> Remover
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- DADOS FISCAIS DA EMPRESA -->
+                        <div class="cliente-card">
+                            <h3><i class="fas fa-building"></i> Dados Fiscais da Empresa</h3>
+                            <div class="form-row">
+                                <div class="form-group" style="flex:2;">
+                                    <label>Razão Social *</label>
+                                    <input type="text" id="cfgRazaoSocial" class="form-control" placeholder="Nome completo da empresa" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>CNPJ *</label>
+                                    <div style="display:flex;gap:0.4rem;">
+                                        <input type="text" id="cfgCNPJ" class="form-control" placeholder="00.000.000/0001-00" maxlength="18" onchange="ConfigFiscal.salvarConfig()">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="ConfigFiscal.buscarCNPJ('cfgCNPJ','cfg')" title="Buscar CNPJ" style="white-space:nowrap;padding:0 0.75rem;">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Inscrição Estadual (IE)</label>
+                                    <input type="text" id="cfgIE" class="form-control" placeholder="Inscrição Estadual" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Inscrição Municipal (IM)</label>
+                                    <input type="text" id="cfgIM" class="form-control" placeholder="Inscrição Municipal" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>CNAE Principal</label>
+                                    <input type="text" id="cfgCNAE" class="form-control" placeholder="Ex: 4774-1/00" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Regime Tributário</label>
+                                    <select id="cfgRegime" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option value="0">0 — MEI (Microempreendedor Individual)</option>
+                                        <option value="1">1 — Simples Nacional</option>
+                                        <option value="2">2 — Simples Nacional (Excesso)</option>
+                                        <option value="3">3 — Regime Normal (Lucro Real/Presumido)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Alíquota ICMS Padrão (%)</label>
+                                    <input type="number" id="cfgICMSPadrao" class="form-control" value="12" min="0" max="100" step="0.1" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>CFOP Padrão (saída)</label>
+                                    <input type="text" id="cfgCFOP" class="form-control" value="5102" maxlength="5" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex:2;">
+                                    <label>Endereço Completo</label>
+                                    <input type="text" id="cfgEnderecoFiscal" class="form-control" placeholder="Rua, número, bairro" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>CEP</label>
+                                    <input type="text" id="cfgCEP" class="form-control" placeholder="00000-000" maxlength="9" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Município</label>
+                                    <input type="text" id="cfgMunicipio" class="form-control" placeholder="Cidade" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Código IBGE Município</label>
+                                    <input type="text" id="cfgCodIBGE" class="form-control" placeholder="Ex: 3550308" maxlength="7" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group" style="max-width:100px;">
+                                    <label>UF</label>
+                                    <select id="cfgEstado" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                                        <option>PR</option><option>SC</option><option>BA</option><option>CE</option>
+                                        <option>GO</option><option>PE</option><option>ES</option><option>AM</option>
+                                        <option>PA</option><option>MT</option><option>MS</option><option>DF</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Telefone</label>
+                                    <input type="text" id="cfgTelFiscal" class="form-control" placeholder="(11) 99999-9999" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LOGO DA NOTA FISCAL -->
+                        <div class="cliente-card">
+                            <h3><i class="fas fa-image"></i> Logo na Nota Fiscal (NF-e)</h3>
+                            <div style="background:rgba(255,107,0,0.07);border:1.5px solid rgba(255,107,0,0.2);border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.82rem;color:#8a4000;">
+                                <i class="fas fa-info-circle" style="margin-right:0.4rem;"></i>
+                                A logo será exibida no cabeçalho da NF-e impressa/PDF. Formatos aceitos: PNG, JPG ou SVG. Tamanho máximo: 2 MB.
+                            </div>
+                            <div class="form-row" style="align-items:flex-start;gap:1.5rem;">
+                                <div class="form-group" style="flex:1;">
+                                    <label>Selecionar Logo</label>
+                                    <input type="file" id="cfgLogoNFeInput" class="form-control" accept="image/png,image/jpeg,image/svg+xml"
+                                        style="padding:0.4rem;cursor:pointer;"
+                                        onchange="ConfigFiscal.carregarLogoNFe(this)">
+                                    <small style="color:var(--gray);font-size:0.76rem;margin-top:4px;display:block;">PNG, JPG ou SVG, máx. 2 MB</small>
+                                </div>
+                                <div class="form-group" style="flex:0 0 auto;text-align:center;">
+                                    <label>Pré-visualização</label>
+                                    <div id="cfgLogoNFePreview" style="width:120px;height:60px;border:2px dashed #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#fafafa;overflow:hidden;">
+                                        <span style="color:#bbb;font-size:0.75rem;" id="cfgLogoNFePreviewPlaceholder">Sem logo</span>
+                                        <img id="cfgLogoNFeImg" src="" alt="Logo NF-e" style="display:none;max-width:100%;max-height:100%;object-fit:contain;">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="flex:0 0 auto;display:flex;flex-direction:column;gap:0.5rem;justify-content:flex-end;">
+                                    <button class="btn btn-danger btn-sm" onclick="ConfigFiscal.removerLogoNFe()" style="font-size:0.8rem;padding:0.4rem 0.8rem;">
+                                        <i class="fas fa-trash"></i> Remover Logo
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Posição da Logo na NF-e</label>
+                                    <select id="cfgLogoPosicao" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option value="esquerda">Esquerda (padrão)</option>
+                                        <option value="centro">Centralizada</option>
+                                        <option value="direita">Direita</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Exibir Logo na NF-e</label>
+                                    <select id="cfgLogoExibir" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option value="sim">Sim — mostrar logo</option>
+                                        <option value="nao">Não — ocultar logo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- API DE CONSULTA CNPJ -->
+                        <div class="cliente-card">
+                            <h3><i class="fas fa-plug"></i> API de Consulta de CNPJ</h3>
+                            <div style="background:rgba(40,167,69,0.08);border:1.5px solid rgba(40,167,69,0.2);border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.82rem;color:#1a7a3a;">
+                                <i class="fas fa-check-circle" style="margin-right:0.4rem;"></i>
+                                A busca de CNPJ usa a API pública <strong>BrasilAPI</strong> (gratuita, sem token). Opcionalmente configure uma API privada com mais dados.
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Provedor de API CNPJ</label>
+                                    <select id="cfgCnpjProvider" class="form-control" onchange="ConfigFiscal.salvarConfig()">
+                                        <option value="brasilapi">BrasilAPI (gratuita)</option>
+                                        <option value="receitaws">ReceitaWS</option>
+                                        <option value="cnpja">CNPJ.a (paga)</option>
+                                        <option value="custom">URL personalizada</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex:2;">
+                                    <label>URL Personalizada (se "URL personalizada")</label>
+                                    <input type="url" id="cfgCnpjUrl" class="form-control" placeholder="https://api.exemplo.com/cnpj/{cnpj}" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Token API CNPJ (se necessário)</label>
+                                    <input type="password" id="cfgCnpjToken" class="form-control" placeholder="Token opcional" onchange="ConfigFiscal.salvarConfig()">
+                                </div>
+                            </div>
+                            <button class="btn btn-success btn-sm" onclick="ConfigFiscal.testarApiCnpj()">
+                                <i class="fas fa-flask"></i> Testar API com CNPJ exemplo
+                            </button>
+                        </div>
+
+                        <!-- BOTÕES -->
+                        <div style="display:flex;gap:0.75rem;justify-content:flex-end;flex-wrap:wrap;">
+                            <button class="btn btn-secondary" onclick="ConfigFiscal.limpar()">
+                                <i class="fas fa-eraser"></i> Limpar
+                            </button>
+                            <button class="btn btn-primary" onclick="ConfigFiscal.salvarConfig(true)">
+                                <i class="fas fa-save"></i> Salvar Configurações Fiscais
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- ── FIM ABA FISCAL ── -->
+
             </section>
+
+            <!-- ═══════════════════════════════════════════════
+                 SEÇÃO NF-e — NOTA FISCAL ELETRÔNICA
+            ═══════════════════════════════════════════════ -->
+            <section id="nfe" class="section" aria-labelledby="pageTitle">
+
+                <!-- AVISO DE INTEGRAÇÃO -->
+                <div id="nfeAvisoIntegracao" style="
+                    background: linear-gradient(135deg,#fff8e1,#fff3cd);
+                    border: 1.5px solid #ffcc00;
+                    border-left: 5px solid #ff6b00;
+                    border-radius: 12px;
+                    padding: 1rem 1.4rem;
+                    margin-bottom: 1.5rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    flex-wrap: wrap;
+                ">
+                    <i class="fas fa-info-circle" style="color:#ff6b00;font-size:1.5rem;flex-shrink:0;"></i>
+                    <div style="flex:1;">
+                        <strong style="color:#8a5000;font-size:0.9rem;">Módulo NF-e — Pré-configuração</strong>
+                        <p style="color:#8a5000;font-size:0.82rem;margin-top:2px;">
+                            Para emissão real, configure seu certificado digital A1 e as credenciais da SEFAZ em 
+                            <strong>Configurações → Fiscal</strong>. Enquanto isso, gerencie suas notas e simule emissões abaixo.
+                        </p>
+                    </div>
+                    <button class="btn btn-sm" onclick="document.getElementById('nfeAvisoIntegracao').style.display='none'" 
+                        style="background:rgba(255,107,0,0.1);color:#ff6b00;border:1px solid rgba(255,107,0,0.3);border-radius:8px;padding:6px 14px;font-size:0.8rem;cursor:pointer;flex-shrink:0;">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                </div>
+
+                <!-- CARDS RESUMO -->
+                <div class="dashboard-cards" style="grid-template-columns: repeat(auto-fit,minmax(180px,1fr));margin-bottom:1.5rem;">
+                    <div class="card" style="--card-accent:linear-gradient(90deg,#28a745,#20c997);">
+                        <div class="card-header">
+                            <div class="card-title">Emitidas</div>
+                            <div class="card-icon" style="background:rgba(40,167,69,0.12);color:#28a745;"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                        <div class="card-value" id="nfeCountEmitidas">0</div>
+                        <div style="font-size:0.75rem;color:#999;margin-top:4px;">este mês</div>
+                    </div>
+                    <div class="card" style="--card-accent:linear-gradient(90deg,#ff6b00,#ffaa00);">
+                        <div class="card-header">
+                            <div class="card-title">Pendentes</div>
+                            <div class="card-icon" style="background:rgba(255,107,0,0.12);color:#ff6b00;"><i class="fas fa-clock"></i></div>
+                        </div>
+                        <div class="card-value" id="nfeCountPendentes">0</div>
+                        <div style="font-size:0.75rem;color:#999;margin-top:4px;">aguardando emissão</div>
+                    </div>
+                    <div class="card" style="--card-accent:linear-gradient(90deg,#dc3545,#c0392b);">
+                        <div class="card-header">
+                            <div class="card-title">Canceladas</div>
+                            <div class="card-icon" style="background:rgba(220,53,69,0.12);color:#dc3545;"><i class="fas fa-times-circle"></i></div>
+                        </div>
+                        <div class="card-value" id="nfeCountCanceladas">0</div>
+                        <div style="font-size:0.75rem;color:#999;margin-top:4px;">este mês</div>
+                    </div>
+                    <div class="card" style="--card-accent:linear-gradient(90deg,#17a2b8,#138496);">
+                        <div class="card-header">
+                            <div class="card-title">Total Emitido</div>
+                            <div class="card-icon" style="background:rgba(23,162,184,0.12);color:#17a2b8;"><i class="fas fa-dollar-sign"></i></div>
+                        </div>
+                        <div class="card-value" id="nfeTotalEmitido">R$ 0</div>
+                        <div style="font-size:0.75rem;color:#999;margin-top:4px;">este mês</div>
+                    </div>
+                </div>
+
+                <!-- FORMULÁRIO NOVA NF-e -->
+                <div class="form-container" style="margin-bottom:1.5rem;">
+                    <h2 class="section-title" style="font-size:1.1rem;margin-bottom:1.2rem;">
+                        <i class="fas fa-plus-circle" style="margin-right:0.5rem;"></i>Nova Nota Fiscal Eletrônica
+                    </h2>
+
+                    <!-- DADOS DO EMITENTE -->
+                    <div class="cliente-card">
+                        <h3><i class="fas fa-building"></i> Dados do Emitente</h3>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label>Razão Social *</label>
+                                <input type="text" id="nfeRazaoSocial" class="form-control" placeholder="Nome da empresa">
+                            </div>
+                            <div class="form-group">
+                                <label>CNPJ *</label>
+                                <div style="display:flex;gap:0.4rem;">
+                                    <input type="text" id="nfeCnpj" class="form-control" placeholder="00.000.000/0000-00" maxlength="18">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="ConfigFiscal.buscarCNPJ('nfeCnpj','nfeEmit')" title="Buscar dados pelo CNPJ" style="padding:0 0.75rem;white-space:nowrap;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>IE (Inscrição Estadual)</label>
+                                <input type="text" id="nfeIE" class="form-control" placeholder="Inscrição Estadual">
+                            </div>
+                            <div class="form-group">
+                                <label>Regime Tributário</label>
+                                <select id="nfeRegime" class="form-control">
+                                    <option value="0">MEI — Microempreendedor Individual</option>
+                                    <option value="1">Simples Nacional</option>
+                                    <option value="2">Simples Nacional — Excesso</option>
+                                    <option value="3">Regime Normal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>UF</label>
+                                <select id="nfeUF" class="form-control">
+                                    <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                                    <option>PR</option><option>SC</option><option>BA</option><option>CE</option>
+                                    <option>GO</option><option>PE</option><option>ES</option><option>AM</option>
+                                    <option>PA</option><option>MT</option><option>MS</option><option>DF</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DADOS DO DESTINATÁRIO -->
+                    <div class="cliente-card">
+                        <h3><i class="fas fa-user"></i> Destinatário</h3>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label>Nome / Razão Social *</label>
+                                <input type="text" id="nfeDestNome" class="form-control" placeholder="Nome ou razão social">
+                            </div>
+                            <div class="form-group">
+                                <label>CPF / CNPJ *</label>
+                                <div style="display:flex;gap:0.4rem;">
+                                    <input type="text" id="nfeDestDoc" class="form-control" placeholder="000.000.000-00 ou CNPJ">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="ConfigFiscal.buscarCNPJ('nfeDestDoc','nfeDest')" title="Buscar dados pelo CNPJ (apenas para PJ)" style="padding:0 0.75rem;white-space:nowrap;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label>Endereço</label>
+                                <input type="text" id="nfeDestEnd" class="form-control" placeholder="Rua, número, bairro">
+                            </div>
+                            <div class="form-group">
+                                <label>Município</label>
+                                <input type="text" id="nfeDestMun" class="form-control" placeholder="Cidade">
+                            </div>
+                            <div class="form-group" style="max-width:120px;">
+                                <label>UF</label>
+                                <select id="nfeDestUF" class="form-control">
+                                    <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                                    <option>PR</option><option>SC</option><option>BA</option><option>CE</option>
+                                    <option>GO</option><option>PE</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>E-mail (envio XML)</label>
+                                <input type="email" id="nfeDestEmail" class="form-control" placeholder="email@cliente.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefone</label>
+                                <input type="text" id="nfeDestTel" class="form-control" placeholder="(11) 99999-9999">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DADOS DA NOTA -->
+                    <div class="cliente-card">
+                        <h3><i class="fas fa-file-alt"></i> Dados da Nota</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Número NF-e</label>
+                                <input type="text" id="nfeNumero" class="form-control" placeholder="Auto" readonly style="background:#f5f5f5;">
+                            </div>
+                            <div class="form-group">
+                                <label>Série</label>
+                                <input type="text" id="nfeSerie" class="form-control" value="001">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Emissão</label>
+                                <input type="date" id="nfeDataEmissao" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Natureza da Operação *</label>
+                                <select id="nfeNatureza" class="form-control">
+                                    <option>Venda de mercadoria</option>
+                                    <option>Prestação de serviços</option>
+                                    <option>Devolução de mercadoria</option>
+                                    <option>Transferência</option>
+                                    <option>Remessa para conserto</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Finalidade</label>
+                                <select id="nfeFinalidade" class="form-control">
+                                    <option value="1">NF-e Normal</option>
+                                    <option value="2">NF-e Complementar</option>
+                                    <option value="3">NF-e de Ajuste</option>
+                                    <option value="4">Devolução/Retorno</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Forma de Pagamento</label>
+                                <select id="nfeFormaPag" class="form-control">
+                                    <option value="01">Dinheiro</option>
+                                    <option value="02">Cheque</option>
+                                    <option value="03">Cartão de Crédito</option>
+                                    <option value="04">Cartão de Débito</option>
+                                    <option value="05">Crédito Loja</option>
+                                    <option value="10">Vale Alimentação</option>
+                                    <option value="15">Boleto Bancário</option>
+                                    <option value="17">PIX</option>
+                                    <option value="90">Sem Pagamento</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>OS Vinculada</label>
+                                <input type="text" id="nfeOSRef" class="form-control" placeholder="Ex: OS-001">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ITENS DA NOTA -->
+                    <div class="cliente-card">
+                        <h3><i class="fas fa-boxes"></i> Itens da Nota</h3>
+                        <div id="nfeItens">
+                            <!-- Itens adicionados dinamicamente -->
+                        </div>
+                        <div class="form-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap;">
+                            <div class="form-group" style="flex:3;min-width:180px;">
+                                <label>Descrição do Produto/Serviço</label>
+                                <input type="text" id="nfeItemDesc" class="form-control" placeholder="Ex: Armação de óculos...">
+                            </div>
+                            <div class="form-group" style="max-width:80px;">
+                                <label>NCM</label>
+                                <input type="text" id="nfeItemNCM" class="form-control" placeholder="90041000" maxlength="10">
+                            </div>
+                            <div class="form-group" style="max-width:80px;">
+                                <label>CFOP</label>
+                                <input type="text" id="nfeItemCFOP" class="form-control" value="5102" maxlength="5">
+                            </div>
+                            <div class="form-group" style="max-width:70px;">
+                                <label>Qtd</label>
+                                <input type="number" id="nfeItemQtd" class="form-control" value="1" min="1" step="1">
+                            </div>
+                            <div class="form-group" style="max-width:110px;">
+                                <label>Valor Unit. (R$)</label>
+                                <input type="number" id="nfeItemValor" class="form-control" placeholder="0,00" step="0.01" min="0">
+                            </div>
+                            <div class="form-group" style="max-width:80px;">
+                                <label>ICMS %</label>
+                                <input type="number" id="nfeItemICMS" class="form-control" value="12" min="0" max="100" step="0.1">
+                            </div>
+                            <div style="padding-bottom:0.05rem;">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="NFeModule.addItem()">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Totais -->
+                        <div id="nfeTotaisBox" style="display:none;margin-top:1rem;">
+                            <div style="background:linear-gradient(135deg,#fff9f5,#fff5ec);border:2px solid rgba(255,107,0,0.2);border-radius:12px;padding:1rem 1.25rem;">
+                                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                                    <div style="text-align:center;">
+                                        <div style="font-size:0.72rem;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Subtotal</div>
+                                        <div style="font-size:1.1rem;font-weight:800;color:#333;" id="nfeSubtotal">R$ 0,00</div>
+                                    </div>
+                                    <div style="text-align:center;">
+                                        <div style="font-size:0.72rem;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Total ICMS</div>
+                                        <div style="font-size:1.1rem;font-weight:800;color:#17a2b8;" id="nfeTotalICMS">R$ 0,00</div>
+                                    </div>
+                                    <div style="text-align:center;">
+                                        <div style="font-size:0.72rem;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Desconto</div>
+                                        <input type="number" id="nfeDesconto" class="form-control" style="max-width:120px;text-align:center;" placeholder="R$ 0,00" step="0.01" min="0" onchange="NFeModule.calcTotais()">
+                                    </div>
+                                    <div style="text-align:center;">
+                                        <div style="font-size:0.72rem;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">TOTAL NF-e</div>
+                                        <div style="font-size:1.6rem;font-weight:900;color:#ff6b00;" id="nfeTotalGeral">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INFORMAÇÕES ADICIONAIS -->
+                    <div class="cliente-card">
+                        <h3><i class="fas fa-comment-alt"></i> Informações Adicionais</h3>
+                        <div class="form-group">
+                            <label>Informações Complementares</label>
+                            <textarea id="nfeInfoCompl" class="form-control" rows="3" 
+                                placeholder="Observações, referências, dados adicionais..." style="resize:vertical;"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Chave de Acesso (gerada pela SEFAZ)</label>
+                                <input type="text" id="nfeChave" class="form-control" placeholder="00 0000 00000000000000 00 000 000000000 0 00000000 0" readonly 
+                                    style="font-family:monospace;font-size:0.8rem;background:#f5f5f5;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTÕES DE AÇÃO -->
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:flex-end;margin-top:0.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="NFeModule.limparForm()">
+                            <i class="fas fa-eraser"></i> Limpar
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="NFeModule.salvarRascunho()">
+                            <i class="fas fa-save"></i> Salvar Rascunho
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="NFeModule.gerarXML()">
+                            <i class="fas fa-code"></i> Gerar XML
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="NFeModule.emitir()" style="min-width:160px;">
+                            <i class="fas fa-paper-plane"></i> Emitir NF-e
+                        </button>
+                    </div>
+                </div>
+
+                <!-- HISTÓRICO DE NOTAS -->
+                <div class="table-container">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem 0.75rem;flex-wrap:wrap;gap:0.75rem;">
+                        <h3 style="margin:0;font-weight:800;">📄 Notas Fiscais Emitidas</h3>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <input type="text" id="nfeBusca" class="form-control" style="max-width:220px;font-size:0.85rem;" 
+                                placeholder="🔍 Buscar por nº, nome..." onkeyup="NFeModule.filtrarHistorico()">
+                            <select id="nfeFiltroStatus" class="form-control" style="max-width:160px;font-size:0.85rem;" onchange="NFeModule.filtrarHistorico()">
+                                <option value="">Todos os status</option>
+                                <option value="emitida">✅ Emitida</option>
+                                <option value="pendente">⏳ Pendente</option>
+                                <option value="cancelada">❌ Cancelada</option>
+                                <option value="rascunho">📝 Rascunho</option>
+                            </select>
+                            <button class="btn btn-sm btn-success" onclick="NFeModule.exportarCSV()">
+                                <i class="fas fa-file-excel"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                    <table id="nfeHistoricoTable">
+                        <thead>
+                            <tr>
+                                <th>Nº NF-e</th>
+                                <th>Data</th>
+                                <th>Destinatário</th>
+                                <th>CPF/CNPJ</th>
+                                <th>Valor Total</th>
+                                <th>OS Ref.</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nfeHistoricoBody">
+                            <tr>
+                                <td colspan="8" style="text-align:center;padding:3rem 1rem;color:#aaa;">
+                                    <i class="fas fa-file-invoice" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.3;"></i>
+                                    Nenhuma nota fiscal emitida ainda.<br>
+                                    <span style="font-size:0.82rem;">Preencha o formulário acima e clique em <strong>Emitir NF-e</strong></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+            </section>
+            <!-- ═══ FIM NF-e ═══ -->
+
         </main>
     </div>
 
@@ -16200,8 +16859,708 @@ ${container.innerHTML}
 </script>
 <!-- ===== /PWA ===== -->
 
+<!-- ═══════════════════════════════════════════════════
+     ConfigFiscal MODULE — Configurações Fiscais + API CNPJ
+═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
 
+const ConfigFiscal = window.ConfigFiscal = {
 
+    _cfg: {},
+
+    // ── Carrega configs salvas ──
+    init() {
+        try { this._cfg = JSON.parse(localStorage.getItem('fiscal_config')||'{}'); } catch(e){}
+        this._preencher();
+    },
+
+    _preencher() {
+        const c = this._cfg;
+        const set = (id,v) => { const el=document.getElementById(id); if(el&&v!==undefined) el.value=v; };
+        set('cfgNfeAmbiente',  c.ambiente  || '2');
+        set('cfgNfeUF',        c.uf        || 'SP');
+        set('cfgNfeVersao',    c.versao    || '4.00');
+        set('cfgNfeUrlSefaz',  c.urlSefaz  || '');
+        set('cfgNfeToken',     c.token     || '');
+        set('cfgNfeUrlProxy',  c.urlProxy  || '');
+        set('cfgNfeSerie',     c.serie     || '001');
+        set('cfgCertSenha',    c.certSenha || '');
+        set('cfgCertValidade', c.certValidade || '');
+        set('cfgCertTitular',  c.certTitular  || '');
+        set('cfgRazaoSocial',  c.razaoSocial  || '');
+        set('cfgCNPJ',         c.cnpj         || '');
+        set('cfgIE',           c.ie           || '');
+        set('cfgIM',           c.im           || '');
+        set('cfgCNAE',         c.cnae         || '');
+        set('cfgRegime',       c.regime       || '1');
+        set('cfgICMSPadrao',   c.icmsPadrao   || '12');
+        set('cfgCFOP',         c.cfop         || '5102');
+        set('cfgEnderecoFiscal', c.endereco   || '');
+        set('cfgCEP',          c.cep          || '');
+        set('cfgMunicipio',    c.municipio    || '');
+        set('cfgCodIBGE',      c.codIBGE      || '');
+        set('cfgEstado',       c.estado       || 'SP');
+        set('cfgTelFiscal',    c.telefone     || '');
+        set('cfgCnpjProvider', c.cnpjProvider || 'brasilapi');
+        set('cfgCnpjUrl',      c.cnpjUrl      || '');
+        set('cfgCnpjToken',    c.cnpjToken    || '');
+        set('cfgLogoPosicao',  c.logoPosicao  || 'esquerda');
+        set('cfgLogoExibir',   c.logoExibir   || 'sim');
+
+        // Restaurar logo NF-e salva
+        if (c.logoNFeBase64) {
+            const img = document.getElementById('cfgLogoNFeImg');
+            const ph  = document.getElementById('cfgLogoNFePreviewPlaceholder');
+            if (img) { img.src = c.logoNFeBase64; img.style.display = 'block'; }
+            if (ph)  ph.style.display = 'none';
+        }
+
+        // Status certificado
+        const statusEl = document.getElementById('cfgCertStatus');
+        if (statusEl) {
+            if (c.certTitular) {
+                statusEl.innerHTML = `<span style="color:#28a745;font-weight:700;"><i class="fas fa-check-circle"></i> ${c.certTitular}</span>`;
+            } else {
+                statusEl.textContent = 'Nenhum certificado carregado';
+            }
+        }
+
+        // Pré-preenche campos NF-e com dados da config
+        if (c.razaoSocial) { const el=document.getElementById('nfeRazaoSocial'); if(el&&!el.value) el.value=c.razaoSocial; }
+        if (c.cnpj)        { const el=document.getElementById('nfeCnpj');        if(el&&!el.value) el.value=c.cnpj; }
+        if (c.ie)          { const el=document.getElementById('nfeIE');           if(el&&!el.value) el.value=c.ie; }
+        if (c.regime)      { const el=document.getElementById('nfeRegime');       if(el&&!el.value) el.value=c.regime; }
+        if (c.serie)       { const el=document.getElementById('nfeSerie');        if(el) el.value=c.serie; }
+    },
+
+    salvarConfig(feedback) {
+        const get = id => document.getElementById(id)?.value||'';
+        this._cfg = {
+            ambiente:     get('cfgNfeAmbiente'),
+            uf:           get('cfgNfeUF'),
+            versao:       get('cfgNfeVersao'),
+            urlSefaz:     get('cfgNfeUrlSefaz'),
+            token:        get('cfgNfeToken'),
+            urlProxy:     get('cfgNfeUrlProxy'),
+            serie:        get('cfgNfeSerie'),
+            certSenha:    get('cfgCertSenha'),
+            certValidade: get('cfgCertValidade'),
+            certTitular:  get('cfgCertTitular'),
+            razaoSocial:  get('cfgRazaoSocial'),
+            cnpj:         get('cfgCNPJ'),
+            ie:           get('cfgIE'),
+            im:           get('cfgIM'),
+            cnae:         get('cfgCNAE'),
+            regime:       get('cfgRegime'),
+            icmsPadrao:   get('cfgICMSPadrao'),
+            cfop:         get('cfgCFOP'),
+            endereco:     get('cfgEnderecoFiscal'),
+            cep:          get('cfgCEP'),
+            municipio:    get('cfgMunicipio'),
+            codIBGE:      get('cfgCodIBGE'),
+            estado:       get('cfgEstado'),
+            telefone:     get('cfgTelFiscal'),
+            cnpjProvider: get('cfgCnpjProvider'),
+            cnpjUrl:      get('cfgCnpjUrl'),
+            cnpjToken:    get('cfgCnpjToken'),
+            logoPosicao:  get('cfgLogoPosicao'),
+            logoExibir:   get('cfgLogoExibir'),
+            logoNFeBase64: this._cfg.logoNFeBase64 || '',
+            certBase64:   this._cfg.certBase64 || '',
+        };
+        localStorage.setItem('fiscal_config', JSON.stringify(this._cfg));
+        if (feedback) this._toast('✅ Configurações fiscais salvas!', 'success');
+    },
+
+    limpar() {
+        if (!confirm('Limpar todas as configurações fiscais?')) return;
+        localStorage.removeItem('fiscal_config');
+        this._cfg = {};
+        this._preencher();
+    },
+
+    // ── Logo NF-e ──
+    carregarLogoNFe(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            this._toast('⚠️ Arquivo muito grande. Máximo: 2 MB.', 'warning');
+            input.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64 = e.target.result;
+            this._cfg.logoNFeBase64 = base64;
+            localStorage.setItem('fiscal_config', JSON.stringify(this._cfg));
+            const img = document.getElementById('cfgLogoNFeImg');
+            const ph  = document.getElementById('cfgLogoNFePreviewPlaceholder');
+            if (img) { img.src = base64; img.style.display = 'block'; }
+            if (ph)  ph.style.display = 'none';
+            this._toast('✅ Logo carregada com sucesso!', 'success');
+        };
+        reader.readAsDataURL(file);
+    },
+
+    removerLogoNFe() {
+        if (!confirm('Remover a logo da NF-e?')) return;
+        this._cfg.logoNFeBase64 = '';
+        localStorage.setItem('fiscal_config', JSON.stringify(this._cfg));
+        const img = document.getElementById('cfgLogoNFeImg');
+        const ph  = document.getElementById('cfgLogoNFePreviewPlaceholder');
+        const inp = document.getElementById('cfgLogoNFeInput');
+        if (img) { img.src = ''; img.style.display = 'none'; }
+        if (ph)  ph.style.display = '';
+        if (inp) inp.value = '';
+        this._toast('Logo removida.', 'info');
+    },
+
+    // ── API de Busca de CNPJ ──
+    async buscarCNPJ(inputId, prefixo) {
+        const inputEl = document.getElementById(inputId);
+        if (!inputEl) return;
+        const cnpjRaw = inputEl.value.replace(/\D/g,'');
+
+        if (cnpjRaw.length !== 14) {
+            this._toast('⚠️ Digite um CNPJ completo (14 dígitos).', 'warning');
+            return;
+        }
+
+        const btn = inputEl.nextElementSibling;
+        const originalHTML = btn?.innerHTML || '';
+        if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        try {
+            const provider = this._cfg.cnpjProvider || 'brasilapi';
+            let url = '';
+
+            if (provider === 'brasilapi') {
+                url = `https://brasilapi.com.br/api/cnpj/v1/${cnpjRaw}`;
+            } else if (provider === 'receitaws') {
+                url = `https://www.receitaws.com.br/v1/cnpj/${cnpjRaw}`;
+            } else if (provider === 'cnpja') {
+                url = `https://api.cnpja.com/office/${cnpjRaw}`;
+            } else if (provider === 'custom' && this._cfg.cnpjUrl) {
+                url = this._cfg.cnpjUrl.replace('{cnpj}', cnpjRaw);
+            } else {
+                url = `https://brasilapi.com.br/api/cnpj/v1/${cnpjRaw}`;
+            }
+
+            const headers = {};
+            if (this._cfg.cnpjToken && provider !== 'brasilapi') {
+                headers['Authorization'] = `Bearer ${this._cfg.cnpjToken}`;
+            }
+
+            const resp = await fetch(url, { headers });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+
+            this._preencherDadosCNPJ(data, prefixo, provider);
+            this._toast('✅ CNPJ encontrado e dados preenchidos!', 'success');
+
+        } catch(e) {
+            this._toast('❌ CNPJ não encontrado ou API indisponível.', 'error');
+            console.warn('[ConfigFiscal] Erro CNPJ:', e);
+        } finally {
+            if (btn) btn.innerHTML = originalHTML;
+        }
+    },
+
+    _preencherDadosCNPJ(data, prefixo, provider) {
+        // Normaliza campos das diferentes APIs
+        let nome, fantasia, logradouro, numero, bairro, municipio, uf, cep, telefone, email, cnpjFormatado;
+
+        if (provider === 'brasilapi' || !provider) {
+            nome       = data.razao_social      || '';
+            fantasia   = data.nome_fantasia      || '';
+            logradouro = data.logradouro         || '';
+            numero     = data.numero             || '';
+            bairro     = data.bairro             || '';
+            municipio  = data.municipio          || '';
+            uf         = data.uf                 || '';
+            cep        = data.cep                || '';
+            telefone   = data.ddd_telefone_1     || '';
+            email      = data.email              || '';
+            cnpjFormatado = data.cnpj            || '';
+        } else {
+            // Fallback genérico
+            nome       = data.razao_social || data.nome || data.company?.name || '';
+            fantasia   = data.nome_fantasia || data.fantasia || '';
+            logradouro = data.logradouro   || data.address?.street || '';
+            numero     = data.numero       || data.address?.number || '';
+            bairro     = data.bairro       || data.address?.district || '';
+            municipio  = data.municipio    || data.address?.city || '';
+            uf         = data.uf           || data.address?.state || '';
+            cep        = data.cep          || data.address?.zip || '';
+            telefone   = data.telefone     || '';
+            email      = data.email        || '';
+        }
+
+        const set = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
+        const end = [logradouro, numero, bairro].filter(Boolean).join(', ');
+
+        if (prefixo === 'nfeEmit') {
+            set('nfeRazaoSocial', nome);
+            // UF para select
+            const ufSel = document.getElementById('nfeUF');
+            if (ufSel && uf) ufSel.value = uf;
+
+        } else if (prefixo === 'nfeDest') {
+            set('nfeDestNome', nome || fantasia);
+            set('nfeDestEnd',  end);
+            set('nfeDestMun',  municipio);
+            set('nfeDestEmail', email);
+            set('nfeDestTel',  telefone);
+            const ufSel = document.getElementById('nfeDestUF');
+            if (ufSel && uf) ufSel.value = uf;
+
+        } else if (prefixo === 'cfg') {
+            // Configurações fiscais
+            set('cfgRazaoSocial',    nome);
+            set('cfgEnderecoFiscal', end);
+            set('cfgCEP',            cep.replace(/\D/g,'').replace(/(\d{5})(\d{3})/,'$1-$2'));
+            set('cfgMunicipio',      municipio);
+            set('cfgTelFiscal',      telefone);
+            const ufSel = document.getElementById('cfgEstado');
+            if (ufSel && uf) ufSel.value = uf;
+            this.salvarConfig();
+        }
+    },
+
+    async testarApiCnpj() {
+        const cnpjEl = document.getElementById('cfgCNPJ');
+        if (cnpjEl?.value?.replace(/\D/g,'').length === 14) {
+            await this.buscarCNPJ('cfgCNPJ', 'cfg');
+        } else {
+            // Usa CNPJ público da Receita Federal para teste
+            const tempEl = { value: '00.394.460/0001-41' };
+            document.getElementById('cfgCNPJ').value = '00.394.460/0001-41';
+            await this.buscarCNPJ('cfgCNPJ', 'cfg');
+        }
+    },
+
+    // ── Certificado Digital ──
+    carregarCertificado(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this._cfg.certBase64 = e.target.result;
+            this._cfg.certNome   = file.name;
+            // Dados reais viriam da leitura do PFX — aqui simulamos
+            this._cfg.certTitular  = file.name.replace(/\.(pfx|p12)$/i,'').toUpperCase();
+            this._cfg.certValidade = 'Verificar com software de certificado';
+            const statusEl = document.getElementById('cfgCertStatus');
+            if (statusEl) statusEl.innerHTML = `<span style="color:#28a745;font-weight:700;"><i class="fas fa-check-circle"></i> ${file.name}</span>`;
+            const v = document.getElementById('cfgCertValidade'); if(v) v.value = this._cfg.certValidade;
+            const t = document.getElementById('cfgCertTitular');  if(t) t.value = this._cfg.certTitular;
+            this.salvarConfig();
+            this._toast('✅ Certificado carregado! Configure a senha e salve.', 'success');
+        };
+        reader.readAsDataURL(file);
+    },
+
+    removerCertificado() {
+        if (!confirm('Remover o certificado digital?')) return;
+        delete this._cfg.certBase64;
+        delete this._cfg.certNome;
+        delete this._cfg.certTitular;
+        delete this._cfg.certValidade;
+        const statusEl = document.getElementById('cfgCertStatus');
+        if (statusEl) statusEl.textContent = 'Nenhum certificado carregado';
+        ['cfgCertValidade','cfgCertTitular','cfgCertSenha'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+        this.salvarConfig();
+        this._toast('Certificado removido.', 'warning');
+    },
+
+    testarCertificado() {
+        if (!this._cfg.certBase64) {
+            this._toast('⚠️ Nenhum certificado carregado.', 'warning');
+            return;
+        }
+        if (!document.getElementById('cfgCertSenha')?.value) {
+            this._toast('⚠️ Informe a senha do certificado.', 'warning');
+            return;
+        }
+        // Simulação — integração real exigiria backend
+        this._toast('⚠️ Teste real requer backend. Certificado está carregado na memória.', 'info');
+    },
+
+    toggleSenha() {
+        const el   = document.getElementById('cfgCertSenha');
+        const icon = document.getElementById('cfgCertSenhaIcon');
+        if (!el) return;
+        if (el.type === 'password') {
+            el.type = 'text';
+            if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+        } else {
+            el.type = 'password';
+            if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+        }
+    },
+
+    _toast(msg, tipo='info') {
+        const colors = {success:'#28a745',error:'#dc3545',warning:'#ff6b00',info:'#17a2b8'};
+        const icons  = {success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+        const t = document.createElement('div');
+        t.style.cssText = `background:white;border-radius:10px;padding:0.9rem 1rem;box-shadow:0 5px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:10px;border-left:4px solid ${colors[tipo]};min-width:250px;`;
+        t.innerHTML = `<i class="fas ${icons[tipo]}" style="color:${colors[tipo]};font-size:1.1rem;flex-shrink:0;"></i><span style="font-size:0.84rem;font-weight:600;color:#333;">${msg}</span>`;
+        const c = document.getElementById('toastContainer');
+        if (c) { c.appendChild(t); setTimeout(()=>t.remove(), 4500); }
+    }
+};
+
+// Inicializa ao abrir aba Fiscal nas Configurações
+document.addEventListener('DOMContentLoaded', () => {
+    const fiscalBtn = document.querySelector('[onclick*="fiscal"]');
+    if (fiscalBtn) {
+        const orig = fiscalBtn.getAttribute('onclick');
+        fiscalBtn.setAttribute('onclick', orig + '; ConfigFiscal.init()');
+    }
+    // Também inicializa ao abrir NF-e (pré-preenche campos)
+    const menuNFe = document.querySelector('.menu-item[data-section="nfe"]');
+    if (menuNFe) {
+        menuNFe.addEventListener('click', () => setTimeout(()=>ConfigFiscal.init(), 80));
+    }
+});
+
+})();
+</script>
+
+</body>
+</html>
+<script>
+(function() {
+'use strict';
+
+const NFeModule = window.NFeModule = {
+
+    itens: [],
+    historico: [],
+    nfeCounter: 1,
+
+    init() {
+        this._loadStorage();
+        this._preencherData();
+        this._gerarNumero();
+        this.renderItens();
+        this.renderHistorico();
+        this.atualizarCards();
+    },
+
+    _preencherData() {
+        const el = document.getElementById('nfeDataEmissao');
+        if (el) el.value = new Date().toISOString().slice(0,10);
+    },
+
+    _gerarNumero() {
+        const el = document.getElementById('nfeNumero');
+        if (el) el.value = 'NFe-' + String(this.nfeCounter).padStart(6,'0');
+    },
+
+    _loadStorage() {
+        try {
+            const h = localStorage.getItem('nfe_historico');
+            if (h) this.historico = JSON.parse(h);
+            const c = localStorage.getItem('nfe_counter');
+            if (c) this.nfeCounter = parseInt(c) || 1;
+        } catch(e) {}
+    },
+
+    _saveStorage() {
+        try {
+            localStorage.setItem('nfe_historico', JSON.stringify(this.historico));
+            localStorage.setItem('nfe_counter', String(this.nfeCounter));
+        } catch(e) {}
+    },
+
+    _fmt(v) {
+        return 'R$ ' + Number(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+    },
+
+    addItem() {
+        const desc  = document.getElementById('nfeItemDesc')?.value?.trim();
+        const ncm   = document.getElementById('nfeItemNCM')?.value?.trim()  || '90041000';
+        const cfop  = document.getElementById('nfeItemCFOP')?.value?.trim() || '5102';
+        const qtd   = parseFloat(document.getElementById('nfeItemQtd')?.value)  || 1;
+        const valor = parseFloat(document.getElementById('nfeItemValor')?.value) || 0;
+        const icms  = parseFloat(document.getElementById('nfeItemICMS')?.value)  || 12;
+
+        if (!desc) { alert('Informe a descrição do item.'); return; }
+        if (valor <= 0) { alert('Informe o valor unitário.'); return; }
+
+        this.itens.push({ desc, ncm, cfop, qtd, valor, icms, total: qtd * valor });
+        this.renderItens();
+        this.calcTotais();
+        const el = document.getElementById('nfeItemDesc');
+        if (el) { el.value = ''; el.focus(); }
+        const vEl = document.getElementById('nfeItemValor');
+        if (vEl) vEl.value = '';
+    },
+
+    removeItem(idx) {
+        this.itens.splice(idx, 1);
+        this.renderItens();
+        this.calcTotais();
+    },
+
+    renderItens() {
+        const cont = document.getElementById('nfeItens');
+        if (!cont) return;
+        if (!this.itens.length) { cont.innerHTML = ''; return; }
+
+        cont.innerHTML = `<div style="overflow-x:auto;margin-bottom:0.75rem;">
+        <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:0.83rem;">
+            <thead><tr>
+                ${['#','Descrição','NCM','CFOP','Qtd','Vl. Unit.','ICMS%','Total',''].map(h =>
+                    `<th style="background:linear-gradient(90deg,#ff6b00,#ffaa00);color:white;padding:0.65rem 0.8rem;text-align:left;font-size:0.7rem;letter-spacing:0.5px;text-transform:uppercase;">${h}</th>`
+                ).join('')}
+            </tr></thead>
+            <tbody>
+            ${this.itens.map((it,i) => `<tr>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);color:#888;font-weight:600;">${i+1}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);font-weight:600;">${it.desc}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:center;font-family:monospace;font-size:0.78rem;">${it.ncm}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:center;font-family:monospace;font-size:0.78rem;">${it.cfop}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:center;">${it.qtd}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:right;">${this._fmt(it.valor)}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:center;">${it.icms}%</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:right;font-weight:700;color:#ff6b00;">${this._fmt(it.total)}</td>
+                <td style="padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,107,0,0.08);text-align:center;">
+                    <button onclick="NFeModule.removeItem(${i})" style="background:rgba(220,53,69,0.1);color:#dc3545;border:none;border-radius:6px;width:28px;height:28px;cursor:pointer;" title="Remover">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>`).join('')}
+            </tbody>
+        </table></div>`;
+    },
+
+    calcTotais() {
+        const sub  = this.itens.reduce((a,it) => a + it.total, 0);
+        const icms = this.itens.reduce((a,it) => a + (it.total * it.icms / 100), 0);
+        const desc = parseFloat(document.getElementById('nfeDesconto')?.value) || 0;
+        const total = Math.max(0, sub - desc);
+        const set = (id,v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+        set('nfeSubtotal', this._fmt(sub));
+        set('nfeTotalICMS', this._fmt(icms));
+        set('nfeTotalGeral', this._fmt(total));
+        const box = document.getElementById('nfeTotaisBox');
+        if (box) box.style.display = this.itens.length ? 'block' : 'none';
+    },
+
+    limparForm() {
+        if (!confirm('Limpar todos os dados do formulário?')) return;
+        this.itens = [];
+        this.renderItens();
+        this.calcTotais();
+        ['nfeRazaoSocial','nfeCnpj','nfeIE','nfeDestNome','nfeDestDoc',
+         'nfeDestEnd','nfeDestMun','nfeDestEmail','nfeDestTel',
+         'nfeSerie','nfeInfoCompl','nfeChave','nfeOSRef','nfeDesconto'
+        ].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        const s = document.getElementById('nfeSerie'); if (s) s.value = '001';
+        this._preencherData();
+    },
+
+    salvarRascunho() {
+        const nfe = this._coletarDados('rascunho');
+        if (!nfe) return;
+        this.historico.unshift(nfe);
+        this._saveStorage();
+        this.renderHistorico();
+        this.atualizarCards();
+        this._toast('Rascunho salvo!', 'success');
+    },
+
+    gerarXML() {
+        const nfe = this._coletarDados('pendente');
+        if (!nfe) return;
+        const blob = new Blob([this._buildXML(nfe)], {type:'application/xml'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `NFe_${nfe.numero}.xml`; a.click();
+        URL.revokeObjectURL(url);
+        this._toast('XML gerado e baixado!', 'info');
+    },
+
+    emitir() {
+        const nfe = this._coletarDados('emitida');
+        if (!nfe) return;
+        nfe.chave = this._gerarChave();
+        const el = document.getElementById('nfeChave');
+        if (el) el.value = nfe.chave;
+        this.historico.unshift(nfe);
+        this.nfeCounter++;
+        this._saveStorage();
+        this.renderHistorico();
+        this.atualizarCards();
+        this._toast('✅ NF-e ' + nfe.numero + ' emitida!', 'success');
+        this._gerarNumero();
+    },
+
+    _coletarDados(status) {
+        const destNome = document.getElementById('nfeDestNome')?.value?.trim();
+        if (!destNome) { alert('Informe o destinatário.'); return null; }
+        if (!this.itens.length) { alert('Adicione pelo menos um item.'); return null; }
+        const desc  = parseFloat(document.getElementById('nfeDesconto')?.value) || 0;
+        const sub   = this.itens.reduce((a,it) => a + it.total, 0);
+        return {
+            id: Date.now(),
+            numero: document.getElementById('nfeNumero')?.value || 'NFe-000001',
+            serie:  document.getElementById('nfeSerie')?.value || '001',
+            data:   document.getElementById('nfeDataEmissao')?.value || new Date().toISOString().slice(0,10),
+            emitente:  document.getElementById('nfeRazaoSocial')?.value || '',
+            cnpjEmit:  document.getElementById('nfeCnpj')?.value || '',
+            destNome,
+            destDoc:   document.getElementById('nfeDestDoc')?.value || '',
+            destEmail: document.getElementById('nfeDestEmail')?.value || '',
+            natureza:  document.getElementById('nfeNatureza')?.value || 'Venda de mercadoria',
+            formaPag:  document.getElementById('nfeFormaPag')?.value || '01',
+            osRef:     document.getElementById('nfeOSRef')?.value || '',
+            infoCompl: document.getElementById('nfeInfoCompl')?.value || '',
+            chave:     document.getElementById('nfeChave')?.value || '',
+            itens: [...this.itens],
+            subtotal: sub,
+            desconto: desc,
+            total: Math.max(0, sub - desc),
+            status,
+            criadoEm: new Date().toISOString(),
+        };
+    },
+
+    _gerarChave() {
+        let c = '';
+        for (let i=0; i<44; i++) c += Math.floor(Math.random()*10);
+        return c.replace(/(.{4})/g,'$1 ').trim();
+    },
+
+    _buildXML(nfe) {
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<!-- NF-e gerada pelo ÓticaVision Pro — Demonstração -->
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <NFe><infNFe versao="4.00">
+    <ide><nNF>${nfe.numero}</nNF><serie>${nfe.serie}</serie><dhEmi>${nfe.data}</dhEmi><natOp>${nfe.natureza}</natOp></ide>
+    <emit><xNome>${nfe.emitente}</xNome><CNPJ>${nfe.cnpjEmit.replace(/\D/g,'')}</CNPJ></emit>
+    <dest><xNome>${nfe.destNome}</xNome><CPF>${nfe.destDoc.replace(/\D/g,'')}</CPF><email>${nfe.destEmail}</email></dest>
+    ${nfe.itens.map((it,i)=>`<det nItem="${i+1}"><prod><xProd>${it.desc}</xProd><NCM>${it.ncm}</NCM><CFOP>${it.cfop}</CFOP><qCom>${it.qtd}</qCom><vUnCom>${it.valor.toFixed(2)}</vUnCom><vProd>${it.total.toFixed(2)}</vProd></prod><imposto><ICMS><pICMS>${it.icms}</pICMS></ICMS></imposto></det>`).join('\n    ')}
+    <total><ICMSTot><vProd>${nfe.subtotal.toFixed(2)}</vProd><vDesc>${nfe.desconto.toFixed(2)}</vDesc><vNF>${nfe.total.toFixed(2)}</vNF></ICMSTot></total>
+    <pag><detPag><tPag>${nfe.formaPag}</tPag><vPag>${nfe.total.toFixed(2)}</vPag></detPag></pag>
+    <infAdic><infCpl>${nfe.infoCompl}</infCpl></infAdic>
+  </infNFe></NFe>
+</nfeProc>`;
+    },
+
+    renderHistorico(lista) {
+        const tbody = document.getElementById('nfeHistoricoBody');
+        if (!tbody) return;
+        const dados = lista !== undefined ? lista : this.historico;
+        if (!dados.length) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:3rem 1rem;color:#aaa;">
+                <i class="fas fa-file-invoice" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.3;"></i>
+                Nenhuma nota fiscal registrada ainda.</td></tr>`;
+            return;
+        }
+        const sb = {
+            emitida:  '<span style="background:rgba(40,167,69,0.12);color:#1a7a3a;padding:3px 10px;border-radius:99px;font-size:0.72rem;font-weight:700;">✅ Emitida</span>',
+            pendente: '<span style="background:rgba(255,170,0,0.15);color:#8a5800;padding:3px 10px;border-radius:99px;font-size:0.72rem;font-weight:700;">⏳ Pendente</span>',
+            cancelada:'<span style="background:rgba(220,53,69,0.12);color:#b02030;padding:3px 10px;border-radius:99px;font-size:0.72rem;font-weight:700;">❌ Cancelada</span>',
+            rascunho: '<span style="background:rgba(108,117,125,0.12);color:#555;padding:3px 10px;border-radius:99px;font-size:0.72rem;font-weight:700;">📝 Rascunho</span>',
+        };
+        tbody.innerHTML = dados.map(nfe => `<tr>
+            <td style="font-family:monospace;font-weight:700;color:#ff6b00;">${nfe.numero}</td>
+            <td>${nfe.data ? new Date(nfe.data+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
+            <td style="font-weight:600;">${nfe.destNome||'-'}</td>
+            <td style="font-family:monospace;font-size:0.8rem;">${nfe.destDoc||'-'}</td>
+            <td style="font-weight:700;color:#28a745;">${this._fmt(nfe.total)}</td>
+            <td>${nfe.osRef||'-'}</td>
+            <td>${sb[nfe.status]||nfe.status}</td>
+            <td><div style="display:flex;gap:0.3rem;">
+                <button onclick="NFeModule.verDetalhe(${nfe.id})" title="Ver" style="background:rgba(23,162,184,0.1);color:#17a2b8;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-eye"></i></button>
+                <button onclick="NFeModule.baixarXML(${nfe.id})" title="XML" style="background:rgba(255,107,0,0.1);color:#ff6b00;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-download"></i></button>
+                ${nfe.status==='emitida'?`<button onclick="NFeModule.cancelarNFe(${nfe.id})" title="Cancelar" style="background:rgba(220,53,69,0.1);color:#dc3545;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-ban"></i></button>`:''}
+            </div></td>
+        </tr>`).join('');
+    },
+
+    filtrarHistorico() {
+        const busca  = (document.getElementById('nfeBusca')?.value||'').toLowerCase();
+        const status = document.getElementById('nfeFiltroStatus')?.value||'';
+        this.renderHistorico(this.historico.filter(n =>
+            (!busca  || (n.numero+n.destNome+n.destDoc).toLowerCase().includes(busca)) &&
+            (!status || n.status===status)
+        ));
+    },
+
+    verDetalhe(id) {
+        const n = this.historico.find(n=>n.id===id);
+        if (!n) return;
+        alert([`📄 NF-e: ${n.numero} | Série: ${n.serie}`,`📅 Data: ${n.data}`,
+            `👤 Destinatário: ${n.destNome} (${n.destDoc})`,
+            `📦 Itens: ${n.itens?.length||0}`,`💰 Total: ${this._fmt(n.total)}`,
+            `🔑 Status: ${n.status}`, n.chave?`🗝️ Chave: ${n.chave}`:'',
+            n.osRef?`🔗 OS: ${n.osRef}`:''].filter(Boolean).join('\n'));
+    },
+
+    baixarXML(id) {
+        const nfe = this.historico.find(n=>n.id===id);
+        if (!nfe) return;
+        const blob = new Blob([this._buildXML(nfe)], {type:'application/xml'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href=url; a.download=`NFe_${nfe.numero}.xml`; a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    cancelarNFe(id) {
+        if (!confirm('Cancelar esta NF-e?')) return;
+        const nfe = this.historico.find(n=>n.id===id);
+        if (nfe) { nfe.status='cancelada'; this._saveStorage(); this.renderHistorico(); this.atualizarCards(); }
+        this._toast('NF-e cancelada.', 'warning');
+    },
+
+    exportarCSV() {
+        if (!this.historico.length) { alert('Nenhuma nota para exportar.'); return; }
+        const csv = ['Número,Data,Destinatário,CPF/CNPJ,Total,OS,Status',
+            ...this.historico.map(n=>`${n.numero},${n.data},${n.destNome},${n.destDoc},${n.total.toFixed(2)},${n.osRef||''},${n.status}`)
+        ].join('\n');
+        const blob = new Blob([csv],{type:'text/csv'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url; a.download='nfe_historico.csv'; a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    atualizarCards() {
+        const mes=new Date().getMonth(), ano=new Date().getFullYear();
+        const dm=this.historico.filter(n=>{const d=new Date(n.criadoEm);return d.getMonth()===mes&&d.getFullYear()===ano;});
+        const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+        set('nfeCountEmitidas',  dm.filter(n=>n.status==='emitida').length);
+        set('nfeCountPendentes', dm.filter(n=>n.status==='pendente'||n.status==='rascunho').length);
+        set('nfeCountCanceladas',dm.filter(n=>n.status==='cancelada').length);
+        set('nfeTotalEmitido', this._fmt(dm.filter(n=>n.status==='emitida').reduce((a,n)=>a+n.total,0)));
+    },
+
+    _toast(msg, tipo='info') {
+        const colors={success:'#28a745',error:'#dc3545',warning:'#ff6b00',info:'#17a2b8'};
+        const icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+        const t=document.createElement('div');
+        t.style.cssText=`background:white;border-radius:10px;padding:0.9rem 1rem;box-shadow:0 5px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:10px;border-left:4px solid ${colors[tipo]};min-width:240px;`;
+        t.innerHTML=`<i class="fas ${icons[tipo]}" style="color:${colors[tipo]};font-size:1.1rem;flex-shrink:0;"></i><span style="font-size:0.85rem;font-weight:600;color:#333;">${msg}</span>`;
+        const c=document.getElementById('toastContainer');
+        if(c){c.appendChild(t);setTimeout(()=>t.remove(),4000);}
+    }
+};
+
+// Inicializa ao clicar no menu NF-e
+document.addEventListener('DOMContentLoaded', () => {
+    const m = document.querySelector('.menu-item[data-section="nfe"]');
+    if (m) m.addEventListener('click', () => setTimeout(()=>NFeModule.init(), 60));
+});
+
+})();
+</script>
 
 </body>
 </html>
