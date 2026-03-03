@@ -2352,7 +2352,7 @@
             /* ── Evitar quebras ruins ── */
             table, tr, td, th { page-break-inside: avoid !important; }
             h1, h2, h3, h4 { page-break-after: avoid !important; }
-            .os-via, .promissoria, .comprovante-body { page-break-inside: avoid !important; }
+            .promissoria, .comprovante-body { page-break-inside: avoid !important; }
 
             /* ── Garantir cores e bordas impressas ── */
             * {
@@ -2402,7 +2402,6 @@
         /* ===== ESTILOS PARA OS NOVOS PDFs — ALTA QUALIDADE ===== */
 
         /* Diretivas globais de qualidade para todos os documentos PDF/impressão */
-        .os-pdf-wrapper,
         .promissoria-pdf,
         .carne-pdf,
         .comprovante-pdf,
@@ -2418,7 +2417,6 @@
         }
 
         /* Força opacidade total em todos os textos dos documentos */
-        .os-pdf-wrapper *,
         .promissoria-pdf *,
         .carne-pdf *,
         .comprovante-pdf * {
@@ -2426,488 +2424,11 @@
             color: inherit;
         }
 
-        /* Textos escuros e nítidos */
-        .os-pdf-wrapper p,
-        .os-pdf-wrapper span,
-        .os-pdf-wrapper td,
-        .os-pdf-wrapper th,
-        .os-pdf-wrapper div {
-            color: #000000 !important;
-        }
-
         /* Evita anti-aliasing ruim em textos pequenos */
-        .os-pdf-wrapper,
         .promissoria-pdf {
             -webkit-text-stroke: 0 !important;
             text-stroke: 0 !important;
         }
-
-        /* ===== OS PDF - DESIGN PROFISSIONAL PREMIUM ===== */
-        .os-pdf-wrapper {
-            width: 210mm;
-            background: white;
-            font-family: 'Arial', sans-serif;
-            font-size: 8px;
-        }
-        /* Modo página única (ambas) */
-        .os-pdf-wrapper.uma-folha .os-via {
-            width: 210mm;
-            background: white;
-            box-sizing: border-box;
-        }
-        /* Modo página separada */
-        .os-via {
-            width: 210mm;
-            background: white;
-            box-sizing: border-box;
-            border: 1px solid #e0e0e0;
-        }
-        /* Compactar elementos quando ambas as vias estão numa folha */
-        .os-pdf-wrapper.uma-folha .os-via-header-bar { min-height: 16mm; }
-        .os-pdf-wrapper.uma-folha .os-empresa-nome   { font-size: 14px; }
-        .os-pdf-wrapper.uma-folha .os-empresa-sub    { font-size: 8px; font-weight: 600; }
-        .os-pdf-wrapper.uma-folha .os-numero-valor   { font-size: 17px; }
-        .os-pdf-wrapper.uma-folha .os-logo-area      { width: 15mm; font-size: 17px; }
-        .os-pdf-wrapper.uma-folha .os-info-cell      { padding: 1.2mm 2mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-info-cell-val  { font-size: 9.5px; font-weight: 800; }
-        .os-pdf-wrapper.uma-folha .os-info-cell-label{ font-size: 7px; font-weight: 700; }
-        .os-pdf-wrapper.uma-folha .os-cliente-body   { padding: 2mm 3mm; }
-        .os-pdf-wrapper.uma-folha .os-cliente-nome   { font-size: 13px; margin-bottom: 0.5mm; }
-        .os-pdf-wrapper.uma-folha .os-cliente-field  { font-size: 8.5px; font-weight: 600; }
-        .os-pdf-wrapper.uma-folha .os-section-title  { padding: 1.2mm 3mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-receita-table th { padding: 1.2mm 2mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-receita-table td { padding: 1.2mm 2mm; font-size: 9px; font-weight: 700; }
-        .os-pdf-wrapper.uma-folha .os-receita-extra  { padding: 1.8mm 3mm; font-size: 9px; gap: 4mm; }
-        .os-pdf-wrapper.uma-folha .os-itens-table th { padding: 1.2mm 2mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-itens-table td { padding: 1.2mm 2mm; font-size: 9px; font-weight: 600; }
-        .os-pdf-wrapper.uma-folha .os-totais-row     { padding: 1.8mm 3mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-total-final    { font-size: 14px; }
-        .os-pdf-wrapper.uma-folha .os-pagamento-cell { padding: 1.8mm 2.5mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-pagamento-pix  { padding: 1.2mm 3mm; font-size: 8.5px; }
-        .os-pdf-wrapper.uma-folha .os-obs-section    { min-height: 8mm; }
-        .os-pdf-wrapper.uma-folha .os-obs-body       { padding: 1.8mm 3mm; font-size: 9px; }
-        .os-pdf-wrapper.uma-folha .os-assinaturas    { padding: 2.5mm 3mm 2mm; }
-        .os-pdf-wrapper.uma-folha .os-assinatura-linha { height: 7mm; }
-        .os-pdf-wrapper.uma-folha .os-assinatura-label { font-size: 8.5px; font-weight: 700; }
-        .os-pdf-wrapper.uma-folha .os-rodape         { padding: 1.5mm 3mm; font-size: 8px; font-weight: 600; }
-
-        /* ── Cabeçalho da via — barra colorida premium ── */
-        .os-via-header-bar {
-            display: flex;
-            align-items: stretch;
-            background: #ff6b00;
-            color: white;
-            min-height: 20mm;
-            position: relative;
-        }
-        /* Linha decorativa dourada na base do header */
-        .os-via-header-bar::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.15) 100%);
-        }
-        .os-via-header-bar.verde { background: linear-gradient(135deg, #1a7a3e 0%, #0d5a2c 100%); }
-        .os-via-header-bar:not(.verde) { background: linear-gradient(135deg, #ff6b00 0%, #cc4a00 100%); }
-        .os-logo-area {
-            width: 20mm;
-            background: rgba(0,0,0,0.18);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2.5mm;
-            flex-shrink: 0;
-            border-right: 1px solid rgba(255,255,255,0.2);
-        }
-        .os-logo-circulo {
-            width: 15mm;
-            height: 15mm;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
-            flex-shrink: 0;
-        }
-        .os-logo-circulo span {
-            font-size: 19px;
-            line-height: 1;
-        }
-        /* ===== REGRA GLOBAL: logos circulares preenchendo todo o círculo sem distorção ===== */
-        .os-logo-circulo,
-        .carne-logo-circulo,
-        .comp-logo-circulo,
-        .prom-logo-circulo,
-        .rec-logo-circulo {
-            overflow: hidden !important;
-            border-radius: 50% !important;
-            background-size: cover !important;
-            background-repeat: no-repeat !important;
-            background-position: center center !important;
-        }
-        /* Imagens ocultas — logo renderizada via background-image no container */
-        .os-logo-circulo img,
-        .carne-logo-circulo img,
-        .comp-logo-circulo img,
-        .prom-logo-circulo img,
-        .rec-logo-circulo img,
-        .logo-img {
-            display: none !important;
-        }
-        /* Compacto (uma-folha) */
-        .os-pdf-wrapper.uma-folha .os-logo-area { width: 14mm; }
-        .os-pdf-wrapper.uma-folha .os-logo-circulo { width: 11mm; height: 11mm; }
-        .os-pdf-wrapper.uma-folha .os-logo-circulo span { font-size: 15px; }
-        .os-empresa-area {
-            flex: 1;
-            padding: 3mm 4mm;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 0.5mm;
-        }
-        /* Linha tênue separando nome da empresa do subtítulo */
-        .os-empresa-nome-wrap {
-            display: flex;
-            align-items: center;
-            gap: 3mm;
-            padding-bottom: 1mm;
-            border-bottom: 1px solid rgba(255,255,255,0.25);
-            margin-bottom: 1mm;
-        }
-        .os-empresa-nome {
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-        .os-empresa-badge {
-            font-size: 6px;
-            font-weight: 700;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 10px;
-            padding: 0.5mm 2mm;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .os-empresa-sub {
-            font-size: 7.5px;
-            opacity: 0.92;
-            line-height: 1.4;
-        }
-        .os-numero-area {
-            min-width: 32mm;
-            background: rgba(0,0,0,0.22);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2.5mm 3.5mm;
-            text-align: center;
-            border-left: 1px solid rgba(255,255,255,0.2);
-            gap: 0.5mm;
-        }
-        .os-numero-label { font-size: 6px; letter-spacing: 1.5px; opacity: 0.85; text-transform: uppercase; font-weight: 700; }
-        .os-numero-valor { font-size: 20px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .os-via-label { font-size: 6.5px; opacity: 0.85; margin-top: 0.5mm; font-weight: 700; letter-spacing: 0.5px; background: rgba(255,255,255,0.15); padding: 0.5mm 2mm; border-radius: 8px; }
-
-        /* ── Linha tênue divisória entre seções (impressão nítida) ── */
-        .os-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, #e0e0e0 5%, #e0e0e0 95%, transparent 100%);
-        }
-
-        /* Barra de info rápida */
-        .os-info-bar {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e0e0e0;
-            font-size: 0;
-        }
-        .os-info-cell {
-            flex: 1;
-            padding: 2.2mm 3mm;
-            border-right: 1px solid #e4e4e4;
-            font-size: 0;
-            position: relative;
-        }
-        /* Linha vertical decorativa entre células */
-        .os-info-cell:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            right: 0; top: 20%; bottom: 20%;
-            width: 1px;
-            background: #d0d0d0;
-        }
-        .os-info-cell:last-child { border-right: none; }
-        .os-info-cell-label {
-            font-size: 7.5px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            display: block;
-            margin-bottom: 0.5mm;
-            font-weight: 800;
-        }
-        .os-info-cell-val { font-weight: 900; color: #111; font-size: 11px; }
-
-        /* ── Cliente ── */
-        .os-cliente-section {
-            display: flex;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .os-cliente-accent {
-            width: 2mm;
-            background: #ff6b00;
-            flex-shrink: 0;
-        }
-        .os-cliente-accent.verde { background: #1a7a3e; }
-        .os-cliente-body { flex: 1; padding: 3mm 4mm; }
-        .os-cliente-nome { font-size: 15px; font-weight: 900; color: #111; margin-bottom: 1.5mm; letter-spacing: 0.3px; }
-        /* Linha separadora abaixo do nome */
-        .os-cliente-nome-sep {
-            height: 1px;
-            background: linear-gradient(90deg, #e0e0e0 0%, transparent 100%);
-            margin-bottom: 1.5mm;
-        }
-        .os-cliente-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5mm 2mm;
-        }
-        .os-cliente-field {
-            font-size: 8px;
-            color: #666;
-            padding-bottom: 1mm;
-            border-bottom: 1px dotted #e8e8e8;
-            font-weight: 700;
-        }
-        .os-cliente-field span { font-weight: 900; color: #111; display: block; font-size: 9.5px; margin-top: 0.3mm; }
-
-        /* ── Receituário ── */
-        .os-receita-section { border-bottom: 2px solid #e0e0e0; }
-        .os-section-title {
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            padding: 2mm 4mm;
-            background: linear-gradient(90deg, #f5f5f5, #fafafa);
-            border-bottom: 1.5px solid #d8d8d8;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 1.5mm;
-        }
-        /* Linha colorida à esquerda do título de seção */
-        .os-section-title::before {
-            content: '';
-            display: inline-block;
-            width: 2px;
-            height: 8px;
-            background: var(--cor, #ff6b00);
-            border-radius: 1px;
-            flex-shrink: 0;
-        }
-        .os-receita-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 8px;
-        }
-        .os-receita-table th {
-            background: #ff6b00;
-            color: white;
-            padding: 2mm 3mm;
-            text-align: center;
-            font-size: 8.5px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-        .os-receita-table.verde th { background: #1a7a3e; }
-        .os-receita-table td {
-            padding: 2mm 3mm;
-            text-align: center;
-            border: 1px solid #ececec;
-            font-size: 9.5px;
-            font-weight: 800;
-        }
-        .os-receita-table tr:nth-child(odd) td { background: #fafafa; }
-        .os-olho-label { font-weight: 800; background: #f0f0f0 !important; color: #333; }
-        .os-receita-extra {
-            display: flex;
-            gap: 5mm;
-            padding: 2mm 3.5mm;
-            font-size: 8px;
-            background: #fffdf5;
-            border-top: 1px solid #ede8d5;
-        }
-        .os-receita-extra-item { color: #666; border-right: 1px dotted #ddd; padding-right: 5mm; }
-        .os-receita-extra-item:last-child { border-right: none; }
-        .os-receita-extra-item strong { color: #111; display: block; font-size: 8.5px; }
-
-        /* ── Itens ── */
-        .os-itens-section { border-bottom: 2px solid #e0e0e0; }
-        .os-itens-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 8px;
-        }
-        .os-itens-table th {
-            background: linear-gradient(180deg, #2d6a4f 0%, #1e4d38 100%);
-            color: white;
-            padding: 2mm 3mm;
-            text-align: left;
-            font-size: 8.5px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(0,0,0,0.15);
-        }
-        .os-itens-table th:nth-child(3),
-        .os-itens-table th:nth-child(4),
-        .os-itens-table th:nth-child(5) { text-align: right; }
-        .os-itens-table td {
-            padding: 2mm 3mm;
-            border-bottom: 1px solid #eeeeee;
-            border-left: 1px solid #f5f5f5;
-            font-size: 9px;
-            font-weight: 700;
-        }
-        .os-itens-table td:nth-child(3),
-        .os-itens-table td:nth-child(4),
-        .os-itens-table td:nth-child(5) { text-align: right; }
-        .os-itens-table tr:nth-child(even) td { background: #f9f9f9; }
-        .os-itens-table tr:last-child td { border-bottom: none; }
-
-        /* ── Totais ── */
-        .os-totais-row {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 5mm;
-            padding: 2.5mm 4mm;
-            background: linear-gradient(90deg, #f0f0f0, #f8f8f8);
-            border-bottom: 2px solid #d8d8d8;
-            font-size: 9px;
-        }
-        .os-totais-item { color: #777; }
-        .os-totais-item strong { color: #333; }
-        .os-total-final {
-            font-size: 17px;
-            font-weight: 900;
-            color: #1a7a3e;
-            border-left: 3px solid #1a7a3e;
-            padding-left: 3.5mm;
-            margin-left: 2mm;
-        }
-
-        /* ── Pagamento ── */
-        .os-pagamento-section { border-bottom: 2px solid #e0e0e0; }
-        .os-pagamento-grid {
-            display: flex;
-            font-size: 0;
-            background: #fff;
-        }
-        .os-pagamento-cell {
-            flex: 1;
-            padding: 3mm 4mm;
-            border-right: 1px solid #eeeeee;
-            font-size: 9px;
-        }
-        .os-pagamento-cell:last-child { border-right: none; }
-        .os-pagamento-cell-label {
-            font-size: 7.5px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 0.8mm;
-            font-weight: 800;
-        }
-        .os-pagamento-cell-val { font-weight: 900; color: #111; font-size: 11px; }
-        .os-pagamento-pix {
-            background: linear-gradient(90deg, #e8f5fe, #f0f8ff);
-            padding: 2mm 3.5mm;
-            font-size: 7.5px;
-            color: #1565c0;
-            border-top: 1.5px dashed #90caf9;
-            font-weight: 600;
-        }
-
-        /* ── Observações + Assinaturas ── */
-        .os-obs-section {
-            display: flex;
-            border-bottom: 2px solid #e0e0e0;
-            min-height: 11mm;
-        }
-        .os-obs-body {
-            flex: 1;
-            padding: 2.5mm 3.5mm;
-            font-size: 8px;
-            color: #555;
-        }
-        .os-obs-label { font-size: 6.5px; color: #aaa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 1mm; font-weight: 700; }
-
-        .os-assinaturas {
-            display: flex;
-            padding: 4mm 5mm 2.5mm;
-            gap: 8mm;
-            background: #fafafa;
-            border-bottom: 1px solid #eeeeee;
-        }
-        .os-assinatura-box {
-            flex: 1;
-            text-align: center;
-        }
-        /* Linha de assinatura com pontos __ estilo formulário */
-        .os-assinatura-linha {
-            border-bottom: 1.5px solid #333;
-            margin-bottom: 1.5mm;
-            height: 8mm;
-            position: relative;
-        }
-        /* X pontilhado para sinalizar onde assinar */
-        .os-assinatura-linha::before {
-            content: '✕';
-            position: absolute;
-            bottom: 2px;
-            left: 2mm;
-            font-size: 7px;
-            color: #bbb;
-        }
-        .os-assinatura-label { font-size: 8.5px; color: #555; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* ── Rodapé ── */
-        .os-rodape {
-            background: linear-gradient(90deg, #f0f0f0, #f8f8f8);
-            padding: 2mm 4mm;
-            font-size: 7.5px;
-            color: #666;
-            text-align: center;
-            border-top: 2px solid #d0d0d0;
-            line-height: 1.6;
-            font-weight: 600;
-        }
-
-        /* ── Separador entre vias ── */
-        .os-corte {
-            display: flex;
-            align-items: center;
-            gap: 2mm;
-            padding: 2mm 3.5mm;
-            background: #fff9f5;
-            border-top: 2px dashed #ff8c40;
-            border-bottom: 2px dashed #ff8c40;
-            font-size: 8px;
-            color: #cc5200;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .os-corte-linha { flex: 1; border-top: 1px dashed #ffb380; }
 
         /* ===== PROMISSÓRIA PDF — DESIGN PROFISSIONAL ===== */
         .promissoria-pdf {
@@ -3739,20 +3260,79 @@
     line-height: 1.3;
   }
 
-  /* Textos escuros garantidos — evita "apagado" no PDF */
-  .os-info-cell-label { color: #444 !important; font-weight: 600 !important; }
-  .os-info-cell-val   { color: #000 !important; font-weight: 700 !important; }
-  .os-cliente-nome    { color: #000 !important; font-weight: 800 !important; }
-  .os-cliente-field   { color: #222 !important; }
-  .os-section-title   { color: #fff !important; font-weight: 700 !important; }
-  .os-receita-table th{ color: #fff !important; font-weight: 700 !important; }
-  .os-receita-table td{ color: #000 !important; font-weight: 600 !important; }
-  .os-itens-table th  { color: #fff !important; }
-  .os-itens-table td  { color: #000 !important; }
-  .os-total-final     { color: #000 !important; font-weight: 900 !important; }
-  .os-empresa-nome    { color: #fff !important; font-weight: 900 !important; letter-spacing: 0.3px; }
-  .os-numero-valor    { color: #fff !important; font-weight: 900 !important; }
-  .os-rodape          { color: #555 !important; }
+  /* ===== OS — MODELO APROVADO — CSS EXATO ===== */
+  .os-pdf-wrapper { width:210mm; background:#fff; font-family:Arial,Helvetica,sans-serif; font-size:9px; color:#000; }
+  .os-via { width:210mm; height:145mm; overflow:hidden; background:#fff; border:1px solid #bbb; box-sizing:border-box; display:flex; flex-direction:column; }
+  .os-header { display:flex; align-items:stretch; border-bottom:2px solid #333; min-height:18mm; flex-shrink:0; }
+  .os-logo-area { width:18mm; min-width:18mm; border-right:1px solid #bbb; display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:2mm; align-self:stretch; }
+  .os-logo-circulo { width:13mm; height:13mm; min-width:13mm; min-height:13mm; max-width:13mm; max-height:13mm; border-radius:50%; border:1.5px solid #555; display:flex; align-items:center; justify-content:center; font-size:16px; overflow:hidden; flex-shrink:0; }
+  .os-logo-circulo img { max-width:100% !important; max-height:100% !important; width:auto !important; height:auto !important; border-radius:50% !important; display:block !important; }
+  .os-empresa-info { flex:1; padding:1.5mm 2mm; display:flex; flex-direction:column; justify-content:center; }
+  .os-empresa-nome { font-size:13px; font-weight:800; color:#000; line-height:1.1; }
+  .os-empresa-badge { display:inline-block; border:1px solid #555; border-radius:3px; padding:0.5mm 2mm; font-size:7px; font-weight:700; margin-top:0.5mm; color:#333; width:fit-content; }
+  .os-empresa-sub { font-size:7px; color:#444; margin-top:1mm; line-height:1.4; }
+  .os-numero-area { width:32mm; border-left:1px solid #bbb; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2mm; text-align:center; flex-shrink:0; }
+  .os-numero-label { font-size:6.5px; color:#555; text-transform:uppercase; }
+  .os-numero-valor { font-size:17px; font-weight:900; color:#000; line-height:1.1; margin:0.5mm 0; }
+  .os-via-label { font-size:7px; font-weight:700; color:#333; border:1px solid #aaa; border-radius:99px; padding:0.5mm 2mm; }
+  .os-info-bar { display:flex; border-bottom:1px solid #ccc; flex-shrink:0; }
+  .os-info-cell { flex:1; padding:1mm 2mm; border-right:1px solid #ccc; display:flex; flex-direction:column; justify-content:center; }
+  .os-info-cell:last-child { border-right:none; }
+  .os-info-cell-label { font-size:6px; color:#666; font-weight:700; text-transform:uppercase; display:block; }
+  .os-info-cell-val { font-size:8.5px; font-weight:800; color:#000; display:block; margin-top:0.3mm; }
+  .os-cliente-section { display:flex; border-bottom:1px solid #ccc; flex-shrink:0; }
+  .os-cliente-accent { width:3px; background:#333; flex-shrink:0; }
+  .os-cliente-body { flex:1; padding:1.5mm 2.5mm; }
+  .os-cliente-nome { font-size:12px; font-weight:800; color:#000; margin-bottom:1mm; padding-bottom:0.8mm; border-bottom:1px solid #ddd; }
+  .os-cliente-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.5mm 2mm; }
+  .os-cliente-field { font-size:7px; color:#555; font-weight:700; text-transform:uppercase; display:flex; flex-direction:column; }
+  .os-cliente-field span { font-size:8px; font-weight:600; color:#000; text-transform:none; margin-top:0.2mm; }
+  .os-section-title { padding:1mm 2.5mm; font-size:8px; font-weight:800; color:#000 !important; border-bottom:1.5px solid #ccc; border-top:1px solid #eee; background:transparent !important; text-transform:uppercase; letter-spacing:0.3px; flex-shrink:0; }
+  .os-receita-section { flex-shrink:0; }
+  .os-receita-table { width:100%; border-collapse:collapse; font-size:8px; table-layout:fixed; }
+  .os-receita-table th,.os-receita-table td { border:1px solid #ccc; padding:0.8mm 1.5mm; text-align:center; }
+  .os-receita-table thead { background:#f5f5f5 !important; }
+  .os-receita-table th { background:#f5f5f5 !important; font-weight:700; font-size:7.5px; text-transform:uppercase; color:#333 !important; padding:0.8mm 1mm !important; letter-spacing:0 !important; white-space:nowrap; }
+  .os-receita-table td { font-weight:700; color:#000 !important; padding:0.8mm 1mm !important; font-size:7.5px !important; }
+  .os-olho-label { background:#333 !important; color:#fff !important; font-weight:800 !important; }
+  .os-receita-extra { display:flex; gap:6mm; padding:1.5mm 2.5mm; font-size:8px; border-bottom:1px solid #ccc; flex-shrink:0; flex-wrap:wrap; }
+  .os-receita-extra span { font-weight:700; color:#555; }
+  .os-receita-extra strong { color:#000; }
+  .os-itens-section { flex-shrink:0; }
+  .os-itens-table { width:100%; border-collapse:collapse; font-size:8px; table-layout:fixed; }
+  .os-itens-table th,.os-itens-table td { border:1px solid #ccc; padding:0.8mm 1.5mm; }
+  .os-itens-table thead { background:#f5f5f5 !important; }
+  .os-itens-table th { background:#f5f5f5 !important; font-weight:700; font-size:7.5px !important; text-transform:uppercase; color:#333 !important; text-align:center; padding:0.8mm 1mm !important; letter-spacing:0 !important; white-space:nowrap; }
+  .os-itens-table td { font-weight:600; color:#000 !important; font-size:7.5px !important; padding:0.8mm 1mm !important; }
+  .os-itens-table tr:hover td { background:transparent !important; }
+  .os-itens-table tr:last-child td { border-bottom:1px solid #ccc !important; }
+  .os-totais-row { display:flex; align-items:center; gap:4mm; padding:1.5mm 2.5mm; border-bottom:1px solid #ccc; font-size:8px; flex-shrink:0; }
+  .os-totais-item { color:#333; }
+  .os-totais-item strong { color:#000; }
+  .os-total-final { margin-left:auto; font-size:12px; font-weight:900; color:#000; }
+  .os-pagamento-section { flex-shrink:0; }
+  .os-pagamento-grid { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid #ccc; }
+  .os-pagamento-cell { padding:1.5mm 2mm; border-right:1px solid #ccc; border-bottom:1px solid #ccc; font-size:8px; display:flex; flex-direction:column; }
+  .os-pagamento-cell:last-child { border-right:none; }
+  .os-pagamento-cell span { font-size:6.5px; color:#555; font-weight:700; text-transform:uppercase; }
+  .os-pagamento-cell strong { font-size:9px; color:#000; margin-top:0.3mm; }
+  .os-pagamento-pix { padding:0.8mm 2.5mm; font-size:7px; border-bottom:1px solid #ccc; color:#333; flex-shrink:0; }
+  .os-obs-section { flex-shrink:0; border-bottom:1px solid #ccc; min-height:6mm; max-height:14mm; overflow:hidden; }
+  .os-obs-body { padding:1.5mm 2.5mm; font-size:8px; color:#444; }
+  .os-obs-label { font-size:6.5px; font-weight:800; text-transform:uppercase; color:#555; margin-bottom:0.5mm; }
+  .os-assinaturas { display:flex; gap:4mm; padding:2mm 3mm 1.5mm; border-bottom:1px solid #ccc; flex-shrink:0; }
+  .os-assinatura-box { flex:1; }
+  .os-assinatura-linha { height:7mm; border-bottom:1px solid #888; margin-bottom:0.5mm; }
+  .os-assinatura-label { font-size:7px; font-weight:700; color:#444; text-align:center; text-transform:uppercase; }
+  .os-rodape { padding:1.5mm 2.5mm; font-size:7px; color:#444; line-height:1.5; border-top:1px solid #ccc; flex-shrink:0; }
+  .os-corte { display:flex; align-items:center; gap:2mm; padding:1.2mm 4mm; font-size:7.5px; font-weight:700; color:#555; border-top:1px dashed #aaa; border-bottom:1px dashed #aaa; background:#fafafa; justify-content:center; letter-spacing:0.5px; flex-shrink:0; }
+  .os-corte-linha { flex:1; height:1px; border-top:1px dashed #aaa; }
+  /* Ambas as vias em A4 */
+  .os-pdf-wrapper.uma-folha { width:210mm; height:297mm; overflow:hidden; background:#fff; display:flex; flex-direction:column; }
+  .os-pdf-wrapper.uma-folha .os-via { height:144mm; font-size:8px; }
+  .os-pdf-wrapper.uma-folha .os-empresa-nome { font-size:12px !important; }
+  .os-pdf-wrapper.uma-folha .os-numero-valor { font-size:15px !important; }
+  .os-pdf-wrapper.uma-folha .os-logo-circulo { width:11mm; height:11mm; min-width:11mm; min-height:11mm; max-width:11mm; max-height:11mm; font-size:14px; }
 
   /* Promissória */
   .promissoria-pdf .titulo        { color: #fff !important; font-weight: 900 !important; }
@@ -3774,7 +3354,7 @@
      Laranja #ff6b00 · Âmbar #ffaa00 · Ouro #ffcc00
      Zero alterações em JavaScript
 ═══════════════════════════════════════════════════════ -->
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ── VARIÁVEIS ── */
 :root {
@@ -4087,18 +3667,18 @@ th {
     background: transparent !important;
     color: white !important;
     font-weight: 700 !important;
-    font-size: 0.76rem !important;
+    font-size: 0.68rem !important;
     letter-spacing: 0.8px !important;
     text-transform: uppercase !important;
-    padding: 1rem 1.1rem !important;
+    padding: 0.52rem 0.9rem !important;
     border: none !important;
     white-space: nowrap !important;
 }
 
 td {
-    padding: 0.9rem 1.1rem !important;
+    padding: 0.5rem 0.9rem !important;
     border-bottom: 1px solid rgba(255,107,0,0.06) !important;
-    font-size: 0.88rem !important;
+    font-size: 0.82rem !important;
     color: #333 !important;
     font-weight: 500 !important;
     vertical-align: middle !important;
@@ -4137,11 +3717,30 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
     border-radius: var(--radius-xl) !important;
     box-shadow: 0 20px 80px rgba(0,0,0,0.25) !important;
     overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+.modal-body {
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+/* ViewModal precisa de scroll correto */
+#viewModal .modal-content {
+    overflow: hidden !important;
+}
+#viewModal .modal-body {
+    max-height: calc(90vh - 80px) !important;
+    overflow-y: auto !important;
+    padding: 0 1.5rem 1.5rem !important;
 }
 .modal-header {
     background: linear-gradient(90deg, rgba(255,107,0,0.06), rgba(255,170,0,0.03)) !important;
     border-bottom: 1px solid rgba(255,107,0,0.1) !important;
     padding: 1.25rem 1.5rem !important;
+    flex-shrink: 0 !important;
 }
 .modal-title {
     font-weight: 800 !important;
@@ -4553,6 +4152,36 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
 
 /* ══ FIM UPGRADE VISUAL v4.0 ══ */
 </style>
+<style id="visionpro-final-override">
+.table-container{overflow-y:auto!important;overflow-x:auto!important;max-height:520px!important;}
+.table-container::-webkit-scrollbar{width:7px;height:7px;}
+.table-container::-webkit-scrollbar-track{background:#fdf9f5;border-radius:99px;}
+.table-container::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#ff6b00,#ffaa00);border-radius:99px;}
+.table-container::-webkit-scrollbar-thumb:hover{background:#e85500;}
+.table-container::-webkit-scrollbar-corner{background:#fdf9f5;}
+.table-container thead tr th{position:sticky!important;top:0!important;z-index:10!important;padding:0.52rem 0.9rem!important;font-size:0.68rem!important;font-weight:700!important;white-space:nowrap!important;}
+.table-container tbody tr td{padding:0.5rem 0.9rem!important;font-size:0.82rem!important;vertical-align:middle!important;}
+.table-container tbody tr:hover td{background:rgba(255,107,0,0.03)!important;}
+.dark-mode .table-container::-webkit-scrollbar-track{background:#1a1208!important;}
+.os-pdf-wrapper,.os-pdf-wrapper *{font-family:"DM Sans",Arial,sans-serif!important;}
+.os-pdf-wrapper .os-empresa-nome{font-weight:900!important;letter-spacing:-0.3px!important;}
+.os-pdf-wrapper .os-empresa-badge{font-weight:800!important;letter-spacing:0.5px!important;}
+.os-pdf-wrapper .os-info-cell-label{font-size:5.5px!important;font-weight:800!important;color:#777!important;letter-spacing:0.4px!important;}
+.os-pdf-wrapper .os-info-cell-val{font-size:8px!important;font-weight:800!important;color:#000!important;}
+.os-pdf-wrapper .os-cliente-nome{font-weight:900!important;letter-spacing:-0.2px!important;}
+.os-pdf-wrapper .os-cliente-field{font-size:5.5px!important;font-weight:800!important;color:#777!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-cliente-field span{font-size:7.5px!important;font-weight:700!important;color:#111!important;}
+.os-pdf-wrapper .os-section-title{font-size:7.5px!important;font-weight:900!important;background:#efefef!important;color:#000!important;border-top:1px solid #ddd!important;border-bottom:2px solid #ccc!important;letter-spacing:0.5px!important;}
+.os-pdf-wrapper .os-receita-table th,.os-pdf-wrapper .os-itens-table th{background:#e4e4e4!important;color:#111!important;font-weight:800!important;font-size:6.5px!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-receita-table td,.os-pdf-wrapper .os-itens-table td{font-weight:700!important;color:#000!important;font-size:7.5px!important;}
+.os-pdf-wrapper .os-pagamento-cell span{font-size:5.5px!important;font-weight:800!important;color:#777!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-pagamento-cell strong{font-size:8.5px!important;font-weight:800!important;color:#000!important;}
+.os-pdf-wrapper .os-obs-label{font-size:5.5px!important;font-weight:900!important;color:#666!important;letter-spacing:0.4px!important;}
+.os-pdf-wrapper .os-assinatura-label{font-size:6.5px!important;font-weight:800!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-rodape{font-size:6.5px!important;font-weight:500!important;background:#fafafa!important;color:#555!important;line-height:1.6!important;}
+.os-pdf-wrapper .os-numero-valor{font-size:18px!important;font-weight:900!important;}
+.os-pdf-wrapper .os-olho-label{background:#222!important;color:#fff!important;font-weight:900!important;}
+</style>
 </head>
 <body>
     <div class="app-container">
@@ -4776,7 +4405,23 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                     </div>
                 </div>
                 <div class="table-container">
-                    <h3 class="mb-3">Últimas Vendas</h3>
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem;">
+                        <h3 style="margin:0;">Últimas Vendas</h3>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <input type="text" id="filterRecentClient" class="form-control" placeholder="🔍 Cliente..." oninput="Dashboard.filterRecentSales()" style="max-width:160px;font-size:0.82rem;">
+                            <select id="filterRecentStatus" class="form-control" onchange="Dashboard.filterRecentSales()" style="max-width:150px;font-size:0.82rem;">
+                                <option value="">Todos os status</option>
+                                <option value="orcamento">Orçamento</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="producao">Em Produção</option>
+                                <option value="laboratorio">Laboratório</option>
+                                <option value="tratamento">Tratamento</option>
+                                <option value="pronto">Pronto</option>
+                                <option value="entregue">Entregue</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
                     <table id="recentSalesTable">
                         <thead><tr><th>Nº O.S</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead>
                         <tbody></tbody>
@@ -5072,6 +4717,10 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid #ddd;background:#fff;color:#888;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:3px;">
                                     <i class="fas fa-tools" style="font-size:14px;"></i>Serviço
                                 </button>
+                                <button type="button" onclick="Sales.showItemTab('tratamento')" id="tabBtnTratamento"
+                                    style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid #ddd;background:#fff;color:#888;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;align-items:center;gap:3px;">
+                                    <i class="fas fa-flask" style="font-size:14px;"></i>Tratamento
+                                </button>
                             </div>
 
                             <!-- Painel Lente -->
@@ -5156,6 +4805,35 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                         <button type="button" onclick="Sales.addServico()"
                                             style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#039be5,#0277bd);color:#fff;font-weight:700;font-size:0.83rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(2,119,189,0.25);">
                                             <i class="fas fa-plus-circle"></i> Adicionar Serviço
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Painel Tratamento -->
+                            <div id="itemTabTratamento" style="display:none;animation:fadeIn 0.2s ease;">
+                                <div style="background:#f9f9f9;border:1.5px solid #ce93d8;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                                        <div style="width:28px;height:28px;background:#f3e5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-flask" style="color:#7b1fa2;font-size:12px;"></i>
+                                        </div>
+                                        <span style="font-weight:700;font-size:0.82rem;color:#7b1fa2;">Selecionar Tratamento</span>
+                                    </div>
+                                    <select id="tratamentoSelect" class="form-control" style="border-radius:8px;border-color:#ce93d8;background:#fff;font-size:0.85rem;">
+                                        <option value="">🔍 Escolha um tratamento...</option>
+                                    </select>
+                                    <div style="display:flex;gap:10px;align-items:center;">
+                                        <div style="flex:1;">
+                                            <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Quantidade</label>
+                                            <div style="display:flex;align-items:center;gap:0;border:1.5px solid #ce93d8;border-radius:8px;overflow:hidden;background:#fff;width:fit-content;">
+                                                <button type="button" onclick="Sales.changeQty('tratamentoQty',-1)" style="width:34px;height:34px;border:none;background:#f3e5f5;color:#7b1fa2;font-size:16px;font-weight:700;cursor:pointer;">−</button>
+                                                <input type="number" id="tratamentoQty" value="1" min="1" style="width:44px;height:34px;border:none;text-align:center;font-size:0.9rem;font-weight:700;color:#333;outline:none;">
+                                                <button type="button" onclick="Sales.changeQty('tratamentoQty',1)" style="width:34px;height:34px;border:none;background:#f3e5f5;color:#7b1fa2;font-size:16px;font-weight:700;cursor:pointer;">+</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" onclick="Sales.addTratamento()"
+                                            style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#ab47bc,#7b1fa2);color:#fff;font-weight:700;font-size:0.83rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(123,31,162,0.25);">
+                                            <i class="fas fa-plus-circle"></i> Adicionar Tratamento
                                         </button>
                                     </div>
                                 </div>
@@ -5615,6 +5293,15 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                     <tbody id="installmentsTableBody"></tbody>
                                 </table>
                             </div>
+                            <!-- Botões de PDF do Crediário -->
+                            <div id="crediarioPdfBtns" style="display:none;margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_Carne()" style="background:#6610f2;border-color:#6610f2;">
+                                    <i class="fas fa-receipt"></i> Gerar Carnê PDF
+                                </button>
+                                <button type="button" class="btn btn-pdf" onclick="Sales.gerarPDF_Promissoria()" style="background:#0277bd;border-color:#0277bd;">
+                                    <i class="fas fa-file-alt"></i> Nota Promissória
+                                </button>
+                            </div>
                         </div>
 
                     </div>
@@ -5681,7 +5368,7 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 <th>Status</th>
                                 <th>Data</th>
                                 <th>Ações</th>
-                                <th><i class="fas fa-file-pdf" style="color:#dc3545"></i></th>
+                                <th><i class="fas fa-file-pdf" style="color:#555"></i> O.S.</th>
                                 <th><i class="fab fa-whatsapp" style="color:#25d366"></i></th>
                             </tr>
                         </thead>
@@ -5980,6 +5667,15 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                             <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray);"></i>
                             <input type="text" id="searchClient" class="form-control" placeholder="Buscar por nome, CPF, telefone..." onkeyup="Clients.search()" style="padding-left:36px;">
                         </div>
+                        <select id="filterClientCity" class="form-control" style="max-width:160px;font-size:0.85rem;" onchange="Clients.search()">
+                            <option value="">Todas as cidades</option>
+                        </select>
+                        <select id="filterClientPresc" class="form-control" style="max-width:150px;font-size:0.85rem;" onchange="Clients.search()">
+                            <option value="">Com ou sem receita</option>
+                            <option value="com">Com receita</option>
+                            <option value="sem">Sem receita</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="Clients.clearFilter()" title="Limpar filtros"><i class="fas fa-times"></i></button>
                         <span id="clientsCountBadge" style="background:var(--primary);color:white;padding:4px 14px;border-radius:20px;font-size:0.82rem;font-weight:700;white-space:nowrap;"></span>
                     </div>
                     <table id="clientsTable">
@@ -9094,7 +8790,7 @@ ORDER BY t.table_name;
             },
             editingId: null,
             editingSaleId: null, // ID da venda sendo editada
-            osModelo: 'colorido', // 'colorido' | 'semfundo' | 'pb'
+            osModelo: 'semfundo', // 'colorido' | 'semfundo' | 'pb'
             lastOsCounter: {},
             lastOsYear: new Date().getFullYear(),
             notificacoes: {
@@ -9544,12 +9240,15 @@ ORDER BY t.table_name;
         // ── Prepara container de renderização fora da tela ──────────────────
         function _criarContainerPDF(elemento, larguraMM) {
             const container = document.createElement('div');
+            // Herda a altura do elemento se ele tiver altura fixa inline
+            const elH = elemento.style.height || '';
             container.style.cssText = [
                 'position:fixed',
                 'top:0',
                 'left:-9999px',
                 `width:${larguraMM}mm`,
-                'min-height:1px',
+                elH ? `height:${elH}` : 'min-height:1px',
+                elH ? 'overflow:hidden' : '',
                 'background:#ffffff',
                 'color:#000000',
                 'z-index:99999',
@@ -9558,7 +9257,7 @@ ORDER BY t.table_name;
                 'font-smoothing:antialiased',
                 '-webkit-font-smoothing:antialiased',
                 'text-rendering:geometricPrecision',
-            ].join(';');
+            ].filter(Boolean).join(';');
 
             // Injeta TODOS os estilos da página para garantir que classes CSS sejam aplicadas
             if (!_cssCache) _cssCache = _coletarTodosCSS();
@@ -9567,7 +9266,15 @@ ORDER BY t.table_name;
                 styleEl.textContent = _cssCache +
                     `* { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important;
                          -webkit-font-smoothing:antialiased!important; text-rendering:geometricPrecision!important;
-                         font-family:Arial,Helvetica,sans-serif!important; }`;
+                         font-family:Arial,Helvetica,sans-serif!important; }
+                    /* neutraliza thead laranja global para OS */
+                    .os-receita-table thead,.os-itens-table thead { background:#f5f5f5 !important; }
+                    .os-receita-table th,.os-itens-table th { background:#f5f5f5 !important; color:#333 !important; padding:0.8mm 1mm !important; font-size:7.5px !important; letter-spacing:0 !important; white-space:nowrap !important; border:1px solid #ccc !important; }
+                    .os-receita-table td,.os-itens-table td { color:#000 !important; padding:0.8mm 1mm !important; font-size:7.5px !important; border:1px solid #ccc !important; }
+                    .os-itens-table tr:hover td { background:transparent !important; }
+                    .os-itens-table tr:last-child td,.os-receita-table tr:last-child td { border-bottom:1px solid #ccc !important; }
+                    .os-olho-label { background:#333 !important; color:#fff !important; font-weight:800 !important; }
+                    .os-section-title { color:#000 !important; background:transparent !important; }`;
                 container.appendChild(styleEl);
             }
 
@@ -9642,7 +9349,7 @@ ORDER BY t.table_name;
         async function gerarPDF(elemento, nomeArquivo, opcoes = {}) {
             const { jsPDF } = window.jspdf;
             const { PX_PER_MM, SCALE, RENDER_DELAY } = PDF_CONFIG;
-            const PAGE_W_MM = 210;
+            const PAGE_W_MM = opcoes.pageWidth || 210;
             const PAGE_H_MM = opcoes.pageHeight || 297;
             const PAGE_W_PX = Math.round(PAGE_W_MM * PX_PER_MM);
             const PAGE_H_PX = Math.round(PAGE_H_MM * PX_PER_MM);
@@ -9653,30 +9360,44 @@ ORDER BY t.table_name;
             await new Promise(r => setTimeout(r, RENDER_DELAY));
 
             try {
-                const totalH_px = elemento.scrollHeight;
-                // Para conteúdo menor que 1 página: renderiza tudo de uma vez (mais nítido)
+                // forceHeight: usa PAGE_H_PX exato (OS via individual).
+                // Sem forceHeight: usa scrollHeight para conteúdo de altura variável.
+                const totalH_px = opcoes.forceHeight
+                    ? PAGE_H_PX
+                    : Math.max(elemento.scrollHeight, elemento.offsetHeight);
+
                 const pagesNeeded = Math.ceil(totalH_px / PAGE_H_PX);
 
                 const pdf = new jsPDF({
-                    orientation: 'portrait',
+                    // Quando largura > altura (ex: 210×145mm), usar 'landscape' para impedir
+                    // que jsPDF inverta as dimensões automaticamente para portrait (145×210).
+                    // Quando altura >= largura (ex: A4 210×297mm), 'portrait' é correto.
+                    orientation: PAGE_W_MM > PAGE_H_MM ? 'landscape' : 'portrait',
                     unit: 'mm',
                     format: [PAGE_W_MM, PAGE_H_MM],
-                    compress: false,    // sem compressão interna do PDF
+                    compress: false,
                     putOnlyUsedFonts: true,
                 });
                 pdf.setProperties({ title: nomeArquivo, creator: 'ÓticaVision Pro' });
 
                 if (pagesNeeded === 1) {
-                    // ── Página única: captura completa de uma vez ──
-                    const canvas = await _capturarCanvas(elemento, { larguraMM: PAGE_W_MM, height: totalH_px });
+                    // ── Página única: captura exatamente PAGE_H_PX linhas de pixel ──
+                    const captureH = opcoes.forceHeight ? PAGE_H_PX : totalH_px;
+                    const canvas = await _capturarCanvas(elemento, {
+                        larguraMM: PAGE_W_MM,
+                        width: PAGE_W_PX,
+                        height: captureH
+                    });
                     const { data, format } = _canvasParaImagem(canvas);
-                    const imgH_mm = (totalH_px / PAGE_H_PX) * PAGE_H_MM;
+                    const imgH_mm = opcoes.forceHeight
+                        ? PAGE_H_MM
+                        : (totalH_px / PAGE_H_PX) * PAGE_H_MM;
                     pdf.addImage(data, format, 0, 0, PAGE_W_MM, Math.min(imgH_mm, PAGE_H_MM), '', 'NONE');
                 } else {
                     // ── Multi-página: captura região exata de cada página ──
                     for (let pg = 0; pg < pagesNeeded; pg++) {
-                        const clipY_px  = pg * PAGE_H_PX; // coordenada Y em pixels para a página atual
-                        const clipH_px  = Math.min(PAGE_H_PX, totalH_px - pg * PAGE_H_PX);
+                        const clipY_px = pg * PAGE_H_PX;
+                        const clipH_px = Math.min(PAGE_H_PX, totalH_px - clipY_px);
 
                         const canvas = await _capturarCanvas(elemento, {
                             larguraMM: PAGE_W_MM,
@@ -9686,13 +9407,20 @@ ORDER BY t.table_name;
                         const { data, format } = _canvasParaImagem(canvas);
                         const imgH_mm = (clipH_px / PAGE_H_PX) * PAGE_H_MM;
 
-                        if (pg > 0) pdf.addPage([PAGE_W_MM, PAGE_H_MM]);
+                        if (pg > 0) pdf.addPage([PAGE_W_MM, PAGE_H_MM], PAGE_W_MM > PAGE_H_MM ? 'landscape' : 'portrait');
                         pdf.addImage(data, format, 0, 0, PAGE_W_MM, imgH_mm, `pg${pg}`, 'NONE');
                     }
                 }
 
-                pdf.save(`${nomeArquivo}.pdf`);
-                Toast.show('PDF gerado com sucesso!', 'success');
+                if (opcoes.preview) {
+                    const blobUrl = pdf.output('bloburl');
+                    const tab = window.open(blobUrl, '_blank');
+                    if (!tab) Toast.show('Permita popups para visualizar o PDF', 'warning');
+                    else Toast.show('PDF aberto para visualização!', 'success');
+                } else {
+                    pdf.save(`${nomeArquivo}.pdf`);
+                    Toast.show('PDF gerado com sucesso!', 'success');
+                }
             } catch (err) {
                 console.error('[PDF] Erro:', err);
                 Toast.show('Erro ao gerar PDF: ' + err.message, 'error');
@@ -10121,7 +9849,8 @@ ORDER BY t.table_name;
                             </tbody>
                         </table>
 
-                        <!-- ── TABELA PERTO ── -->
+                        <!-- ── TABELA PERTO (só mostra se há adição) ── -->
+                        ${(parseFloat(odAdd) > 0 || parseFloat(oeAdd) > 0) ? `
                         <div class="secao-titulo verde" style="margin-bottom:0;">👁 VISÃO DE PERTO</div>
                         <table class="tabela-verde">
                             <thead><tr>
@@ -10144,7 +9873,7 @@ ORDER BY t.table_name;
                                     <td>${oeNearDnp ? Utils.sanitizeHTML(oeNearDnp) : '—'}</td>
                                 </tr>
                             </tbody>
-                        </table>
+                        </table>` : ''}
 
                         <!-- ── MEDIDAS ── -->
                         <div class="secao-titulo azul" style="margin-bottom:2mm;">📐 MEDIDAS COMPLEMENTARES</div>
@@ -11169,23 +10898,40 @@ ORDER BY t.table_name;
             },
 
             updateRecentSales() {
+                this.filterRecentSales();
+            },
+            filterRecentSales() {
                 const tbody = document.querySelector('#recentSalesTable tbody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
+                const searchTerm = (document.getElementById('filterRecentClient')?.value || '').toLowerCase();
+                const statusFilter = document.getElementById('filterRecentStatus')?.value || '';
                 
-                const recentSales = [...(state.sales || [])]
-                    .sort((a, b) => new Date(b.date + 'T12:00:00') - new Date(a.date + 'T12:00:00'))
-                    .slice(0, 5);
+                let sales = [...(state.sales || [])]
+                    .sort((a, b) => new Date(b.date + 'T12:00:00') - new Date(a.date + 'T12:00:00'));
+                if (searchTerm || statusFilter) {
+                    sales = sales.filter(s => {
+                        const clientName = (state.clients.find(c => c.id === s.clientId)?.name || '').toLowerCase();
+                        const matchName = !searchTerm || clientName.includes(searchTerm) || (s.number||'').toLowerCase().includes(searchTerm);
+                        const matchStatus = !statusFilter || s.status === statusFilter;
+                        return matchName && matchStatus;
+                    });
+                }
+                const recentSales = sales.slice(0, 20);
+                const ST_LABELS = {orcamento:'Orçamento',pendente:'Pendente',producao:'Em Produção',laboratorio:'Laboratório',tratamento:'Tratamento',atrasado:'Atrasado',pronto:'Pronto',entregue:'Entregue',cancelado:'Cancelado'};
                 recentSales.forEach(s => {
                     const client = state.clients.find(c => c.id === s.clientId)?.name || '';
                     tbody.innerHTML += `<tr>
                         <td>${s.number}</td>
                         <td>${Utils.sanitizeHTML(client)}</td>
                         <td>${Utils.formatCurrency(s.total)}</td>
-                        <td><span class="badge badge-info">${s.status}</span></td>
+                        <td><span class="badge badge-info">${ST_LABELS[s.status]||s.status}</span></td>
                         <td>${Utils.formatDate(s.date)}</td>
                     </tr>`;
                 });
+                if (!recentSales.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:1.5rem;">Nenhuma venda encontrada.</td></tr>';
+                }
             }
         };
 
@@ -11197,6 +10943,16 @@ ORDER BY t.table_name;
                 tbody.innerHTML = '';
                 const badge = document.getElementById('clientsCountBadge');
                 if (badge) badge.textContent = state.clients.length + ' cliente' + (state.clients.length !== 1 ? 's' : '');
+                // Populate city filter
+                const cityFilter = document.getElementById('filterClientCity');
+                if (cityFilter && cityFilter.options.length <= 1) {
+                    const cities = [...new Set(state.clients.map(c => c.city).filter(Boolean))].sort();
+                    cities.forEach(city => {
+                        const opt = document.createElement('option');
+                        opt.value = city; opt.textContent = city;
+                        cityFilter.appendChild(opt);
+                    });
+                }
                 
                 state.clients.forEach(c => {
                     const hasPresc = state.prescriptions.some(p => p.clientId === c.id);
@@ -11463,10 +11219,25 @@ ORDER BY t.table_name;
                 document.getElementById('viewTitle').innerText = 'Detalhes do Cliente';
             },
 
+            clearFilter() {
+                const s = document.getElementById('searchClient');
+                const c = document.getElementById('filterClientCity');
+                const p = document.getElementById('filterClientPresc');
+                if(s) s.value=''; if(c) c.value=''; if(p) p.value='';
+                this.search();
+            },
             search() {
-                const term = document.getElementById('searchClient').value.toLowerCase();
+                const term = (document.getElementById('searchClient')?.value || '').toLowerCase();
+                const city = (document.getElementById('filterClientCity')?.value || '').toLowerCase();
+                const presc = document.getElementById('filterClientPresc')?.value || '';
                 document.querySelectorAll('#clientsTable tbody tr').forEach(row => {
-                    row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+                    const text = row.innerText.toLowerCase();
+                    const clientId = row.querySelector('[onclick*="view"]')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                    const hasPresc = clientId ? state.prescriptions.some(p => p.clientId === clientId) : true;
+                    const matchTerm = !term || text.includes(term);
+                    const matchCity = !city || text.includes(city);
+                    const matchPresc = !presc || (presc === 'com' ? hasPresc : !hasPresc);
+                    row.style.display = (matchTerm && matchCity && matchPresc) ? '' : 'none';
                 });
             },
 
@@ -13300,6 +13071,25 @@ ${container.innerHTML}
                         selServico.innerHTML += '<option disabled>— Nenhum serviço cadastrado —</option>';
                     }
                 }
+                // Populate tratamento select (produtos tipo tratamento + serviços com tipo tratamento)
+                const selTratamento = document.getElementById('tratamentoSelect');
+                if (selTratamento) {
+                    selTratamento.innerHTML = '<option value="">Selecione um tratamento</option>';
+                    // Inclui produtos categorizados como tratamento E todos os serviços
+                    const trats = [...(state.products || []).filter(p => p.type === 'tratamento' || p.category === 'tratamento'),
+                                   ...(state.services || [])];
+                    if (trats.length > 0) {
+                        trats.forEach(t => {
+                            const opt = document.createElement('option');
+                            const price = t.price || t.value || 0;
+                            opt.value = t.id + '|' + price;
+                            opt.textContent = t.name + ' - ' + Utils2.fmt(price);
+                            selTratamento.appendChild(opt);
+                        });
+                    } else {
+                        selTratamento.innerHTML += '<option disabled>— Nenhum tratamento cadastrado —</option>';
+                    }
+                }
             },
 
             generateOsNumber() {
@@ -13402,6 +13192,10 @@ ${container.innerHTML}
                 const badge = document.getElementById('salesCountBadge');
                 if (badge) badge.textContent = `${filtered.length} OS${filtered.length !== state.sales.length ? ` de ${state.sales.length}` : ''}`;
 
+                // Se filtro ativo, mostrar só as 5 últimas e rolar para cima
+                const filtroAtivo = !!(term || status || period);
+                const exibir = filtroAtivo ? filtered.slice(0, 5) : filtered;
+
                 tbody.innerHTML = '';
                 if (filtered.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--gray);">
@@ -13411,7 +13205,7 @@ ${container.innerHTML}
                     return;
                 }
 
-                filtered.forEach(s => {
+                exibir.forEach(s => {
                     const client = state.clients.find(c => c.id === s.clientId);
                     const clientName = client?.name || 'N/A';
                     const st = STATUS_MAP[s.status] || { label: s.status || '—', cls: 'secondary' };
@@ -13429,8 +13223,14 @@ ${container.innerHTML}
                             <button class="btn-icon btn-delete" onclick="Sales.delete('${s.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                         <td class="action-buttons">
-                            <button class="btn-icon" style="background:rgba(255,107,0,0.12);color:#ff6b00;" onclick="Sales._setPdfTarget('${s.id}');Sales.gerarPDF_OS('via1')" title="PDF Via Ótica"><i class="fas fa-file-pdf"></i></button>
-                            <button class="btn-icon" style="background:rgba(40,167,69,0.12);color:#28a745;" onclick="Sales._setPdfTarget('${s.id}');Sales.gerarPDF_OS('via2')" title="PDF Via Cliente"><i class="fas fa-file-pdf"></i></button>
+                            <button class="btn-icon" style="background:rgba(50,50,50,0.1);color:#333;flex-direction:column;padding:4px 6px;" onclick="Sales._setPdfTarget('${s.id}');Sales.gerarPDF_OS('via1')" title="PDF Via Loja">
+                                <i class="fas fa-file-pdf" style="font-size:13px;"></i>
+                                <span style="font-size:8px;line-height:1;margin-top:1px;font-weight:700;">Loja</span>
+                            </button>
+                            <button class="btn-icon" style="background:rgba(21,128,61,0.12);color:#166534;flex-direction:column;padding:4px 6px;" onclick="Sales._setPdfTarget('${s.id}');Sales.gerarPDF_OS('via2')" title="PDF Via Cliente">
+                                <i class="fas fa-file-pdf" style="font-size:13px;"></i>
+                                <span style="font-size:8px;line-height:1;margin-top:1px;font-weight:700;">Cliente</span>
+                            </button>
                         </td>
                         <td class="action-buttons">
                             <button class="btn-icon" style="background:${hasPhone ? 'rgba(37,211,102,0.15)' : 'rgba(0,0,0,0.05)'};color:${hasPhone ? '#25d366' : '#aaa'};"
@@ -13441,6 +13241,18 @@ ${container.innerHTML}
                         </td>
                     </tr>`;
                 });
+
+                // Se filtro ativo: mostrar aviso de quantas foram exibidas e rolar para o topo
+                if (filtroAtivo && filtered.length > 5) {
+                    tbody.innerHTML += `<tr><td colspan="9" style="text-align:center;padding:0.75rem;color:var(--gray);font-size:0.82rem;background:var(--light-gray);">
+                        <i class="fas fa-filter" style="margin-right:4px;opacity:0.5;"></i>Mostrando 5 de ${filtered.length} resultados. Refine o filtro para ver mais.
+                    </td></tr>`;
+                }
+                if (filtroAtivo) {
+                    const tableEl = document.getElementById('salesHistoryTable');
+                    const scrollTarget = tableEl?.closest('.table-container') || tableEl?.closest('.card') || tableEl;
+                    if (scrollTarget) setTimeout(() => scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                }
             },
 
             clearHistoryFilter() {
@@ -13543,9 +13355,9 @@ ${container.innerHTML}
                 }
                 if (hint) hint.style.display = 'none';
 
-                const typeIcon = { lente:'fa-eye', armacao:'fa-glasses', servico:'fa-tools', default:'fa-tag' };
-                const typeColor = { lente:'#ff6b00', armacao:'#2e7d32', servico:'#0277bd', default:'#888' };
-                const typeBg   = { lente:'#fff3e0', armacao:'#e8f5e9', servico:'#e1f5fe', default:'#f5f5f5' };
+                const typeIcon = { lente:'fa-eye', armacao:'fa-glasses', servico:'fa-tools', tratamento:'fa-flask', default:'fa-tag' };
+                const typeColor = { lente:'#ff6b00', armacao:'#2e7d32', servico:'#0277bd', tratamento:'#7b1fa2', default:'#888' };
+                const typeBg   = { lente:'#fff3e0', armacao:'#e8f5e9', servico:'#e1f5fe', tratamento:'#f3e5f5', default:'#f5f5f5' };
 
                 let html = `<div style="padding:8px 0 4px;">`;
                 state.currentSale.items.forEach((item, i) => {
@@ -13581,11 +13393,11 @@ ${container.innerHTML}
                 el.value = Math.max(1, val + delta);
             },
 
-            // Troca de aba de item (lente / armação / serviço)
+            // Troca de aba de item (lente / armação / serviço / tratamento)
             showItemTab(tab) {
-                const tabs   = { lente:'itemTabLente', armacao:'itemTabArmacao', servico:'itemTabServico' };
-                const btns   = { lente:'tabBtnLente',  armacao:'tabBtnArmacao',  servico:'tabBtnServico' };
-                const colors = { lente:['#ff6b00','#ff6b00'], armacao:['#43a047','#2e7d32'], servico:['#039be5','#0277bd'] };
+                const tabs   = { lente:'itemTabLente', armacao:'itemTabArmacao', servico:'itemTabServico', tratamento:'itemTabTratamento' };
+                const btns   = { lente:'tabBtnLente',  armacao:'tabBtnArmacao',  servico:'tabBtnServico', tratamento:'tabBtnTratamento' };
+                const colors = { lente:['#ff6b00','#ff6b00'], armacao:['#43a047','#2e7d32'], servico:['#039be5','#0277bd'], tratamento:['#ab47bc','#7b1fa2'] };
                 Object.keys(tabs).forEach(key => {
                     const panel = document.getElementById(tabs[key]);
                     const btn   = document.getElementById(btns[key]);
@@ -13650,6 +13462,21 @@ ${container.innerHTML}
                 document.getElementById('servicoQty').value = 1;
                 this.renderItems(); this.calculateTotal();
                 Toast.show('Serviço adicionado!');
+            },
+
+            addTratamento() {
+                const select = document.getElementById('tratamentoSelect');
+                const qty = parseInt(document.getElementById('tratamentoQty').value) || 1;
+                if (!select || !select.value) { Toast.show('Selecione um tratamento', 'warning'); return; }
+                const [tId, priceStr] = select.value.split('|');
+                const price = parseFloat(priceStr);
+                const prod = state.products.find(p => p.id === tId) || state.services.find(s => s.id === tId);
+                const name = prod ? prod.name : select.options[select.selectedIndex].text.split(' - ')[0];
+                state.currentSale.items.push({ type: 'tratamento', productId: tId, name, qty, price, subtotal: price * qty });
+                select.value = '';
+                document.getElementById('tratamentoQty').value = 1;
+                this.renderItems(); this.calculateTotal();
+                Toast.show('Tratamento adicionado!');
             },
 
             removeItem(index) {
@@ -14403,6 +14230,9 @@ ${container.innerHTML}
                 `;
                 
                 document.getElementById('installmentsTableBody').innerHTML = html;
+                // Mostrar botões de PDF do crediário
+                const pdfBtns = document.getElementById('crediarioPdfBtns');
+                if (pdfBtns) pdfBtns.style.display = 'flex';
             },
 
             setFixedDay() {
@@ -14629,293 +14459,213 @@ ${container.innerHTML}
             },
 
             gerarPDF_OS(tipo) {
-                const client  = state.clients.find(c => c.id === state.currentSale.clientId);
-                const presc   = state.prescriptions.find(p => p.clientId === client?.id);
                 const sale    = state.currentSale;
-                const details = state.currentSale.paymentDetails;
+                const client  = state.clients.find(c => c.id === sale?.clientId);
+                const presc   = state.prescriptions?.find(p => p.clientId === client?.id);
+                const details = sale?.paymentDetails;
                 const company = state.company;
-                const modelo  = state.osModelo || 'colorido';
 
-                // Paletas por modelo
-                let cor1, cor2, headerBg1, headerBg2, headerText, tableBg, borderColor, sectionBg, rodapeBg;
-                if (modelo === 'semfundo') {
-                    // Sem Fundo: sem qualquer cor — tudo preto/cinza/branco, sem faixas
-                    cor1 = '#000'; cor2 = '#000';
-                    headerBg1 = 'transparent'; headerBg2 = 'transparent'; headerText = '#000';
-                    tableBg = '#fff'; borderColor = '#ccc'; sectionBg = 'transparent'; rodapeBg = 'transparent';
-                } else {
-                    // Colorido: usa as cores da empresa
-                    cor1 = company.primaryColor || '#ff6b00'; cor2 = '#1a7a3e';
-                    headerBg1 = cor1; headerBg2 = cor2; headerText = '#fff';
-                    tableBg = '#fff3ee'; borderColor = '#e0e0e0'; sectionBg = '#f5f5f5'; rodapeBg = '#f0f0f0';
-                }
+                if (!sale) { Toast.show('Nenhuma OS selecionada.', 'error'); return; }
 
-                const fd = (d) => {
+                const fd = d => {
                     if (!d) return '—';
-                    return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR');
+                    try { const dt = new Date(d + (d.includes('T') ? '' : 'T00:00:00')); return dt.toLocaleDateString('pt-BR'); } catch(e) { return d; }
                 };
+                const fc = v => Utils.formatCurrency(v);
 
+                const statusMap = { pending:'Aguardando', production:'Em Produção', ready:'Pronto p/ Retirada', delivered:'Entregue', cancelled:'Cancelado' };
+                const pagMap    = { pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário', mixed:'Misto' };
+                const isMixed   = sale.paymentMethod === 'mixed' && Array.isArray(sale.mixedPayments) && sale.mixedPayments.length > 0;
+
+                // ── Logo: max-width/max-height para html2canvas (não suporta object-fit) ──
                 const logoHtml = company.logo
-                    ? `<div class="os-logo-circulo" style="background-image:url('${company.logo}')"></div>`
-                    : `<div class="os-logo-circulo"><span>👁️</span></div>`;
+                    ? `<div style="width:100%;height:100%;background-image:url('${company.logo}');background-size:cover;background-repeat:no-repeat;background-position:center;border-radius:50%;"></div>`
+                    : '<span style="font-size:16px;line-height:1;display:block;text-align:center;">👁️</span>';
 
-                const buildVia = (num, cor, titulo, showPrices) => {
-                    const headerBg  = num === 1 ? headerBg1 : headerBg2;
-                    // No semfundo: cabeçalho limpo com borda inferior simples, sem fundo
-                    const hdrStyle  = modelo === 'semfundo'
-                        ? `border:1px solid #ccc;border-radius:4px;`
-                        : ``;
-                    // Títulos de seção: colorido = faixa colorida; semfundo = só texto preto sem fundo
-                    const secTitle  = (txt) => modelo === 'semfundo'
-                        ? `<div class="os-section-title" style="background:transparent;color:#000;border-bottom:1.5px solid #ccc;font-weight:800;--cor:#000">${txt}</div>`
-                        : `<div class="os-section-title" style="background:${cor};color:#fff;--cor:${cor}">${txt}</div>`;
-
-                    const prescrHtml = presc ? `
-                        <div class="os-receita-section">
-                            ${secTitle('📋 Receituário Óptico')}
-                            <table class="os-receita-table" style="--cor:${cor}">
-                                <thead>
-                                    <tr style="background:${modelo==='semfundo'?'#f5f5f5':cor+'20'}">
-                                        <th>Olho</th><th>Tipo</th><th>ESF</th><th>CIL</th><th>EIXO</th><th>ADIÇÃO</th><th>DNP</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OD</td><td>Longe</td>
-                                        <td>${presc.od?.sph || '0.00'}</td><td>${presc.od?.cyl || '0.00'}</td>
-                                        <td>${presc.od?.axis || '0°'}</td><td>${presc.od?.add || '0.00'}</td>
-                                        <td>${presc.od?.dnp || '—'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OE</td><td>Longe</td>
-                                        <td>${presc.oe?.sph || '0.00'}</td><td>${presc.oe?.cyl || '0.00'}</td>
-                                        <td>${presc.oe?.axis || '0°'}</td><td>${presc.oe?.add || '0.00'}</td>
-                                        <td>${presc.oe?.dnp || '—'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OD</td><td>Perto</td>
-                                        <td>${presc.od?.sph && presc.od?.add ? (parseFloat(presc.od.sph)+parseFloat(presc.od.add)).toFixed(2) : '0.00'}</td>
-                                        <td>${presc.od?.cyl || '0.00'}</td><td>${presc.od?.axis || '0°'}</td><td>—</td>
-                                        <td>${presc.od?.dnp ? (parseFloat(presc.od.dnp)-2.5).toFixed(1) : '—'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="os-olho-label" style="background:${modelo==='semfundo'?'#f0f0f0':'#000'};color:${modelo==='semfundo'?'#000':'#fff'}">OE</td><td>Perto</td>
-                                        <td>${presc.oe?.sph && presc.oe?.add ? (parseFloat(presc.oe.sph)+parseFloat(presc.oe.add)).toFixed(2) : '0.00'}</td>
-                                        <td>${presc.oe?.cyl || '0.00'}</td><td>${presc.oe?.axis || '0°'}</td><td>—</td>
-                                        <td>${presc.oe?.dnp ? (parseFloat(presc.oe.dnp)-2.5).toFixed(1) : '—'}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="os-receita-extra">
-                                <div class="os-receita-extra-item">Optometrista: <strong>${presc.optometrist || '______'}</strong></div>
-                                <div class="os-receita-extra-item">DP: <strong>${presc.dp || '—'} mm</strong></div>
-                                <div class="os-receita-extra-item">Altura: <strong>${presc.height || '—'} mm</strong></div>
-                                <div class="os-receita-extra-item">CRO: <strong>${presc.cro || '______'}</strong></div>
-                            </div>
-                        </div>` : '';
-
-                    const itensRows = sale.items.map((item, i) => `
-                        <tr>
-                            <td>${String(i+1).padStart(2,'0')}</td>
-                            <td>${item.name || ''}</td>
-                            <td style="text-align:right">${item.qty || 1}</td>
-                            ${showPrices ? `<td style="text-align:right">${Utils.formatCurrency(item.price)}</td><td style="text-align:right">${Utils.formatCurrency(item.subtotal)}</td>` : ''}
-                        </tr>`).join('');
-
-                    const pagMethodLabel = {'pix':'PIX','cash':'Dinheiro','debit':'Débito','credit':'Crédito','installment':'Crediário'}[sale.paymentMethod] || sale.paymentMethod || '—';
-                    const isMixed = sale.paymentMode === 'mixed' && sale.mixedPayments?.length;
-
-                    const pagHtml = details ? `
-                        <div class="os-pagamento-grid">
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">Entrada (${details.entryPercent || 0}%)</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${Utils.formatCurrency(details.entryValue || 0)}</div>
-                            </div>
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">Parcelas</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${details.installments}× ${Utils.formatCurrency(details.installmentValue)}</div>
-                            </div>
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">1º Vencimento</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${details.parcels?.[0] ? fd(details.parcels[0].dueDate) : '—'}</div>
-                            </div>
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">Multa / Juros</div>
-                                <div class="os-pagamento-cell-val">${company.lateFee}% + ${company.dailyInterest}%/dia</div>
-                            </div>
-                        </div>
-                        <div class="os-pagamento-pix" style="background:${cor}15;border-left:3px solid ${cor}">
-                            🔑 Pagamento via PIX — Chave CNPJ: <strong>${company.cnpj}</strong>
-                        </div>
-                    ` : isMixed ? `
-                        <div class="os-pagamento-grid">
-                            ${sale.mixedPayments.map(r => `
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">${{'pix':'PIX','cash':'Dinheiro','debit':'Débito','credit':'Crédito','installment':'Crediário'}[r.method]||r.method}</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${Utils.formatCurrency(r.value)}</div>
-                            </div>`).join('')}
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">Valor Total</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${Utils.formatCurrency(sale.total)}</div>
-                            </div>
-                        </div>` : `
-                        <div class="os-pagamento-grid">
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">Forma de Pagamento</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${pagMethodLabel}</div>
-                            </div>
-                            <div class="os-pagamento-cell" style="border-color:${borderColor}">
-                                <div class="os-pagamento-cell-label">Valor Total</div>
-                                <div class="os-pagamento-cell-val" style="color:${cor}">${Utils.formatCurrency(sale.total)}</div>
-                            </div>
-                        </div>`;
-
-                    const via = document.createElement('div');
-                    via.className = 'os-via os-via-modelo-' + modelo;
-                    via.innerHTML = `
-                        <div class="os-via-header-bar" style="background:${headerBg};color:${headerText};${hdrStyle}border-radius:0">
-                            <div class="os-logo-area" style="background:${modelo==='semfundo'?'transparent':'rgba(0,0,0,0.18)'}">
-                                ${logoHtml}
-                            </div>
-                            <div class="os-empresa-area">
-                                <div class="os-empresa-nome-wrap" style="border-bottom:1px solid ${modelo==='semfundo'?'#ccc':'rgba(255,255,255,0.25)'}">
-                                    <div class="os-empresa-nome" style="color:${headerText}">${company.name}</div>
-                                    <div class="os-empresa-badge" style="color:${modelo==='semfundo'?'#333':headerText};border-color:${modelo==='semfundo'?'#aaa':'rgba(255,255,255,0.4)'};background:${modelo==='semfundo'?'transparent':'rgba(255,255,255,0.15)'}">Ordem de Serviço</div>
-                                </div>
-                                <div class="os-empresa-sub" style="color:${modelo==='semfundo'?'#333':headerText+'dd'}">
-                                    ${company.legalName ? company.legalName + ' &nbsp;|&nbsp; ' : ''}
-                                    CNPJ: ${company.cnpj || '—'}<br>
-                                    ${[company.address, company.number, company.neighborhood, company.city, company.state].filter(Boolean).join(', ')}<br>
-                                    📞 ${company.phone || ''}  &nbsp; 📱 ${company.whatsapp || ''}  &nbsp; ✉️ ${company.email || ''}
-                                </div>
-                            </div>
-                            <div class="os-numero-area" style="background:${modelo==='semfundo'?'transparent':'rgba(0,0,0,0.22)'};border-left:1px solid ${modelo==='semfundo'?'#ccc':'rgba(255,255,255,0.2)'}">
-                                <div class="os-numero-label" style="color:${modelo==='semfundo'?'#555':headerText+'cc'}">Ordem de Serviço</div>
-                                <div class="os-numero-valor" style="color:${headerText}">${sale.number}</div>
-                                <div class="os-via-label" style="color:${modelo==='semfundo'?'#555':headerText+'cc'};background:${modelo==='semfundo'?'transparent':'rgba(255,255,255,0.15)'}">${titulo}</div>
-                            </div>
-                        </div>
-
-                        <div class="os-info-bar" style="background:${sectionBg}">
-                            <div class="os-info-cell"><span class="os-info-cell-label">Data de Abertura</span><span class="os-info-cell-val" style="color:${modelo==='semfundo'?'#000':cor}">${fd(sale.date)}</span></div>
-                            <div class="os-info-cell"><span class="os-info-cell-label">Previsão de Entrega</span><span class="os-info-cell-val" style="color:${modelo==='semfundo'?'#000':cor}">${fd(sale.deliveryForecast)}</span></div>
-                            <div class="os-info-cell"><span class="os-info-cell-label">Unidade</span><span class="os-info-cell-val">${sale.unit || '—'}</span></div>
-                            <div class="os-info-cell"><span class="os-info-cell-label">Vendedor</span><span class="os-info-cell-val">${sale.seller || '—'}</span></div>
-                            <div class="os-info-cell"><span class="os-info-cell-label">Status</span><span class="os-info-cell-val">${({'orcamento':'Orçamento','pendente':'Pendente','producao':'Em Produção','production':'Em Produção','laboratorio':'Laboratório','tratamento':'Tratamento','atrasado':'Atrasado','pronto':'Pronto p/ Retirada','ready':'Pronto','entregue':'Entregue','delivered':'Entregue','cancelado':'Cancelado'})[sale.status] || sale.status || '—'}</span></div>
-                        </div>
-
-                        <div class="os-cliente-section">
-                            <div class="os-cliente-accent" style="background:${modelo==='semfundo'?'#ccc':cor}"></div>
-                            <div class="os-cliente-body">
-                                <div class="os-cliente-nome" style="color:${modelo==='semfundo'?'#000':cor}">${client?.name || 'Cliente não identificado'}</div>
-                                <div class="os-cliente-nome-sep" style="border-color:${modelo==='semfundo'?'#ccc':cor+'40'}"></div>
-                                <div class="os-cliente-grid">
-                                    <div class="os-cliente-field">CPF / CNPJ<span>${client?.cpf || '—'}</span></div>
-                                    <div class="os-cliente-field">Nascimento<span>${fd(client?.birthDate)}</span></div>
-                                    <div class="os-cliente-field">Telefone<span>${client?.phone || '—'}</span></div>
-                                    <div class="os-cliente-field">E-mail<span>${client?.email || '—'}</span></div>
-                                    <div class="os-cliente-field">Endereço<span>${[client?.address, client?.number].filter(Boolean).join(', ') || '—'}</span></div>
-                                    <div class="os-cliente-field">Bairro<span>${client?.neighborhood || '—'}</span></div>
-                                    <div class="os-cliente-field">Cidade / UF<span>${[client?.city, client?.state].filter(Boolean).join(' / ') || '—'}</span></div>
-                                    <div class="os-cliente-field">CEP<span>${client?.cep || '—'}</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        ${prescrHtml}
-
-                        <div class="os-itens-section">
-                            ${secTitle('Itens da Ordem de Serviço')}
-                            <table class="os-itens-table">
-                                <thead>
-                                    <tr style="background:${modelo==='semfundo'?'#f5f5f5':cor+'15'}">
-                                        <th style="width:8mm">#</th>
-                                        <th>Descrição do Produto / Serviço</th>
-                                        <th style="width:12mm;text-align:center">Qtd</th>
-                                        ${showPrices ? '<th style="width:22mm;text-align:right">Unitário</th><th style="width:24mm;text-align:right">Subtotal</th>' : ''}
-                                    </tr>
-                                </thead>
-                                <tbody>${itensRows}</tbody>
-                            </table>
-                        </div>
-
-                        ${showPrices ? `
-                        <div class="os-totais-row" style="background:${sectionBg}">
-                            <span class="os-totais-item">Subtotal: <strong>${Utils.formatCurrency(sale.subtotal)}</strong></span>
-                            <span class="os-totais-item">Desconto: <strong style="color:#c0392b">− ${Utils.formatCurrency(sale.discount)}</strong></span>
-                            ${sale.addition > 0 ? `<span class="os-totais-item">Acréscimo: <strong>+ ${Utils.formatCurrency(sale.addition)}</strong></span>` : ''}
-                            <span class="os-total-final" style="color:${modelo==='semfundo'?'#000':cor}">TOTAL: ${Utils.formatCurrency(sale.total)}</span>
-                        </div>` : ''}
-
-                        <div class="os-pagamento-section">
-                            ${secTitle('Condições de Pagamento')}
-                            ${pagHtml}
-                        </div>
-
-                        <div class="os-obs-section">
-                            <div class="os-obs-body">
-                                <div class="os-obs-label">Observações</div>
-                                ${sale.observations || '—'}
-                            </div>
-                        </div>
-
-                        <div class="os-assinaturas">
-                            <div class="os-assinatura-box">
-                                <div class="os-assinatura-linha" style="border-color:${modelo==='semfundo'?'#aaa':cor}"></div>
-                                <div class="os-assinatura-label">Assinatura do Cliente</div>
-                            </div>
-                            <div class="os-assinatura-box">
-                                <div class="os-assinatura-linha" style="border-color:${modelo==='semfundo'?'#aaa':cor}"></div>
-                                <div class="os-assinatura-label">Responsável / Vendedor</div>
-                            </div>
-                            <div class="os-assinatura-box">
-                                <div class="os-assinatura-linha" style="border-color:${modelo==='semfundo'?'#aaa':cor}"></div>
-                                <div class="os-assinatura-label">Data de Entrega</div>
-                            </div>
-                        </div>
-
-                        <div class="os-rodape" style="background:${rodapeBg};border-top:${modelo==='semfundo'?'1px solid #ccc':'2px solid '+cor}">
-                            <strong>${company.name || ''}</strong>${company.cnpj ? ' &nbsp;·&nbsp; CNPJ: ' + company.cnpj : ''} &nbsp;·&nbsp; ${[company.address, company.number, company.city, company.state].filter(Boolean).join(', ')}${company.cep ? ' — CEP: ' + company.cep : ''}<br>
-                            ${company.phone ? '📞 ' + company.phone + ' &nbsp; ' : ''}${company.whatsapp ? '📱 ' + company.whatsapp + ' &nbsp; ' : ''}${company.email ? '✉️ ' + company.email : ''}<br>
-                            Garantia: ${company.warrantyDays || 90} dias após entrega. Documento válido somente com assinatura e carimbo da empresa.
-                        </div>
-                    `;
-                    return via;
+                // ── Receituário ──
+                const buildPrescHtml = () => {
+                    if (!presc) return '';
+                    const hasAdd = parseFloat(presc.od?.add) > 0 || parseFloat(presc.oe?.add) > 0;
+                    return `
+                    <div class="os-receita-section">
+                      <div class="os-section-title">📋 Receituário Óptico</div>
+                      <table class="os-receita-table">
+                        <colgroup><col style="width:8%"><col style="width:11%"><col style="width:14%"><col style="width:13%"><col style="width:11%"><col style="width:13%"><col style="width:13%"></colgroup>
+                        <thead><tr><th>Olho</th><th>Tipo</th><th>ESF</th><th>CIL</th><th>EIXO</th><th>ADIÇÃO</th><th>DNP</th></tr></thead>
+                        <tbody>
+                          <tr><td class="os-olho-label">OD</td><td>Longe</td><td>${presc.od?.sph||'—'}</td><td>${presc.od?.cyl||'—'}</td><td>${presc.od?.axis||'—'}</td><td>${presc.od?.add||'—'}</td><td>${presc.od?.dnp||'—'}</td></tr>
+                          <tr><td class="os-olho-label">OE</td><td>Longe</td><td>${presc.oe?.sph||'—'}</td><td>${presc.oe?.cyl||'—'}</td><td>${presc.oe?.axis||'—'}</td><td>${presc.oe?.add||'—'}</td><td>${presc.oe?.dnp||'—'}</td></tr>
+                          ${hasAdd ? `
+                          <tr><td class="os-olho-label">OD</td><td>Perto</td><td>${(parseFloat(presc.od?.sph||0)+parseFloat(presc.od?.add||0)).toFixed(2)}</td><td>${presc.od?.cyl||'—'}</td><td>${presc.od?.axis||'—'}</td><td>—</td><td>${presc.od?.dnp?(parseFloat(presc.od.dnp)-2.5).toFixed(1):'—'}</td></tr>
+                          <tr><td class="os-olho-label">OE</td><td>Perto</td><td>${(parseFloat(presc.oe?.sph||0)+parseFloat(presc.oe?.add||0)).toFixed(2)}</td><td>${presc.oe?.cyl||'—'}</td><td>${presc.oe?.axis||'—'}</td><td>—</td><td>${presc.oe?.dnp?(parseFloat(presc.oe.dnp)-2.5).toFixed(1):'—'}</td></tr>` : ''}
+                        </tbody>
+                      </table>
+                      <div class="os-receita-extra">
+                        <span>Optometrista: <strong>${presc.optometrist||'______'}</strong></span>
+                        <span>CRO: <strong>${presc.cro||'______'}</strong></span>
+                        <span>DP Longe: <strong>${presc.dp||'—'} mm</strong></span>
+                        <span>DP Perto: <strong>${presc.dpNear||'—'} mm</strong></span>
+                        <span>Altura: <strong>${presc.height||'—'} mm</strong></span>
+                        ${presc.frameRef ? `<span>Armação Ref: <strong>${presc.frameRef}</strong></span>` : ''}
+                      </div>
+                    </div>`;
                 };
 
-                const via1 = buildVia(1, cor1, '1ª VIA — ÓTICA',    true);
-                const via2 = buildVia(2, cor2, '2ª VIA — CLIENTE',  false);
+                // ── Pagamento ──
+                const buildPagHtml = () => {
+                    if (details) {
+                        const nP = parseInt(details.installments) || 0;
+                        const parcStr = nP > 0 ? `${nP}× ${fc(details.installmentValue)}` : (details.installmentValue > 0 ? fc(details.installmentValue) : '—');
+                        return `<div class="os-pagamento-grid">
+                          <div class="os-pagamento-cell"><span>Entrada (${details.entryPercent||0}%)</span><strong>${fc(details.entryValue||0)}</strong></div>
+                          <div class="os-pagamento-cell"><span>Parcelas</span><strong>${parcStr}</strong></div>
+                          <div class="os-pagamento-cell"><span>1º Vencimento</span><strong>${details.parcels?.[0] ? fd(details.parcels[0].dueDate) : '—'}</strong></div>
+                          <div class="os-pagamento-cell"><span>Multa / Juros</span><strong>${company.lateFee||0}% + ${company.dailyInterest||0}%/dia</strong></div>
+                        </div>
+                        ${company.pixKey||company.cnpj ? `<div class="os-pagamento-pix">🔑 PIX — Chave: <strong>${company.pixKey||company.cnpj}</strong></div>` : ''}`;
+                    }
+                    if (isMixed) {
+                        return `<div class="os-pagamento-grid">
+                          ${sale.mixedPayments.map(r => `<div class="os-pagamento-cell"><span>${pagMap[r.method]||r.method}</span><strong>${fc(r.value)}</strong></div>`).join('')}
+                          <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
+                        </div>`;
+                    }
+                    return `<div class="os-pagamento-grid">
+                      <div class="os-pagamento-cell"><span>Forma</span><strong>${pagMap[sale.paymentMethod]||sale.paymentMethod||'—'}</strong></div>
+                      <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
+                      ${(sale.installments||0)>1 ? `<div class="os-pagamento-cell"><span>Parcelas</span><strong>${sale.installments}×</strong></div>` : ''}
+                    </div>
+                    ${company.pixKey||company.cnpj ? `<div class="os-pagamento-pix">🔑 PIX — Chave: <strong>${company.pixKey||company.cnpj}</strong></div>` : ''}`;
+                };
+
+                // ── Endereço empresa ──
+                const empEnd = [company.address, company.number, company.neighborhood, company.city, company.state].filter(Boolean).join(', ') + (company.cep ? ' — CEP: ' + company.cep : '');
+                const empContatos = `${company.phone ? '📞 ' + company.phone + ' &nbsp; ' : ''}${company.whatsapp ? '📱 ' + company.whatsapp + ' &nbsp; ' : ''}${company.email ? '✉️ ' + company.email : ''}`;
+
+                // ═══════════════════════════════════════
+                // buildVia — monta HTML exato do modelo
+                // ═══════════════════════════════════════
+                const buildVia = (titulo, showPrices, compacto, alturaVia) => {
+                    const sNome = compacto ? `font-size:12px;` : '';
+                    const sNum  = compacto ? `font-size:15px;` : '';
+                    const sz = compacto ? '11mm' : '13mm';
+                    // usa logoHtml definido no escopo externo (já com max-width/max-height para html2canvas)
+                    const itemsHtml = (sale.items||[]).map((item, i) => `<tr>
+                      <td style="text-align:center">${String(i+1).padStart(2,'0')}</td>
+                      <td>${item.name||''}</td>
+                      <td style="text-align:center">${item.qty||1}</td>
+                      ${showPrices ? `<td style="text-align:right">${fc(item.price)}</td><td style="text-align:right">${fc(item.subtotal||((item.price||0)*(item.qty||1)))}</td>` : ''}
+                    </tr>`).join('');
+
+                    return `
+                    <div class="os-via" style="height:${alturaVia};flex-shrink:0;">
+                      <div class="os-header">
+                        <div class="os-logo-area">
+                          <div class="os-logo-circulo" style="width:${sz};height:${sz};min-width:${sz};overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            ${logoHtml}
+                          </div>
+                        </div>
+                        <div class="os-empresa-info">
+                          <div class="os-empresa-nome"${sNome ? ' style="'+sNome+'"' : ''}>${company.name||'Empresa'}</div>
+                          <div class="os-empresa-badge">Ordem de Serviço</div>
+                          <div class="os-empresa-sub">${company.legalName ? company.legalName + ' &nbsp;|&nbsp; ' : ''}CNPJ: ${company.cnpj||'—'}<br>${empEnd}<br>${empContatos}</div>
+                        </div>
+                        <div class="os-numero-area">
+                          <div class="os-numero-label">Ordem de Serviço</div>
+                          <div class="os-numero-valor"${sNum ? ' style="'+sNum+'"' : ''}>${sale.number||'—'}</div>
+                          <div class="os-via-label">${titulo}</div>
+                        </div>
+                      </div>
+                      <div class="os-info-bar">
+                        <div class="os-info-cell"><span class="os-info-cell-label">Data de Abertura</span><span class="os-info-cell-val">${fd(sale.date)}</span></div>
+                        <div class="os-info-cell"><span class="os-info-cell-label">Previsão de Entrega</span><span class="os-info-cell-val">${fd(sale.deliveryForecast)}</span></div>
+                        <div class="os-info-cell"><span class="os-info-cell-label">Unidade</span><span class="os-info-cell-val">${sale.unit||'—'}</span></div>
+                        <div class="os-info-cell"><span class="os-info-cell-label">Vendedor</span><span class="os-info-cell-val">${sale.seller||'—'}</span></div>
+                        <div class="os-info-cell"><span class="os-info-cell-label">Status</span><span class="os-info-cell-val">${statusMap[sale.status]||sale.status||'—'}</span></div>
+                      </div>
+                      <div class="os-cliente-section">
+                        <div class="os-cliente-accent"></div>
+                        <div class="os-cliente-body">
+                          <div class="os-cliente-nome"${compacto ? ' style="font-size:11px;"' : ''}>${client?.name||'Cliente não identificado'}</div>
+                          <div class="os-cliente-grid">
+                            <div class="os-cliente-field">CPF / CNPJ<span>${client?.cpf||'—'}</span></div>
+                            <div class="os-cliente-field">Nascimento<span>${fd(client?.birthDate)}</span></div>
+                            <div class="os-cliente-field">Telefone<span>${client?.phone||'—'}</span></div>
+                            <div class="os-cliente-field">E-mail<span>${client?.email||'—'}</span></div>
+                            <div class="os-cliente-field">Endereço<span>${[client?.address,client?.number].filter(Boolean).join(', ')||'—'}</span></div>
+                            <div class="os-cliente-field">Bairro<span>${client?.neighborhood||'—'}</span></div>
+                            <div class="os-cliente-field">Cidade / UF<span>${[client?.city,client?.state].filter(Boolean).join(' / ')||'—'}</span></div>
+                            <div class="os-cliente-field">CEP<span>${client?.cep||'—'}</span></div>
+                          </div>
+                        </div>
+                      </div>
+                      ${buildPrescHtml()}
+                      <div class="os-itens-section">
+                        <div class="os-section-title">Itens da Ordem de Serviço</div>
+                        <table class="os-itens-table">
+                          <thead><tr>
+                            <th style="width:7mm">#</th>
+                            <th style="text-align:left">Descrição do Produto / Serviço</th>
+                            <th style="width:10mm;text-align:center">Qtd</th>
+                            ${showPrices ? '<th style="width:22mm;text-align:right">Unitário</th><th style="width:24mm;text-align:right">Subtotal</th>' : ''}
+                          </tr></thead>
+                          <tbody>${itemsHtml}</tbody>
+                        </table>
+                      </div>
+                      ${showPrices ? `
+                      <div class="os-totais-row">
+                        <span class="os-totais-item">Subtotal: <strong>${fc(sale.subtotal)}</strong></span>
+                        <span class="os-totais-item">Desconto: <strong style="color:#c0392b">− ${fc(sale.discount||0)}</strong></span>
+                        ${(sale.addition||0)>0 ? `<span class="os-totais-item">Acréscimo: <strong>+ ${fc(sale.addition)}</strong></span>` : ''}
+                        <span class="os-total-final">TOTAL: ${fc(sale.total)}</span>
+                      </div>` : ''}
+                      <div class="os-pagamento-section">
+                        <div class="os-section-title">Condições de Pagamento</div>
+                        ${buildPagHtml()}
+                      </div>
+                      <div class="os-obs-section"><div class="os-obs-body"><div class="os-obs-label">Observações</div>${sale.observations||'—'}</div></div>
+                      <div class="os-assinaturas">
+                        <div class="os-assinatura-box"><div class="os-assinatura-linha"></div><div class="os-assinatura-label">Assinatura do Cliente</div></div>
+                        <div class="os-assinatura-box"><div class="os-assinatura-linha"></div><div class="os-assinatura-label">Responsável / Vendedor</div></div>
+                        <div class="os-assinatura-box"><div class="os-assinatura-linha"></div><div class="os-assinatura-label">Data de Entrega</div></div>
+                      </div>
+                      <div class="os-rodape">
+                        <strong>${company.name||''}</strong>${company.cnpj ? ' &nbsp;·&nbsp; CNPJ: '+company.cnpj : ''} &nbsp;·&nbsp; ${empEnd}<br>
+                        ${empContatos}<br>
+                        Garantia: ${company.warrantyDays||90} dias após entrega. Documento válido somente com assinatura e carimbo da empresa.
+                      </div>
+                    </div>`;
+                };
+
+                // ── Montar wrapper e gerar PDF ──
+                // via1/via2 usam exatamente o mesmo modelo compacto de "ambas"
+                // (mesmo flex, mesma altura inline garantida), só muda pageHeight do PDF
 
                 if (tipo === 'via1') {
-                    // Página única — via 1
-                    const w1 = document.createElement('div');
-                    w1.className = 'os-pdf-wrapper';
-                    w1.appendChild(via1);
-                    gerarPDF(w1, `OS_${sale.number}_via1`);
-                } else if (tipo === 'via2') {
-                    // Página única — via 2
-                    const w2 = document.createElement('div');
-                    w2.className = 'os-pdf-wrapper';
-                    w2.appendChild(via2);
-                    gerarPDF(w2, `OS_${sale.number}_via2`);
-                } else {
-                    // AMBAS: as duas vias na mesma folha A4
-                    // Linha de corte entre as vias
-                    const corte = document.createElement('div');
-                    corte.className = 'os-corte';
-                    corte.innerHTML = `
-                        <div class="os-corte-linha"></div>
-                        ✂️ &nbsp; RECORTE AQUI — 2ª VIA DO CLIENTE &nbsp; ✂️
-                        <div class="os-corte-linha"></div>`;
-
                     const wrapper = document.createElement('div');
                     wrapper.className = 'os-pdf-wrapper uma-folha';
-                    wrapper.appendChild(via1);
-                    wrapper.appendChild(corte);
-                    wrapper.appendChild(via2);
-                    gerarPDF(wrapper, `OS_${sale.number}`, { pageHeight: 297 });
+                    wrapper.style.cssText = 'width:210mm;height:297mm;overflow:hidden;display:flex;flex-direction:column;background:#fff;';
+                    wrapper.innerHTML = buildVia('1ª VIA — LOJA', true, true, '297mm');
+                    gerarPDF(wrapper, `OS_${sale.number}_via_loja`, { pageWidth:210, pageHeight:297, forceHeight:true, preview:true });
+
+                } else if (tipo === 'via2') {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'os-pdf-wrapper uma-folha';
+                    wrapper.style.cssText = 'width:210mm;height:297mm;overflow:hidden;display:flex;flex-direction:column;background:#fff;';
+                    wrapper.innerHTML = buildVia('2ª VIA — CLIENTE', false, true, '297mm');
+                    gerarPDF(wrapper, `OS_${sale.number}_via_cliente`, { pageWidth:210, pageHeight:297, forceHeight:true, preview:true });
+
+                } else {
+                    // Ambas — A4 297mm (144mm+9mm corte+144mm)
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'os-pdf-wrapper uma-folha';
+                    const corteHtml = `<div class="os-corte"><div class="os-corte-linha"></div>✂️ &nbsp; RECORTE AQUI — 2ª VIA DO CLIENTE &nbsp; ✂️<div class="os-corte-linha"></div></div>`;
+                    wrapper.innerHTML = buildVia('1ª VIA — LOJA', true, true, '144mm') + corteHtml + buildVia('2ª VIA — CLIENTE', false, true, '144mm');
+                    wrapper.style.cssText = 'width:210mm;height:297mm;overflow:hidden;display:flex;flex-direction:column;background:#fff;';
+                    gerarPDF(wrapper, `OS_${sale.number}_ambas`, { pageWidth:210, pageHeight:297, forceHeight:true, preview:true });
                 }
             },
+
             gerarPDF_Promissoria() {
                 const client = state.clients.find(c => c.id === state.currentSale.clientId);
                 const sale = state.currentSale;
@@ -15882,6 +15632,9 @@ ${container.innerHTML}
                 // Limpa tabela de parcelas
                 const instBody = document.getElementById('installmentsTableBody');
                 if (instBody) instBody.innerHTML = '';
+                // Oculta botões de PDF do crediário
+                const pdfBtns = document.getElementById('crediarioPdfBtns');
+                if (pdfBtns) pdfBtns.style.display = 'none';
                 // Displays de retirada/troco/valores (novos IDs)
                 ['pixRetirada','cashRetirada','cashTroco','creditRetirada','debitRetirada',
                  'pixBruto','pixDesconto','pixFinal',
@@ -16146,6 +15899,25 @@ ${container.innerHTML}
                         ${Utils.sanitizeHTML(sale.observations)}
                     </div>` : ''}
 
+                    <!-- ── Gerar O.S. PDF ── -->
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #ebebeb;">
+                        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#333;margin-bottom:8px;">🖨️ Gerar O.S. em PDF</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                            <button onclick="Sales.gerarPDF_OS('via1')"
+                                style="background:#333;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <i class="fas fa-file-pdf"></i> 1ª Via — Loja
+                            </button>
+                            <button onclick="Sales.gerarPDF_OS('via2')"
+                                style="background:#166534;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <i class="fas fa-file-pdf"></i> 2ª Via — Cliente
+                            </button>
+                            <button onclick="Sales.gerarPDF_OS('ambas')"
+                                style="background:#555;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
+                                <i class="fas fa-file-pdf"></i> ✂️ Ambas as Vias (A4 — 210×297mm)
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- ── Rodapé de ações ── -->
                     <div style="display:flex;gap:8px;padding-top:14px;border-top:1px solid #ebebeb;flex-wrap:wrap;">
                         <button onclick="Modal.close('viewModal');setTimeout(()=>Sales.edit('${sale.id}'),80);"
@@ -16160,24 +15932,6 @@ ${container.innerHTML}
                             style="background:#f0f0f0;color:#555;border:1px solid #ddd;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">
                             ✖ Fechar
                         </button>
-                    </div>
-                    <!-- ── Gerar O.S. PDF ── -->
-                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #ebebeb;">
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#dc3545;margin-bottom:8px;">🖨️ Gerar O.S. (PDF)</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                            <button onclick="Sales.gerarPDF_OS('via1')"
-                                style="background:#ff6b00;color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;">
-                                <i class="fas fa-file-pdf"></i> Via Ótica
-                            </button>
-                            <button onclick="Sales.gerarPDF_OS('via2')"
-                                style="background:#28a745;color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;">
-                                <i class="fas fa-file-pdf"></i> Via Cliente
-                            </button>
-                            <button onclick="Sales.gerarPDF_OS('ambas')"
-                                style="background:#dc3545;color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;grid-column:1/-1;">
-                                <i class="fas fa-file-pdf"></i> Ambas as Vias
-                            </button>
-                        </div>
                     </div>
                 </div>`;
 
