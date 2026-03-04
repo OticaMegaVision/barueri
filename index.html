@@ -5084,7 +5084,7 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                         </div>
                                         <label style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-size:13px;color:#2e7d32;font-weight:600;">
                                             <input type="checkbox" id="pixDescontoAtivo" checked onchange="Sales.PAY.pixCalc.call(Sales.PAY)" style="width:16px;height:16px;cursor:pointer;">
-                                            Aplicar desconto PIX (5%) — opcional
+                                            Aplicar desconto PIX (<span id="pixDescontoPct">5</span>%) — opcional
                                         </label>
                                     </div>
                                 </div>
@@ -5129,7 +5129,7 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                         <div style="font-weight:800;color:#1b5e20;font-size:14px;">Pagamento em Dinheiro</div>
                                         <label style="display:inline-flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-size:13px;color:#2e7d32;font-weight:600;">
                                             <input type="checkbox" id="cashDescontoAtivo" checked onchange="Sales.PAY.cashCalc.call(Sales.PAY)" style="width:16px;height:16px;cursor:pointer;">
-                                            Aplicar desconto dinheiro (3%) — opcional
+                                            Aplicar desconto dinheiro (<span id="cashDescontoPct">3</span>%) — opcional
                                         </label>
                                     </div>
                                 </div>
@@ -6331,6 +6331,18 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
 
                         <h4 style="color: var(--primary); margin: 1.5rem 0 1rem;">Formas de Pagamento</h4>
                         
+                        <!-- Melhoria: campos de desconto configuráveis por forma de pagamento -->
+                        <div class="form-row" style="margin-bottom:1rem;">
+                            <div class="form-group">
+                                <label for="configPixDiscount">Desconto PIX (%)</label>
+                                <input type="number" id="configPixDiscount" class="form-control" value="5" step="0.5" min="0" max="30" title="Percentual de desconto aplicado ao pagar com PIX">
+                            </div>
+                            <div class="form-group">
+                                <label for="configCashDiscount">Desconto Dinheiro (%)</label>
+                                <input type="number" id="configCashDiscount" class="form-control" value="3" step="0.5" min="0" max="30" title="Percentual de desconto aplicado ao pagar com Dinheiro">
+                            </div>
+                        </div>
+
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                             <label class="flex items-center gap-2"><input type="checkbox" id="configPaymentPix" checked> PIX</label>
                             <label class="flex items-center gap-2"><input type="checkbox" id="configPaymentCash" checked> Dinheiro</label>
@@ -8305,11 +8317,16 @@ ORDER BY t.table_name;
             async getAll() {
                 try {
                     const raw = await IDB.get(this._key);
-                    return raw ? JSON.parse(raw) : [];
+                    if (!raw) return [];
+                    // Fix Bug #2: suporta raw como string OU objeto (evita dupla serialização)
+                    if (typeof raw === 'string') return JSON.parse(raw);
+                    if (Array.isArray(raw)) return raw;
+                    return [];
                 } catch(e) { return []; }
             },
 
             async saveAll(contas) {
+                // Fix Bug #2: salva sempre como string para consistência
                 await IDB.set(this._key, JSON.stringify(contas));
             },
 
@@ -8326,9 +8343,11 @@ ORDER BY t.table_name;
                 const metodoLabel   = {pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário'};
                 const contasVendas  = [];
 
-                (state.sales || []).forEach(sale => {
-                    if (sale.status === 'cancelado') return;
-                    if (sale.paymentStatus === 'pago') return;
+                // Fix Bug #1: substituído forEach+return por for...of+continue
+                // (return dentro de forEach encerra apenas o callback, não a função pai)
+                for (const sale of (state.sales || [])) {
+                    if (sale.status === 'cancelado') continue;
+                    if (sale.paymentStatus === 'pago') continue;
 
                     const client       = (state.clients || []).find(c => c.id === sale.clientId);
                     const nomeCliente  = client ? client.name : 'Cliente';
@@ -8338,7 +8357,7 @@ ORDER BY t.table_name;
 
                     // ── Pagamento Duplo (2 formas) ─────────────────────────────
                     if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
-                        sale.dualPayments.forEach((slot, idx) => {
+                        for (const [idx, slot] of sale.dualPayments.entries()) {
                             const slotLabel = idx === 0 ? '1ª' : '2ª';
                             const mLbl = {pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'}[slot.method] || slot.method;
                             if (slot.method === 'installment') {
@@ -8387,10 +8406,10 @@ ORDER BY t.table_name;
                                     });
                                 }
                             }
-                        });
-                        return;
+                        }
+                        // Fix Bug #1: continue (não return) para pular para a próxima venda
+                        continue;
                     }
-
                     // ── Crediário ──────────────────────────────────────────────
                     if (method === 'installment') {
                         // Parcelas pendentes
@@ -8425,12 +8444,12 @@ ORDER BY t.table_name;
                                 _readonly: true
                             });
                         }
-                        return;
-                    }
+                        continue; // Fix Bug #1
+                    } // end if installment
 
                     // ── À vista (PIX / Dinheiro / Débito / Crédito) ────────────
                     if (metodosAVista.includes(method)) {
-                        if (sale.status === 'entregue') return;
+                        if (sale.status === 'entregue') continue; // Fix Bug #1
                         // Só gera conta a receber se foi explicitamente salvo um saldo de retirada
                         // (det.retiradaValue > 0) E a entrada foi menor que o total
                         const retiradaAVista = parseFloat(det.retiradaValue || 0);
@@ -8449,7 +8468,7 @@ ORDER BY t.table_name;
                             });
                         }
                         // PIX/Dinheiro/Débito/Crédito integralmente pago → não gera nada
-                        return;
+                        continue; // Fix Bug #1
                     }
 
                     // ── Outros métodos sem parcelamento ────────────────────────
@@ -8466,7 +8485,7 @@ ORDER BY t.table_name;
                             _readonly: true
                         });
                     }
-                });
+                } // end for...of sales (Fix Bug #1)
 
                 // ── Injeta despesas pendentes em Contas a Pagar ────────────────
                 const contasDespesas = [];
@@ -8673,9 +8692,8 @@ ORDER BY t.table_name;
                             parc.paid     = true;
                             parc.status   = 'pago';
                             parc.paidDate = new Date().toISOString().slice(0,10);
-                            // Verifica se todas as parcelas foram pagas
-                            const todasPagas = sale.paymentDetails.parcels.every(p => p.paid || p.status === 'pago' || p.status === 'paid');
-                            if (todasPagas && !sale.paymentDetails.retiradaEntry) {
+                            // Fix Bug #5: usa checkPaymentComplete que verifica parcelas + retirada
+                            if (this.checkPaymentComplete(sale)) {
                                 sale.paymentStatus = 'pago';
                             }
                             App.saveData();
@@ -8690,6 +8708,10 @@ ORDER BY t.table_name;
                         sale.retiradaPaga = true;
                     } else if (sale.paymentDetails && sale.paymentDetails.retiradaValue) {
                         sale.paymentDetails.retiradaValue = 0;
+                        sale.retiradaPaga = true;
+                    }
+                    // Fix Bug #5: verifica quitação completa após registrar retirada
+                    if (this.checkPaymentComplete(sale)) {
                         sale.paymentStatus = 'pago';
                     }
                     App.saveData();
@@ -8703,6 +8725,34 @@ ORDER BY t.table_name;
                     this.renderAll();
                     this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento Total', itemValor||sale.total||0, itemCliente, itemCategoria, itemVencimento);
                 }
+            },
+
+            // Fix Bug #5: verifica se venda está completamente quitada (parcelas + retirada)
+            checkPaymentComplete(sale) {
+                const det = sale.paymentDetails || {};
+                // Verifica parcelas do crediário simples
+                if (sale.paymentMethod === 'installment' || det.parcels?.length) {
+                    const todasPagas = (det.parcels || []).every(p => p.paid || p.status === 'pago' || p.status === 'paid');
+                    if (!todasPagas) return false;
+                    // Verifica retirada do crediário simples
+                    const temRetirada = parseFloat(det.retiradaEntry || 0) > 0.01 || parseFloat(det.retiradaValue || 0) > 0.01;
+                    if (temRetirada && !sale.retiradaPaga) return false;
+                    return true;
+                }
+                // Verifica pagamento duplo
+                if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
+                    for (const [idx, slot] of sale.dualPayments.entries()) {
+                        if (slot.method === 'installment') {
+                            const todasPagas = (slot.parcelas || []).every(p => p.paid || p.status === 'pago' || p.status === 'paid');
+                            if (!todasPagas) return false;
+                            if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
+                        } else {
+                            if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
+                        }
+                    }
+                    return true;
+                }
+                return true;
             },
 
             async gerarComprovante(id) {
@@ -12560,6 +12610,9 @@ ORDER BY t.table_name;
                     commission: parseFloat(document.getElementById('configCommission').value) || 5,
                     deliveryFee: parseFloat(document.getElementById('configDeliveryFee').value) || 0,
                     nfSeries: document.getElementById('configNfSeries').value || '001',
+                    // Melhoria: salva percentuais de desconto PIX e Dinheiro
+                    pixDiscount: parseFloat(document.getElementById('configPixDiscount')?.value ?? 5) || 5,
+                    cashDiscount: parseFloat(document.getElementById('configCashDiscount')?.value ?? 3) || 3,
                     paymentMethods: {
                         pix: document.getElementById('configPaymentPix').checked,
                         cash: document.getElementById('configPaymentCash').checked,
@@ -12790,6 +12843,11 @@ ORDER BY t.table_name;
                 document.getElementById('configWarranty').value = state.company.warrantyDays || 90;
                 document.getElementById('configCommission').value = state.company.commission || 5;
                 document.getElementById('configDeliveryFee').value = state.company.deliveryFee || 0;
+                // Melhoria: carrega campos de desconto PIX e Dinheiro
+                const pixDiscEl = document.getElementById('configPixDiscount');
+                if (pixDiscEl) pixDiscEl.value = state.company.pixDiscount ?? 5;
+                const cashDiscEl = document.getElementById('configCashDiscount');
+                if (cashDiscEl) cashDiscEl.value = state.company.cashDiscount ?? 3;
                 
                 const currentYear = new Date().getFullYear();
                 const nextOs = (state.lastOsCounter && state.lastOsCounter[currentYear]) ? state.lastOsCounter[currentYear] + 1 : 1;
@@ -13869,12 +13927,18 @@ ${container.innerHTML}
                     if (alertVal) alertVal.textContent = this.fmt(restante);
                 },
 
-                // PIX — desconto 5% opcional
+                // PIX — desconto configurável (padrão 5% se não configurado)
                 pixCalc() {
                     const bruto = state.currentSale._grossTotal || state.currentSale.total || 0;
                     const ativo = document.getElementById('pixDescontoAtivo')?.checked !== false;
-                    const desc  = ativo ? bruto * 0.05 : 0;
+                    // Fix Bug #8: lê percentual das configurações da empresa (state.company.pixDiscount)
+                    const rawPct = parseFloat(state.company?.pixDiscount ?? state.company?.configPaymentPix ?? 5);
+                    const pct   = (isNaN(rawPct) ? 5 : rawPct) / 100;
+                    const desc  = ativo ? bruto * pct : 0;
                     const final = bruto - desc;
+                    // Atualiza labels dinâmicos com % configurado
+                    const pctLabel = isNaN(rawPct) ? 5 : rawPct;
+                    const lbl1 = document.getElementById('pixDescontoPct'); if (lbl1) lbl1.textContent = pctLabel;
                     // Atualiza state com total já com desconto
                     state.currentSale.total = final;
                     // Atualiza display principal
@@ -13890,12 +13954,18 @@ ${container.innerHTML}
                     this.retirada('pix');
                 },
 
-                // Dinheiro — desconto 3% opcional
+                // Dinheiro — desconto configurável (padrão 3% se não configurado)
                 cashCalc() {
                     const bruto = state.currentSale._grossTotal || state.currentSale.total || 0;
                     const ativo = document.getElementById('cashDescontoAtivo')?.checked !== false;
-                    const desc  = ativo ? bruto * 0.03 : 0;
+                    // Fix Bug #8: lê percentual das configurações da empresa (state.company.cashDiscount)
+                    const rawPct = parseFloat(state.company?.cashDiscount ?? 3);
+                    const pct   = (isNaN(rawPct) ? 3 : rawPct) / 100;
+                    const desc  = ativo ? bruto * pct : 0;
                     const final = bruto - desc;
+                    // Atualiza labels dinâmicos com % configurado
+                    const pctLabel = isNaN(rawPct) ? 3 : rawPct;
+                    const lbl1 = document.getElementById('cashDescontoPct'); if (lbl1) lbl1.textContent = pctLabel;
                     // Atualiza state com total já com desconto
                     state.currentSale.total = final;
                     // Atualiza display principal
@@ -14326,7 +14396,11 @@ ${container.innerHTML}
                     parcelas.push({
                         number: i, dueDate: due.toISOString().slice(0,10),
                         value: parcVal, paidDate: null, paidValue: null,
-                        status: 'aberto', daysLate: 0, lateFee: 2, dailyInterest: 0.033, multaJuros: 0
+                        // Bug #D Fix: lê da configuração em vez de hardcodar 2% e 0.033%
+                        status: 'aberto', daysLate: 0,
+                        lateFee: parseFloat(document.getElementById('lateFee')?.value) || 2,
+                        dailyInterest: parseFloat(document.getElementById('dailyInterest')?.value) || 0.033,
+                        multaJuros: 0
                     });
                 }
                 return parcelas;
@@ -14425,7 +14499,7 @@ ${container.innerHTML}
                         value: installmentValue,
                         paidDate: null,
                         paidValue: null,
-                        status: 'pending',
+                        status: daysLate > 0 ? 'vencido' : 'aberto', // Bug #C Fix: era 'pending' (inglês)
                         daysLate: daysLate,
                         lateFee: lateFee,
                         dailyInterest: dailyInterest,
@@ -14607,15 +14681,32 @@ ${container.innerHTML}
             },
 
             modifyDate(parcelNumber) {
-                const newDate = prompt('Nova data de vencimento (AAAA-MM-DD):');
-                if (newDate && newDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    const parcel = state.currentSale.paymentDetails?.parcels.find(p => p.number === parcelNumber);
-                    if (parcel) {
-                        parcel.dueDate = newDate;
-                        this.renderInstallmentsTable();
-                        Toast.show('Data atualizada com sucesso!');
-                    }
-                }
+                // Fix Bug #3: substituído prompt() nativo por micro-modal (PWA-safe)
+                const parcel = state.currentSale.paymentDetails?.parcels.find(p => p.number === parcelNumber);
+                if (!parcel) return;
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `<div style="background:#fff;border-radius:14px;padding:24px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.25);font-family:inherit;">
+                    <h3 style="margin:0 0 10px;font-size:1rem;color:#ff6b00;">📅 Nova Data de Vencimento</h3>
+                    <p style="font-size:0.82rem;color:#666;margin:0 0 12px;">Parcela ${parcelNumber}</p>
+                    <input type="date" id="_modDateInput" value="${parcel.dueDate||''}"
+                        style="width:100%;padding:10px;border:2px solid #ff6b00;border-radius:8px;font-size:1rem;box-sizing:border-box;">
+                    <div style="display:flex;gap:10px;margin-top:14px;">
+                        <button id="_modDateCancel" style="flex:1;padding:10px;border:2px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">Cancelar</button>
+                        <button id="_modDateConfirm" style="flex:1;padding:10px;border:none;border-radius:8px;background:#ff6b00;color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">✔ Confirmar</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(overlay);
+                overlay.querySelector('#_modDateCancel').onclick = () => overlay.remove();
+                overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+                overlay.querySelector('#_modDateConfirm').onclick = () => {
+                    const newDate = overlay.querySelector('#_modDateInput').value;
+                    if (!newDate) { Toast.show('Selecione uma data','warning'); return; }
+                    parcel.dueDate = newDate;
+                    this.renderInstallmentsTable();
+                    Toast.show('Data atualizada com sucesso!');
+                    overlay.remove();
+                };
             },
 
             modifyAllDates() {
@@ -14668,17 +14759,36 @@ ${container.innerHTML}
             },
 
             markAsPaid(parcelNumber) {
-                const value = prompt('Valor pago (R$):');
-                if (value) {
-                    const parcel = state.currentSale.paymentDetails?.parcels.find(p => p.number === parcelNumber);
-                    if (parcel) {
-                        parcel.paidDate = new Date().toISOString().slice(0, 10);
-                        parcel.paidValue = parseFloat(value.replace(',', '.'));
-                        parcel.status = 'pago';
-                        this.renderInstallmentsTable();
-                        Toast.show('Pagamento registrado com sucesso!');
-                    }
-                }
+                // Fix Bug #3: substituído prompt() nativo por micro-modal (PWA-safe)
+                const parcel = state.currentSale.paymentDetails?.parcels.find(p => p.number === parcelNumber);
+                if (!parcel) return;
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                const defaultVal = (parcel.value || parcel.valor || 0).toFixed(2).replace('.',',');
+                overlay.innerHTML = `<div style="background:#fff;border-radius:14px;padding:24px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.25);font-family:inherit;">
+                    <h3 style="margin:0 0 10px;font-size:1rem;color:#28a745;">💰 Registrar Pagamento</h3>
+                    <p style="font-size:0.82rem;color:#666;margin:0 0 12px;">Parcela ${parcelNumber} — Valor original: R$ ${defaultVal}</p>
+                    <input type="number" id="_markPaidInput" value="${(parcel.value || parcel.valor || 0).toFixed(2)}" step="0.01" min="0"
+                        style="width:100%;padding:10px;border:2px solid #28a745;border-radius:8px;font-size:1rem;box-sizing:border-box;">
+                    <div style="display:flex;gap:10px;margin-top:14px;">
+                        <button id="_markPaidCancel" style="flex:1;padding:10px;border:2px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">Cancelar</button>
+                        <button id="_markPaidConfirm" style="flex:1;padding:10px;border:none;border-radius:8px;background:#28a745;color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">✔ Confirmar</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(overlay);
+                overlay.querySelector('#_markPaidCancel').onclick = () => overlay.remove();
+                overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+                overlay.querySelector('#_markPaidConfirm').onclick = () => {
+                    const rawVal = overlay.querySelector('#_markPaidInput').value;
+                    const paidVal = parseFloat(String(rawVal).replace(',','.'));
+                    if (!paidVal || paidVal <= 0) { Toast.show('Informe um valor válido','warning'); return; }
+                    parcel.paidDate = new Date().toISOString().slice(0, 10);
+                    parcel.paidValue = paidVal;
+                    parcel.status = 'pago';
+                    this.renderInstallmentsTable();
+                    Toast.show('Pagamento registrado com sucesso!');
+                    overlay.remove();
+                };
             },
 
             // Editar venda existente
@@ -15764,10 +15874,15 @@ ${container.innerHTML}
                 const method = state.currentSale.paymentMethod;
                 const grossTotal = state.currentSale._grossTotal || state.currentSale.total || 0;
                 let methodDiscount = 0;
-                if (method === 'pix' && document.getElementById('pixDescontoAtivo')?.checked !== false)
-                    methodDiscount = grossTotal * 0.05;
-                if (method === 'cash' && document.getElementById('cashDescontoAtivo')?.checked !== false)
-                    methodDiscount = grossTotal * 0.03;
+                // Bug #A Fix: lê percentual das configurações (igual ao pixCalc/cashCalc)
+                if (method === 'pix' && document.getElementById('pixDescontoAtivo')?.checked !== false) {
+                    const pct = parseFloat(state.company?.pixDiscount ?? state.company?.configPaymentPix ?? 5) / 100;
+                    methodDiscount = grossTotal * (isNaN(pct) ? 0.05 : pct);
+                }
+                if (method === 'cash' && document.getElementById('cashDescontoAtivo')?.checked !== false) {
+                    const pct = parseFloat(state.company?.cashDiscount ?? 3) / 100;
+                    methodDiscount = grossTotal * (isNaN(pct) ? 0.03 : pct);
+                }
                 // Total final já foi aplicado pelo PAY object
                 const finalTotal = state.currentSale.total;
 
@@ -15844,7 +15959,10 @@ ${container.innerHTML}
                     dualPayments: dualPaymentsToSave,
                     observations: document.getElementById('saleObservations').value,
                     status: document.getElementById('saleStatus').value,
-                    statusHistory: [{ date: new Date().toISOString(), status: 'Criada' }]
+                    // Bug #B Fix: preserva histórico existente na edição, não sobrescreve
+                    statusHistory: state.editingSaleId
+                        ? (state.sales.find(s => s.id === state.editingSaleId)?.statusHistory || [{ date: new Date().toISOString(), status: 'Criada' }])
+                        : [{ date: new Date().toISOString(), status: 'Criada' }]
                 };
                 
                 if (state.editingSaleId) {
