@@ -15301,27 +15301,79 @@ ${container.innerHTML}
 
                 // ── Pagamento ──
                 const buildPagHtml = () => {
-                    if (details) {
+                    const method = sale.paymentMethod || '';
+
+                    // ── Crediário: única forma que exibe entrada/parcelas/vencimento/juros
+                    if (method === 'installment' && details) {
                         const nP = parseInt(details.installments) || 0;
                         const parcStr = nP > 0 ? `${nP}× ${fc(details.installmentValue)}` : (details.installmentValue > 0 ? fc(details.installmentValue) : '—');
+                        const retirada = parseFloat(details.retiradaEntry||0) || parseFloat(details.retiradaValue||0) || 0;
                         return `<div class="os-pagamento-grid">
                           <div class="os-pagamento-cell"><span>Entrada (${details.entryPercent||0}%)</span><strong>${fc(details.entryValue||0)}</strong></div>
                           <div class="os-pagamento-cell"><span>Parcelas</span><strong>${parcStr}</strong></div>
                           <div class="os-pagamento-cell"><span>1º Vencimento</span><strong>${details.parcels?.[0] ? fd(details.parcels[0].dueDate) : '—'}</strong></div>
                           <div class="os-pagamento-cell"><span>Multa / Juros</span><strong>${company.lateFee||0}% + ${company.dailyInterest||0}%/dia</strong></div>
                         </div>
+                        ${retirada > 0 ? `<div class="os-pagamento-pix">💰 Valor na Retirada: <strong>${fc(retirada)}</strong></div>` : ''}
                         ${company.pixKey||company.cnpj ? `<div class="os-pagamento-pix">🔑 PIX — Chave: <strong>${company.pixKey||company.cnpj}</strong></div>` : ''}`;
                     }
+
+                    // ── Pagamento duplo (2 formas)
+                    if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
+                        const dualLabels = sale.dualPayments.map((slot, i) => {
+                            const lbl = pagMap[slot.method] || slot.method;
+                            const val = parseFloat(slot.value||0);
+                            return `<div class="os-pagamento-cell"><span>${i===0?'1ª':'2ª'} Forma — ${lbl}</span><strong>${fc(val)}</strong></div>`;
+                        }).join('');
+                        return `<div class="os-pagamento-grid">
+                          ${dualLabels}
+                          <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
+                        </div>
+                        ${company.pixKey||company.cnpj ? `<div class="os-pagamento-pix">🔑 PIX — Chave: <strong>${company.pixKey||company.cnpj}</strong></div>` : ''}`;
+                    }
+
+                    // ── Pagamento misto (múltiplas formas)
                     if (isMixed) {
                         return `<div class="os-pagamento-grid">
                           ${sale.mixedPayments.map(r => `<div class="os-pagamento-cell"><span>${pagMap[r.method]||r.method}</span><strong>${fc(r.value)}</strong></div>`).join('')}
                           <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
                         </div>`;
                     }
+
+                    // ── PIX com desconto aplicado
+                    if (method === 'pix') {
+                        const discPct = parseFloat(state.company?.pixDiscount ?? 5);
+                        const retirada = parseFloat(details?.retiradaValue||0);
+                        return `<div class="os-pagamento-grid">
+                          <div class="os-pagamento-cell"><span>Forma</span><strong>PIX</strong></div>
+                          <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
+                          <div class="os-pagamento-cell"><span>Desconto aplicado</span><strong>${discPct}%</strong></div>
+                          ${retirada > 0 ? `<div class="os-pagamento-cell"><span>Saldo na Retirada</span><strong>${fc(retirada)}</strong></div>` : `<div class="os-pagamento-cell"><span>Status</span><strong>À Vista</strong></div>`}
+                        </div>
+                        ${company.pixKey||company.cnpj ? `<div class="os-pagamento-pix">🔑 PIX — Chave: <strong>${company.pixKey||company.cnpj}</strong></div>` : ''}`;
+                    }
+
+                    // ── Dinheiro com desconto aplicado
+                    if (method === 'cash') {
+                        const discPct = parseFloat(state.company?.cashDiscount ?? 3);
+                        const retirada = parseFloat(details?.retiradaValue||0);
+                        return `<div class="os-pagamento-grid">
+                          <div class="os-pagamento-cell"><span>Forma</span><strong>Dinheiro</strong></div>
+                          <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
+                          <div class="os-pagamento-cell"><span>Desconto aplicado</span><strong>${discPct}%</strong></div>
+                          ${retirada > 0 ? `<div class="os-pagamento-cell"><span>Saldo na Retirada</span><strong>${fc(retirada)}</strong></div>` : `<div class="os-pagamento-cell"><span>Status</span><strong>À Vista</strong></div>`}
+                        </div>`;
+                    }
+
+                    // ── Débito / Crédito / outros
+                    const retirada = parseFloat(details?.retiradaValue||0);
+                    const label = pagMap[method] || method || '—';
+                    const installments = parseInt(sale.installments||0);
                     return `<div class="os-pagamento-grid">
-                      <div class="os-pagamento-cell"><span>Forma</span><strong>${pagMap[sale.paymentMethod]||sale.paymentMethod||'—'}</strong></div>
+                      <div class="os-pagamento-cell"><span>Forma</span><strong>${label}</strong></div>
                       <div class="os-pagamento-cell"><span>Total</span><strong>${fc(sale.total)}</strong></div>
-                      ${(sale.installments||0)>1 ? `<div class="os-pagamento-cell"><span>Parcelas</span><strong>${sale.installments}×</strong></div>` : ''}
+                      ${installments > 1 ? `<div class="os-pagamento-cell"><span>Parcelas Cartão</span><strong>${installments}×</strong></div>` : `<div class="os-pagamento-cell"><span>Status</span><strong>À Vista</strong></div>`}
+                      ${retirada > 0 ? `<div class="os-pagamento-cell"><span>Saldo na Retirada</span><strong>${fc(retirada)}</strong></div>` : ''}
                     </div>
                     ${company.pixKey||company.cnpj ? `<div class="os-pagamento-pix">🔑 PIX — Chave: <strong>${company.pixKey||company.cnpj}</strong></div>` : ''}`;
                 };
@@ -16272,19 +16324,22 @@ ${container.innerHTML}
                 } else {
                     // ── MODO SIMPLES ─────────────────────────────────────────
                     // Captura retirada para métodos à vista com entrada parcial
-                    paymentDetailsToSave = state.currentSale.paymentDetails
-                        ? JSON.parse(JSON.stringify(state.currentSale.paymentDetails)) : null;
                     if (metodosAVista.includes(method)) {
+                        // Para métodos à vista: zera paymentDetails (descarta dados antigos de crediário)
                         const entradaIds = { pix:'pixEntrada', cash:'cashEntrada', debit:'debitEntrada', credit:'creditEntrada' };
                         const entradaEl  = document.getElementById(entradaIds[method]);
                         const entradaVal = entradaEl ? (parseFloat(entradaEl.value) || 0) : 0;
                         const totalFinal = state.currentSale.total || 0;
                         const retiradaVal = Math.max(0, totalFinal - entradaVal);
                         if (entradaVal > 0.01 && retiradaVal > 0.01) {
-                            paymentDetailsToSave = paymentDetailsToSave || {};
-                            paymentDetailsToSave.retiradaValue = retiradaVal;
-                            paymentDetailsToSave.entradaValue  = entradaVal;
+                            paymentDetailsToSave = { retiradaValue: retiradaVal, entradaValue: entradaVal };
+                        } else {
+                            paymentDetailsToSave = null; // venda à vista integral — sem detalhes extras
                         }
+                    } else {
+                        // Crediário: mantém paymentDetails existente (parcelas já calculadas)
+                        paymentDetailsToSave = state.currentSale.paymentDetails
+                            ? JSON.parse(JSON.stringify(state.currentSale.paymentDetails)) : null;
                     }
                 }
                 
