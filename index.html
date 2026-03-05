@@ -7573,6 +7573,9 @@ ORDER BY t.table_name;
                         <button type="button" class="btn btn-info" onclick="NFeModule.gerarXML()">
                             <i class="fas fa-code"></i> Gerar XML
                         </button>
+                        <button type="button" class="btn btn-danger" onclick="NFeModule.gerarPDF_NFe()" style="background:#c0392b;border-color:#c0392b;">
+                            <i class="fas fa-file-pdf"></i> Gerar DANFE PDF
+                        </button>
                         <button type="button" class="btn btn-primary" onclick="NFeModule.emitir()" style="min-width:160px;">
                             <i class="fas fa-paper-plane"></i> Emitir NF-e
                         </button>
@@ -9987,6 +9990,8 @@ ORDER BY t.table_name;
                 if (document.body.contains(container)) document.body.removeChild(container);
             }
         }
+        // Expõe gerarPDF globalmente para uso em outros módulos (ex: NFeModule)
+        window.gerarPDF = gerarPDF;
 
         // ═══════════════════════════════════════════════════════════════════
         // gerarPDFTamanhoReal — comprovante, cupom, tamanho personalizado
@@ -17985,6 +17990,201 @@ const NFeModule = window.NFeModule = {
         this._toast('XML gerado e baixado!', 'info');
     },
 
+    _buildDanfeHtml(nfe) {
+        const fc = v => 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2});
+        const fd = d => { if (!d) return '—'; try { return new Date(d+'T12:00:00').toLocaleDateString('pt-BR'); } catch(e){ return d; } };
+        const formaPagMap = {'01':'Dinheiro','02':'Cheque','03':'Cartão de Crédito','04':'Cartão de Débito','05':'Crédito Loja','10':'Vale Alimentação','11':'Vale Refeição','12':'Vale Presente','13':'Vale Combustível','15':'Boleto Bancário','90':'Sem Pagamento','99':'Outros'};
+        const chaveFormatada = (nfe.chave||'').replace(/\s/g,'').replace(/(.{4})/g,'$1 ').trim();
+        const itensHtml = (nfe.itens||[]).map((it,i) => `
+          <tr style="background:${i%2===0?'#fff':'#fafafa'};">
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:center;font-size:9px;">${i+1}</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;font-size:9px;font-weight:600;">${it.desc||'—'}</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:center;font-size:9px;font-family:monospace;">${it.ncm||'—'}</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:center;font-size:9px;">${it.cfop||'—'}</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:center;font-size:9px;">${it.qtd||1}</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:right;font-size:9px;">${fc(it.valor)}</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:center;font-size:9px;">${it.icms||0}%</td>
+            <td style="padding:4px 6px;border:1px solid #ddd;text-align:right;font-size:9px;font-weight:700;color:#c0392b;">${fc(it.total)}</td>
+          </tr>`).join('');
+        const statusColor = {emitida:'#27ae60',pendente:'#f39c12',cancelada:'#e74c3c',rascunho:'#7f8c8d'}[nfe.status]||'#7f8c8d';
+        const statusLabel = {emitida:'AUTORIZADO USO DA NF-e',pendente:'PENDENTE DE AUTORIZAÇÃO',cancelada:'USO DENEGADO — CANCELADA',rascunho:'SEM VALOR FISCAL — RASCUNHO'}[nfe.status]||nfe.status||'';
+        return `<div style="width:210mm;min-height:297mm;background:#fff;font-family:Arial,sans-serif;font-size:9px;color:#222;box-sizing:border-box;padding:8mm 8mm 8mm 8mm;">
+
+          <!-- FAIXA DE STATUS -->
+          <div style="background:${statusColor};color:#fff;text-align:center;padding:5px;font-size:10px;font-weight:700;letter-spacing:1px;border-radius:4px;margin-bottom:6px;">
+            ${statusLabel}
+          </div>
+
+          <!-- CABEÇALHO PRINCIPAL -->
+          <div style="display:flex;border:2px solid #333;border-radius:4px;overflow:hidden;margin-bottom:0;">
+
+            <!-- EMITENTE -->
+            <div style="flex:2;padding:8px 10px;border-right:2px solid #333;">
+              <div style="font-size:14px;font-weight:900;color:#ff6b00;letter-spacing:-0.5px;line-height:1.1;">${nfe.emitente||'EMITENTE NÃO INFORMADO'}</div>
+              <div style="font-size:8px;color:#555;margin-top:3px;">CNPJ: <strong>${nfe.cnpjEmit||'—'}</strong></div>
+              <div style="font-size:8px;color:#555;">I.E.: <strong>${document.getElementById('nfeIE')?.value||'—'}</strong></div>
+              <div style="font-size:8px;color:#444;margin-top:4px;">Emissão: <strong>${fd(nfe.data)}</strong> &nbsp;|&nbsp; Nat. Op.: <strong>${nfe.natureza||'—'}</strong></div>
+            </div>
+
+            <!-- DANFE CENTRO -->
+            <div style="width:38mm;padding:6px;text-align:center;border-right:2px solid #333;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+              <div style="font-size:13px;font-weight:900;letter-spacing:2px;color:#333;">DANFE</div>
+              <div style="font-size:7px;color:#555;line-height:1.3;margin-top:2px;text-align:center;">Documento Auxiliar<br>da Nota Fiscal<br>Eletrônica</div>
+              <div style="margin-top:6px;background:#f8f8f8;border:1px solid #ccc;border-radius:3px;padding:4px 6px;">
+                <div style="font-size:7px;color:#888;">NF-e Nº</div>
+                <div style="font-size:14px;font-weight:900;color:#ff6b00;font-family:monospace;">${nfe.numero||'000001'}</div>
+                <div style="font-size:7px;color:#888;">Série: <strong>${nfe.serie||'001'}</strong></div>
+              </div>
+            </div>
+
+            <!-- FORMA PAGAMENTO -->
+            <div style="flex:1;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;">
+              <div style="font-size:7px;color:#888;text-transform:uppercase;font-weight:700;margin-bottom:3px;">Forma de Pagamento</div>
+              <div style="font-size:10px;font-weight:700;color:#333;">${formaPagMap[nfe.formaPag]||nfe.formaPag||'—'}</div>
+              <div style="font-size:7px;color:#888;margin-top:6px;text-transform:uppercase;font-weight:700;">OS Referência</div>
+              <div style="font-size:9px;font-weight:700;color:#ff6b00;">${nfe.osRef||'—'}</div>
+            </div>
+          </div>
+
+          <!-- CHAVE DE ACESSO -->
+          <div style="border:1px solid #ccc;border-top:none;padding:5px 8px;background:#f9f9f9;border-radius:0 0 3px 3px;margin-bottom:6px;">
+            <span style="font-size:7px;color:#888;font-weight:700;text-transform:uppercase;">Chave de Acesso &nbsp;·&nbsp; </span>
+            <span style="font-family:monospace;font-size:8px;font-weight:700;color:#333;letter-spacing:0.5px;">${chaveFormatada||'_ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _'}</span>
+          </div>
+
+          <!-- DESTINATÁRIO -->
+          <div style="border:1px solid #bbb;border-radius:4px;padding:7px 10px;margin-bottom:6px;background:#fdfdfd;">
+            <div style="font-size:7px;font-weight:700;color:#ff6b00;text-transform:uppercase;letter-spacing:0.8px;border-bottom:1px solid #eee;margin-bottom:5px;padding-bottom:3px;">Destinatário / Remetente</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <div style="flex:3;min-width:100px;">
+                <div style="font-size:8px;color:#888;">Nome / Razão Social</div>
+                <div style="font-size:10px;font-weight:700;">${nfe.destNome||'—'}</div>
+              </div>
+              <div style="flex:1;min-width:80px;">
+                <div style="font-size:8px;color:#888;">CPF / CNPJ</div>
+                <div style="font-size:10px;font-weight:700;font-family:monospace;">${nfe.destDoc||'—'}</div>
+              </div>
+              <div style="flex:1;min-width:100px;">
+                <div style="font-size:8px;color:#888;">E-mail</div>
+                <div style="font-size:9px;">${nfe.destEmail||'—'}</div>
+              </div>
+              <div style="flex:1;min-width:80px;">
+                <div style="font-size:8px;color:#888;">Data Emissão</div>
+                <div style="font-size:9px;font-weight:600;">${fd(nfe.data)}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABELA DE PRODUTOS -->
+          <div style="margin-bottom:6px;">
+            <div style="background:linear-gradient(90deg,#ff6b00,#ffaa00);color:#fff;padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border-radius:4px 4px 0 0;">
+              Dados dos Produtos / Serviços
+            </div>
+            <table style="width:100%;border-collapse:collapse;border:1px solid #ddd;border-top:none;">
+              <thead>
+                <tr style="background:#f0f0f0;">
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:center;width:6mm;">#</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:left;">Descrição do Produto / Serviço</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:center;width:16mm;">NCM</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:center;width:12mm;">CFOP</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:center;width:8mm;">Qtd</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:right;width:20mm;">Vl. Unit.</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:center;width:12mm;">ICMS%</th>
+                  <th style="padding:5px 6px;border:1px solid #ddd;font-size:8px;text-align:right;width:22mm;">Vl. Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itensHtml||`<tr><td colspan="8" style="padding:10px;text-align:center;color:#aaa;font-size:9px;border:1px solid #ddd;">Nenhum item registrado</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TOTAIS & IMPOSTOS -->
+          <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <!-- CÁLCULO DO IMPOSTO -->
+            <div style="flex:1;border:1px solid #bbb;border-radius:4px;padding:7px 10px;">
+              <div style="font-size:7px;font-weight:700;color:#ff6b00;text-transform:uppercase;letter-spacing:0.8px;border-bottom:1px solid #eee;margin-bottom:5px;padding-bottom:3px;">Cálculo do Imposto</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                ${(()=>{
+                  const sub=nfe.subtotal||0;
+                  const icmsTotal=(nfe.itens||[]).reduce((a,it)=>a+(it.total*(it.icms||0)/100),0);
+                  return `
+                  <div><span style="font-size:7px;color:#888;">Base Cálc. ICMS</span><br><strong style="font-size:9px;">${fc(sub)}</strong></div>
+                  <div><span style="font-size:7px;color:#888;">Valor ICMS</span><br><strong style="font-size:9px;">${fc(icmsTotal)}</strong></div>
+                  <div><span style="font-size:7px;color:#888;">Desconto</span><br><strong style="font-size:9px;color:#e74c3c;">− ${fc(nfe.desconto||0)}</strong></div>
+                  <div><span style="font-size:7px;color:#888;">Outros</span><br><strong style="font-size:9px;">—</strong></div>`;
+                })()}
+              </div>
+            </div>
+            <!-- TOTAL NF-e -->
+            <div style="width:55mm;border:2px solid #ff6b00;border-radius:4px;padding:7px 10px;background:#fff8f5;text-align:center;">
+              <div style="font-size:7px;font-weight:700;color:#ff6b00;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;">Valor Total da NF-e</div>
+              <div style="font-size:18px;font-weight:900;color:#c0392b;">${fc(nfe.total||0)}</div>
+              <div style="font-size:7px;color:#888;margin-top:4px;">Subtotal: ${fc(nfe.subtotal||0)} &nbsp;·&nbsp; Desconto: ${fc(nfe.desconto||0)}</div>
+              <div style="margin-top:6px;font-size:8px;font-weight:700;color:#333;">Forma: ${formaPagMap[nfe.formaPag]||nfe.formaPag||'—'}</div>
+            </div>
+          </div>
+
+          <!-- INFORMAÇÕES COMPLEMENTARES -->
+          ${nfe.infoCompl ? `
+          <div style="border:1px solid #bbb;border-radius:4px;padding:7px 10px;margin-bottom:6px;background:#fdfdfd;">
+            <div style="font-size:7px;font-weight:700;color:#ff6b00;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">Informações Complementares</div>
+            <div style="font-size:8px;color:#444;line-height:1.5;">${nfe.infoCompl}</div>
+          </div>` : ''}
+
+          <!-- RODAPÉ -->
+          <div style="border-top:1px dashed #bbb;padding-top:6px;margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;">
+            <div style="font-size:7px;color:#888;line-height:1.6;">
+              <strong style="color:#ff6b00;">ÓticaVision Pro</strong> — Sistema de Gestão para Óticas<br>
+              Gerado em: ${new Date().toLocaleString('pt-BR')}<br>
+              Este documento não possui valor fiscal — Uso interno
+            </div>
+            <div style="text-align:right;">
+              <div style="border:1px solid #ccc;padding:4px 10px;border-radius:3px;font-size:7px;color:#888;">
+                Assinatura / Carimbo do Emitente
+                <div style="height:14px;"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>`;
+    },
+
+    gerarPDF_NFe() {
+        const nfe = this._coletarDados('rascunho');
+        if (!nfe) return;
+        this._renderizarDanfePDF(nfe);
+    },
+
+    baixarPDF_NFe(id) {
+        const nfe = this.historico.find(n => n.id === id);
+        if (!nfe) return;
+        this._renderizarDanfePDF(nfe);
+    },
+
+    _renderizarDanfePDF(nfe) {
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;';
+        wrapper.innerHTML = this._buildDanfeHtml(nfe);
+        document.body.appendChild(wrapper);
+        const danfe = wrapper.firstElementChild;
+
+        // Usa a função gerarPDF global (mesma usada para OS)
+        if (typeof gerarPDF === 'function') {
+            gerarPDF(danfe, `DANFE_NFe_${nfe.numero}`, { pageWidth:210, pageHeight:297, forceHeight:false })
+                .finally(() => { if (document.body.contains(wrapper)) document.body.removeChild(wrapper); });
+        } else {
+            // Fallback: abre HTML em nova janela para impressão
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DANFE ${nfe.numero}</title><style>@page{size:A4;margin:0}body{margin:0;padding:0}</style></head><body>${this._buildDanfeHtml(nfe)}<script>window.onload=()=>{window.print()}<\/script></body></html>`);
+                win.document.close();
+            }
+            document.body.removeChild(wrapper);
+            this._toast('PDF aberto para impressão.', 'info');
+        }
+    },
+
     emitir() {
         const nfe = this._coletarDados('emitida');
         if (!nfe) return;
@@ -18078,6 +18278,7 @@ const NFeModule = window.NFeModule = {
             <td>${sb[nfe.status]||nfe.status}</td>
             <td><div style="display:flex;gap:0.3rem;">
                 <button onclick="NFeModule.verDetalhe(${nfe.id})" title="Ver" style="background:rgba(23,162,184,0.1);color:#17a2b8;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-eye"></i></button>
+                <button onclick="NFeModule.baixarPDF_NFe(${nfe.id})" title="PDF DANFE" style="background:rgba(192,57,43,0.1);color:#c0392b;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-file-pdf"></i></button>
                 <button onclick="NFeModule.baixarXML(${nfe.id})" title="XML" style="background:rgba(255,107,0,0.1);color:#ff6b00;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-download"></i></button>
                 ${nfe.status==='emitida'?`<button onclick="NFeModule.cancelarNFe(${nfe.id})" title="Cancelar" style="background:rgba(220,53,69,0.1);color:#dc3545;border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;"><i class="fas fa-ban"></i></button>`:''}
             </div></td>
