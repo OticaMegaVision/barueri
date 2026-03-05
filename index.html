@@ -2663,8 +2663,8 @@
             background-position: center;
         }
         .carne-header-logo-circulo span { font-size: 17px; line-height: 1; }
-        .carne-empresa-nome { font-size: 17px; font-weight: 900; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.2); letter-spacing: 0.5px; }
-        .carne-empresa-info { font-size: 8.5px; opacity: 0.92; margin-top: 1mm; font-weight: 700; line-height: 1.5; }
+        .carne-empresa-nome { font-size: 18px; font-weight: 900; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.2); letter-spacing: 0.5px; }
+        .carne-empresa-info { font-size: 9.5px; opacity: 0.95; margin-top: 1mm; font-weight: 800; line-height: 1.5; }
         .carne-header-os {
             text-align: right;
             background: rgba(0,0,0,0.2);
@@ -2672,8 +2672,8 @@
             border-radius: 4px;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        .carne-header-os-label { font-size: 8px; opacity: 0.88; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 800; }
-        .carne-header-os-num { font-size: 24px; font-weight: 900; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .carne-header-os-label { font-size: 9px; opacity: 0.88; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 900; }
+        .carne-header-os-num { font-size: 26px; font-weight: 900; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
         /* Barra de info do cliente no cabeçalho */
         .carne-cliente-bar {
@@ -2687,9 +2687,9 @@
             font-size: 9px;
             font-weight: 600;
         }
-        .carne-cliente-item { color: #666; border-right: 1px dotted #ddd; padding-right: 8mm; font-size: 8.5px; font-weight: 600; }
+        .carne-cliente-item { color: #444; border-right: 1px dotted #ddd; padding-right: 8mm; font-size: 9.5px; font-weight: 800; }
         .carne-cliente-item:last-child { border-right: none; }
-        .carne-cliente-item strong { color: #111; display: block; font-size: 11px; font-weight: 900; margin-top: 0.3mm; }
+        .carne-cliente-item strong { color: #000; display: block; font-size: 12px; font-weight: 900; margin-top: 0.3mm; }
 
         /* ===== CARNÊ TALÃO — 5 parcelas por página A4 ===== */
         .carne-talao-page {
@@ -2700,13 +2700,13 @@
         }
         .carne-talao-page:last-child { page-break-after: avoid; }
 
-        /* Cada parcela ocupa ~50mm de altura */
+        /* Cada parcela ocupa 55mm de altura */
         .carne-parcela {
             width: 210mm;
             box-sizing: border-box;
             border-top: 1px solid #e0e0e0;
             display: flex;
-            height: 50mm;
+            height: 55mm;
             overflow: hidden;
             page-break-inside: avoid;
         }
@@ -2726,20 +2726,20 @@
             border-right: 1px solid rgba(0,0,0,0.1);
         }
         .carne-lateral-num {
-            font-size: 22px;
+            font-size: 26px;
             font-weight: 900;
             line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         .carne-lateral-label {
-            font-size: 5px;
+            font-size: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            opacity: 0.85;
+            opacity: 0.9;
             writing-mode: vertical-rl;
             text-orientation: mixed;
             transform: rotate(180deg);
-            font-weight: 700;
+            font-weight: 800;
         }
 
         /* CANHOTO (recibo da empresa) */
@@ -2754,32 +2754,33 @@
             box-sizing: border-box;
         }
         .carne-canhoto-title {
-            font-size: 7.5px;
-            font-weight: 800;
+            font-size: 9.5px;
+            font-weight: 900;
             text-transform: uppercase;
             color: #ff6b00;
             letter-spacing: 0.8px;
-            padding-bottom: 1mm;
-            border-bottom: 1.5px solid #e8e8e8;
-            margin-bottom: 1.5mm;
+            padding-bottom: 1.5mm;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 2mm;
         }
         .carne-canhoto-row {
             display: flex;
             justify-content: space-between;
-            font-size: 7.5px;
-            color: #666;
-            padding: 0.7mm 0;
+            font-size: 9px;
+            color: #333;
+            padding: 1mm 0;
             border-bottom: 1px dotted #e4e4e4;
+            font-weight: 800;
         }
-        .carne-canhoto-row span:last-child { font-weight: 800; color: #111; }
+        .carne-canhoto-row span:last-child { font-weight: 900; color: #000; font-size: 10px; }
         .carne-canhoto-assin {
             margin-top: auto;
-            border-top: 1.5px solid #555;
+            border-top: 2px solid #444;
             padding-top: 1mm;
-            font-size: 7px;
+            font-size: 8.5px;
             text-align: center;
-            color: #555;
-            font-weight: 600;
+            color: #222;
+            font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -2832,14 +2833,14 @@
             border-bottom: 1.5px solid #eeeeee;
         }
         .carne-logo-circulo.compacto { width: 9mm; height: 9mm; }
-        .carne-dados-contato { font-size: 8px; color: #1565c0; margin-top: 0.3mm; font-weight: 700; }
-        .carne-dados-empresa { font-size: 11.5px; font-weight: 900; color: #111; }
-        .carne-dados-os { font-size: 8.5px; color: #777; font-weight: 700; }
+        .carne-dados-contato { font-size: 9.5px; color: #1565c0; margin-top: 0.3mm; font-weight: 900; }
+        .carne-dados-empresa { font-size: 14px; font-weight: 900; color: #000; }
+        .carne-dados-os { font-size: 10px; color: #333; font-weight: 900; }
         .carne-dados-venc {
             text-align: right;
         }
-        .carne-dados-venc-label { font-size: 7.5px; color: #888; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
-        .carne-dados-venc-date { font-size: 14px; font-weight: 900; color: #c0392b; }
+        .carne-dados-venc-label { font-size: 9px; color: #444; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; }
+        .carne-dados-venc-date { font-size: 18px; font-weight: 900; color: #b71c1c; }
 
         .carne-dados-meio {
             display: flex;
@@ -2856,13 +2857,13 @@
         .carne-dados-row {
             display: flex;
             justify-content: space-between;
-            font-size: 8.5px;
-            color: #555;
-            font-weight: 700;
-            padding-bottom: 0.6mm;
+            font-size: 10px;
+            color: #222;
+            font-weight: 900;
+            padding-bottom: 0.8mm;
             border-bottom: 1px dotted #e8e8e8;
         }
-        .carne-dados-row span:last-child { font-weight: 900; color: #111; }
+        .carne-dados-row span:last-child { font-weight: 900; color: #000; font-size: 10.5px; }
 
         /* Caixa de valor destaque */
         .carne-valor-box {
@@ -2878,10 +2879,10 @@
             flex-shrink: 0;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
         }
-        .carne-valor-label { font-size: 8px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5mm; font-weight: 800; }
-        .carne-valor-num   { font-size: 20px; font-weight: 900; color: #ff6b00; line-height: 1; text-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-        .carne-valor-extenso { font-size: 7.5px; color: #aaa; margin-top: 0.5mm; font-style: italic; }
-        .carne-valor-venc  { font-size: 9px; font-weight: 900; color: #c0392b; margin-top: 1mm; }
+        .carne-valor-label { font-size: 9.5px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1mm; font-weight: 900; }
+        .carne-valor-num   { font-size: 26px; font-weight: 900; color: #ff6b00; line-height: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        .carne-valor-extenso { font-size: 9px; color: #666; margin-top: 1mm; font-style: italic; font-weight: 800; }
+        .carne-valor-venc  { font-size: 10px; font-weight: 900; color: #b71c1c; margin-top: 1mm; }
 
         /* Rodapé da parcela */
         .carne-dados-rodape {
@@ -2889,13 +2890,13 @@
             justify-content: space-between;
             align-items: center;
             margin-top: auto;
-            padding-top: 1mm;
-            border-top: 1px solid #eeeeee;
-            font-size: 7px;
-            font-weight: 700;
+            padding-top: 1.5mm;
+            border-top: 1px solid #ddd;
+            font-size: 8.5px;
+            font-weight: 900;
         }
-        .carne-pix-inline { color: #1565c0; }
-        .carne-multa-info  { color: #c0392b; }
+        .carne-pix-inline { color: #1565c0; font-weight: 900; }
+        .carne-multa-info  { color: #c0392b; font-weight: 900; }
 
         /* Linha de corte entre parcelas */
         .carne-parcela-sep {
@@ -3263,16 +3264,18 @@
         .sync-ok { color: #a6e3a1; font-weight: 600; }
         .sync-off { color: #f38ba8; font-weight: 600; }
         .sync-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
-        .conta-item { background: white; border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.5rem; border-left: 4px solid var(--success); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-wrap: wrap; }
+        .conta-item { background: white; border-radius: 10px; padding: 0.75rem 0.9rem; margin-bottom: 0.5rem; border-left: 4px solid var(--success); display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
         .conta-item.pagar { border-left-color: var(--danger); }
         .conta-item.vencida { border-left-color: var(--warning); background: #fffbf0; }
         .conta-item.paga { opacity: 0.65; background: #f0fff4; border-left-color: #aaa; }
+        .conta-item-row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+        .conta-item-row2 { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
         .conta-item-info { flex: 1; min-width: 0; }
-        .conta-item-nome { font-weight: 600; font-size: 0.88rem; color: var(--dark); }
-        .conta-item-det { font-size: 0.76rem; color: var(--gray); margin-top: 2px; }
-        .conta-item-valor { font-weight: 700; font-size: 0.95rem; color: var(--success); white-space: nowrap; }
+        .conta-item-nome { font-weight: 700; font-size: 0.85rem; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conta-item-det { font-size: 0.72rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .conta-item-valor { font-weight: 800; font-size: 1rem; color: var(--success); white-space: nowrap; flex-shrink: 0; }
         .conta-item.pagar .conta-item-valor { color: var(--danger); }
-        .conta-item-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+        .conta-item-actions { display: flex; gap: 0.35rem; flex-shrink: 0; align-items: center; }
         .dark-mode .conta-item { background: #1a1d27; }
         .dark-mode .conta-item.vencida { background: #2a2510; }
         .dark-mode .conta-item.paga { background: #1a2a1a; }
@@ -3291,75 +3294,75 @@
   /* ===== OS — MODELO APROVADO — CSS EXATO ===== */
   .os-pdf-wrapper { width:210mm; background:#fff; font-family:Arial,Helvetica,sans-serif; font-size:9px; color:#000; }
   .os-via { width:210mm; height:145mm; overflow:hidden; background:#fff; border:1px solid #bbb; box-sizing:border-box; display:flex; flex-direction:column; }
-  .os-header { display:flex; align-items:stretch; border-bottom:2px solid #333; min-height:18mm; flex-shrink:0; }
+  .os-header { display:flex; align-items:stretch; border-bottom:2.5px solid #111; min-height:20mm; flex-shrink:0; }
   .os-logo-area { width:18mm; min-width:18mm; border-right:1px solid #bbb; display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:2mm; align-self:stretch; }
-  .os-logo-circulo { width:13mm; height:13mm; min-width:13mm; min-height:13mm; max-width:13mm; max-height:13mm; border-radius:50%; border:1.5px solid #555; display:flex; align-items:center; justify-content:center; font-size:16px; overflow:hidden; flex-shrink:0; }
+  .os-logo-circulo { width:13mm; height:13mm; min-width:13mm; min-height:13mm; max-width:13mm; max-height:13mm; border-radius:50%; border:2px solid #333; display:flex; align-items:center; justify-content:center; font-size:16px; overflow:hidden; flex-shrink:0; }
   .os-logo-circulo img { max-width:100% !important; max-height:100% !important; width:auto !important; height:auto !important; border-radius:50% !important; display:block !important; image-rendering:-webkit-optimize-contrast; image-rendering:crisp-edges; }
   .os-empresa-info { flex:1; padding:1.5mm 2mm; display:flex; flex-direction:column; justify-content:center; }
-  .os-empresa-nome { font-size:14px; font-weight:900; color:#000; line-height:1.1; letter-spacing:-0.2px; }
-  .os-empresa-badge { display:inline-block; border:1.5px solid #444; border-radius:3px; padding:0.5mm 2mm; font-size:7.5px; font-weight:800; margin-top:0.5mm; color:#222; width:fit-content; }
-  .os-empresa-sub { font-size:7.5px; color:#333; margin-top:1mm; line-height:1.4; font-weight:600; }
-  .os-numero-area { width:32mm; border-left:1px solid #bbb; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2mm; text-align:center; flex-shrink:0; }
-  .os-numero-label { font-size:7px; color:#444; text-transform:uppercase; font-weight:800; letter-spacing:0.5px; }
-  .os-numero-valor { font-size:18px; font-weight:900; color:#000; line-height:1.1; margin:0.5mm 0; }
-  .os-via-label { font-size:7.5px; font-weight:800; color:#222; border:1.5px solid #888; border-radius:99px; padding:0.5mm 2mm; }
-  .os-info-bar { display:flex; border-bottom:1px solid #ccc; flex-shrink:0; }
-  .os-info-cell { flex:1; padding:1mm 2mm; border-right:1px solid #ccc; display:flex; flex-direction:column; justify-content:center; }
+  .os-empresa-nome { font-size:17px; font-weight:900; color:#000; line-height:1.1; letter-spacing:-0.2px; }
+  .os-empresa-badge { display:inline-block; border:2px solid #111; border-radius:3px; padding:0.5mm 2mm; font-size:9px; font-weight:900; margin-top:0.5mm; color:#000; width:fit-content; }
+  .os-empresa-sub { font-size:9px; color:#000; margin-top:1mm; line-height:1.5; font-weight:800; }
+  .os-numero-area { width:34mm; border-left:1.5px solid #bbb; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2mm; text-align:center; flex-shrink:0; }
+  .os-numero-label { font-size:8px; color:#222; text-transform:uppercase; font-weight:900; letter-spacing:0.5px; }
+  .os-numero-valor { font-size:22px; font-weight:900; color:#000; line-height:1.1; margin:0.5mm 0; }
+  .os-via-label { font-size:9px; font-weight:900; color:#000; border:2px solid #333; border-radius:99px; padding:0.5mm 2mm; }
+  .os-info-bar { display:flex; border-bottom:1.5px solid #bbb; flex-shrink:0; }
+  .os-info-cell { flex:1; padding:1.2mm 2mm; border-right:1px solid #ccc; display:flex; flex-direction:column; justify-content:center; }
   .os-info-cell:last-child { border-right:none; }
-  .os-info-cell-label { font-size:6.5px; color:#444; font-weight:900; text-transform:uppercase; display:block; letter-spacing:0.3px; }
-  .os-info-cell-val { font-size:9px; font-weight:900; color:#000; display:block; margin-top:0.3mm; }
-  .os-cliente-section { display:flex; border-bottom:1px solid #ccc; flex-shrink:0; }
-  .os-cliente-accent { width:3px; background:#333; flex-shrink:0; }
+  .os-info-cell-label { font-size:7.5px; color:#222; font-weight:900; text-transform:uppercase; display:block; letter-spacing:0.3px; }
+  .os-info-cell-val { font-size:10px; font-weight:900; color:#000; display:block; margin-top:0.3mm; }
+  .os-cliente-section { display:flex; border-bottom:1.5px solid #bbb; flex-shrink:0; }
+  .os-cliente-accent { width:4px; background:#111; flex-shrink:0; }
   .os-cliente-body { flex:1; padding:1.5mm 2.5mm; }
-  .os-cliente-nome { font-size:13px; font-weight:900; color:#000; margin-bottom:1mm; padding-bottom:0.8mm; border-bottom:1px solid #ddd; }
+  .os-cliente-nome { font-size:15px; font-weight:900; color:#000; margin-bottom:1mm; padding-bottom:0.8mm; border-bottom:2px solid #bbb; }
   .os-cliente-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.5mm 2mm; }
-  .os-cliente-field { font-size:7px; color:#444; font-weight:900; text-transform:uppercase; display:flex; flex-direction:column; }
-  .os-cliente-field span { font-size:8.5px; font-weight:700; color:#000; text-transform:none; margin-top:0.2mm; }
-  .os-section-title { padding:1mm 2.5mm; font-size:8.5px; font-weight:900; color:#000 !important; border-bottom:1.5px solid #bbb; border-top:1px solid #eee; background:transparent !important; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; }
+  .os-cliente-field { font-size:8px; color:#222; font-weight:900; text-transform:uppercase; display:flex; flex-direction:column; }
+  .os-cliente-field span { font-size:9.5px; font-weight:900; color:#000; text-transform:none; margin-top:0.2mm; }
+  .os-section-title { padding:1mm 2.5mm; font-size:9px; font-weight:900; color:#000 !important; border-bottom:1.5px solid #999; border-top:1px solid #ddd; background:#f0f0f0 !important; text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; }
   .os-receita-section { flex-shrink:0; }
-  .os-receita-table { width:100%; border-collapse:collapse; font-size:8px; table-layout:fixed; }
-  .os-receita-table th,.os-receita-table td { border:1px solid #bbb; padding:0.8mm 1.5mm; text-align:center; }
-  .os-receita-table thead { background:#ebebeb !important; }
-  .os-receita-table th { background:#ebebeb !important; font-weight:900; font-size:7.5px; text-transform:uppercase; color:#111 !important; padding:0.8mm 1mm !important; letter-spacing:0.2px !important; white-space:nowrap; }
-  .os-receita-table td { font-weight:800; color:#000 !important; padding:0.8mm 1mm !important; font-size:8px !important; }
-  .os-olho-label { background:#fff !important; color:#000 !important; font-weight:900 !important; border-right: 1px solid #bbb !important; }
-  .os-receita-extra { display:flex; gap:6mm; padding:1.5mm 2.5mm; font-size:8.5px; border-bottom:1px solid #ccc; flex-shrink:0; flex-wrap:wrap; }
-  .os-receita-extra span { font-weight:800; color:#333; }
-  .os-receita-extra strong { color:#000; font-weight:900; }
+  .os-receita-table { width:100%; border-collapse:collapse; font-size:8.5px; table-layout:fixed; }
+  .os-receita-table th,.os-receita-table td { border:1px solid #999; padding:0.8mm 1.5mm; text-align:center; }
+  .os-receita-table thead { background:#e0e0e0 !important; }
+  .os-receita-table th { background:#e0e0e0 !important; font-weight:900; font-size:8.5px; text-transform:uppercase; color:#000 !important; padding:0.8mm 1mm !important; letter-spacing:0.2px !important; white-space:nowrap; }
+  .os-receita-table td { font-weight:900; color:#000 !important; padding:0.8mm 1mm !important; font-size:9px !important; }
+  .os-olho-label { background:#fff !important; color:#000 !important; font-weight:900 !important; border-right: 1px solid #999 !important; }
+  .os-receita-extra { display:flex; gap:6mm; padding:1.5mm 2.5mm; font-size:9.5px; border-bottom:1px solid #ccc; flex-shrink:0; flex-wrap:wrap; }
+  .os-receita-extra span { font-weight:900; color:#111; }
+  .os-receita-extra strong { color:#000; font-weight:900; font-size:10px; }
   .os-itens-section { flex-shrink:0; }
-  .os-itens-table { width:100%; border-collapse:collapse; font-size:8px; table-layout:fixed; }
-  .os-itens-table th,.os-itens-table td { border:1px solid #bbb; padding:0.8mm 1.5mm; }
-  .os-itens-table thead { background:#ebebeb !important; }
-  .os-itens-table th { background:#ebebeb !important; font-weight:900; font-size:8px !important; text-transform:uppercase; color:#111 !important; text-align:center; padding:0.8mm 1mm !important; letter-spacing:0.2px !important; white-space:nowrap; }
-  .os-itens-table td { font-weight:700; color:#000 !important; font-size:8px !important; padding:0.8mm 1mm !important; }
+  .os-itens-table { width:100%; border-collapse:collapse; font-size:8.5px; table-layout:fixed; }
+  .os-itens-table th,.os-itens-table td { border:1px solid #999; padding:0.8mm 1.5mm; }
+  .os-itens-table thead { background:#e0e0e0 !important; }
+  .os-itens-table th { background:#e0e0e0 !important; font-weight:900; font-size:9px !important; text-transform:uppercase; color:#000 !important; text-align:center; padding:0.8mm 1mm !important; letter-spacing:0.2px !important; white-space:nowrap; }
+  .os-itens-table td { font-weight:900; color:#000 !important; font-size:9px !important; padding:0.8mm 1mm !important; }
   .os-itens-table tr:hover td { background:transparent !important; }
-  .os-itens-table tr:last-child td { border-bottom:1px solid #bbb !important; }
-  .os-totais-row { display:flex; align-items:center; gap:4mm; padding:1.5mm 2.5mm; border-bottom:1px solid #ccc; font-size:8.5px; flex-shrink:0; }
-  .os-totais-item { color:#222; font-weight:700; }
-  .os-totais-item strong { color:#000; font-weight:900; }
-  .os-total-final { margin-left:auto; font-size:13px; font-weight:900; color:#000; }
+  .os-itens-table tr:last-child td { border-bottom:1px solid #999 !important; }
+  .os-totais-row { display:flex; align-items:center; gap:4mm; padding:1.5mm 2.5mm; border-bottom:1.5px solid #bbb; font-size:10px; flex-shrink:0; }
+  .os-totais-item { color:#000; font-weight:900; }
+  .os-totais-item strong { color:#000; font-weight:900; font-size:10.5px; }
+  .os-total-final { margin-left:auto; font-size:15px; font-weight:900; color:#000; }
   .os-pagamento-section { flex-shrink:0; }
   .os-pagamento-grid { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid #ccc; }
-  .os-pagamento-cell { padding:1.5mm 2mm; border-right:1px solid #ccc; border-bottom:1px solid #ccc; font-size:8px; display:flex; flex-direction:column; }
+  .os-pagamento-cell { padding:1.5mm 2mm; border-right:1px solid #ccc; border-bottom:1px solid #ccc; font-size:8.5px; display:flex; flex-direction:column; }
   .os-pagamento-cell:last-child { border-right:none; }
-  .os-pagamento-cell span { font-size:7px; color:#444; font-weight:900; text-transform:uppercase; letter-spacing:0.2px; }
-  .os-pagamento-cell strong { font-size:9.5px; color:#000; margin-top:0.3mm; font-weight:900; }
-  .os-pagamento-pix { padding:0.8mm 2.5mm; font-size:7.5px; border-bottom:1px solid #ccc; color:#222; flex-shrink:0; font-weight:600; }
+  .os-pagamento-cell span { font-size:8px; color:#222; font-weight:900; text-transform:uppercase; letter-spacing:0.2px; }
+  .os-pagamento-cell strong { font-size:11px; color:#000; margin-top:0.3mm; font-weight:900; }
+  .os-pagamento-pix { padding:0.8mm 2.5mm; font-size:9px; border-bottom:1px solid #ccc; color:#000; flex-shrink:0; font-weight:900; }
   .os-obs-section { flex-shrink:0; border-bottom:1px solid #ccc; min-height:6mm; max-height:14mm; overflow:hidden; }
-  .os-obs-body { padding:1.5mm 2.5mm; font-size:8.5px; color:#333; }
-  .os-obs-label { font-size:7px; font-weight:900; text-transform:uppercase; color:#444; margin-bottom:0.5mm; letter-spacing:0.3px; }
-  .os-assinaturas { display:flex; gap:4mm; padding:2mm 3mm 1.5mm; border-bottom:1px solid #ccc; flex-shrink:0; }
+  .os-obs-body { padding:1.5mm 2.5mm; font-size:9.5px; color:#111; font-weight:800; }
+  .os-obs-label { font-size:8px; font-weight:900; text-transform:uppercase; color:#222; margin-bottom:0.5mm; letter-spacing:0.3px; }
+  .os-assinaturas { display:flex; gap:4mm; padding:2mm 3mm 1.5mm; border-bottom:1.5px solid #bbb; flex-shrink:0; }
   .os-assinatura-box { flex:1; }
-  .os-assinatura-linha { height:7mm; border-bottom:1.5px solid #666; margin-bottom:0.5mm; }
-  .os-assinatura-label { font-size:7.5px; font-weight:800; color:#333; text-align:center; text-transform:uppercase; }
-  .os-rodape { padding:1.5mm 2.5mm; font-size:7.5px; color:#333; line-height:1.5; border-top:1px solid #ccc; flex-shrink:0; font-weight:600; }
-  .os-corte { display:flex; align-items:center; gap:2mm; padding:1.2mm 4mm; font-size:7.5px; font-weight:800; color:#444; border-top:1px dashed #aaa; border-bottom:1px dashed #aaa; background:#fafafa; justify-content:center; letter-spacing:0.5px; flex-shrink:0; }
+  .os-assinatura-linha { height:7mm; border-bottom:2.5px solid #333; margin-bottom:0.5mm; }
+  .os-assinatura-label { font-size:9px; font-weight:900; color:#111; text-align:center; text-transform:uppercase; letter-spacing:0.3px; }
+  .os-rodape { padding:1.5mm 2.5mm; font-size:8.5px; color:#111; line-height:1.6; border-top:1.5px solid #bbb; flex-shrink:0; font-weight:900; }
+  .os-corte { display:flex; align-items:center; gap:2mm; padding:1.2mm 4mm; font-size:8px; font-weight:900; color:#333; border-top:1px dashed #aaa; border-bottom:1px dashed #aaa; background:#fafafa; justify-content:center; letter-spacing:0.5px; flex-shrink:0; }
   .os-corte-linha { flex:1; height:1px; border-top:1px dashed #aaa; }
   /* Ambas as vias em A4 */
   .os-pdf-wrapper.uma-folha { width:210mm; height:297mm; overflow:hidden; background:#fff; display:flex; flex-direction:column; }
-  .os-pdf-wrapper.uma-folha .os-via { height:144mm; font-size:8px; }
-  .os-pdf-wrapper.uma-folha .os-empresa-nome { font-size:13px !important; }
-  .os-pdf-wrapper.uma-folha .os-numero-valor { font-size:16px !important; }
+  .os-pdf-wrapper.uma-folha .os-via { height:144mm; font-size:8.5px; }
+  .os-pdf-wrapper.uma-folha .os-empresa-nome { font-size:14px !important; }
+  .os-pdf-wrapper.uma-folha .os-numero-valor { font-size:17px !important; }
   .os-pdf-wrapper.uma-folha .os-logo-circulo { width:11mm; height:11mm; min-width:11mm; min-height:11mm; max-width:11mm; max-height:11mm; font-size:14px; }
 
   /* Promissória */
@@ -4199,15 +4202,15 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
 .os-pdf-wrapper .os-cliente-nome{font-weight:900!important;letter-spacing:-0.2px!important;}
 .os-pdf-wrapper .os-cliente-field{font-size:5.5px!important;font-weight:800!important;color:#777!important;letter-spacing:0.3px!important;}
 .os-pdf-wrapper .os-cliente-field span{font-size:7.5px!important;font-weight:700!important;color:#111!important;}
-.os-pdf-wrapper .os-section-title{font-size:7.5px!important;font-weight:900!important;background:#efefef!important;color:#000!important;border-top:1px solid #ddd!important;border-bottom:2px solid #ccc!important;letter-spacing:0.5px!important;}
-.os-pdf-wrapper .os-receita-table th,.os-pdf-wrapper .os-itens-table th{background:#e4e4e4!important;color:#111!important;font-weight:800!important;font-size:6.5px!important;letter-spacing:0.3px!important;}
-.os-pdf-wrapper .os-receita-table td,.os-pdf-wrapper .os-itens-table td{font-weight:700!important;color:#000!important;font-size:7.5px!important;}
-.os-pdf-wrapper .os-pagamento-cell span{font-size:5.5px!important;font-weight:800!important;color:#777!important;letter-spacing:0.3px!important;}
-.os-pdf-wrapper .os-pagamento-cell strong{font-size:8.5px!important;font-weight:800!important;color:#000!important;}
-.os-pdf-wrapper .os-obs-label{font-size:5.5px!important;font-weight:900!important;color:#666!important;letter-spacing:0.4px!important;}
-.os-pdf-wrapper .os-assinatura-label{font-size:6.5px!important;font-weight:800!important;letter-spacing:0.3px!important;}
-.os-pdf-wrapper .os-rodape{font-size:6.5px!important;font-weight:500!important;background:#fafafa!important;color:#555!important;line-height:1.6!important;}
-.os-pdf-wrapper .os-numero-valor{font-size:18px!important;font-weight:900!important;}
+.os-pdf-wrapper .os-section-title{font-size:8.5px!important;font-weight:900!important;background:#efefef!important;color:#000!important;border-top:1px solid #ddd!important;border-bottom:2px solid #ccc!important;letter-spacing:0.5px!important;}
+.os-pdf-wrapper .os-receita-table th,.os-pdf-wrapper .os-itens-table th{background:#e4e4e4!important;color:#000!important;font-weight:900!important;font-size:8px!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-receita-table td,.os-pdf-wrapper .os-itens-table td{font-weight:900!important;color:#000!important;font-size:8.5px!important;}
+.os-pdf-wrapper .os-pagamento-cell span{font-size:7px!important;font-weight:900!important;color:#333!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-pagamento-cell strong{font-size:10px!important;font-weight:900!important;color:#000!important;}
+.os-pdf-wrapper .os-obs-label{font-size:7.5px!important;font-weight:900!important;color:#333!important;letter-spacing:0.4px!important;}
+.os-pdf-wrapper .os-assinatura-label{font-size:8px!important;font-weight:900!important;letter-spacing:0.3px!important;}
+.os-pdf-wrapper .os-rodape{font-size:8px!important;font-weight:800!important;background:#fafafa!important;color:#222!important;line-height:1.6!important;}
+.os-pdf-wrapper .os-numero-valor{font-size:20px!important;font-weight:900!important;}
 .os-pdf-wrapper .os-olho-label{background:#fff!important;color:#000!important;font-weight:900!important;border-right:1px solid #bbb!important;}
 </style>
 </head>
@@ -4313,8 +4316,44 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 <i class="fas fa-plus"></i> Nova
                             </button>
                         </div>
-                        <div id="contasReceberTotal" style="font-size:1.3rem;font-weight:700;color:#28a745;margin-bottom:0.75rem;">R$ 0,00</div>
-                        <div id="contasReceberList" style="max-height:220px;overflow-y:auto;">
+                        <!-- Totais resumo profissional -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+                            <div style="background:#e8f5e9;border-radius:8px;padding:8px 10px;text-align:center;">
+                                <div style="font-size:0.62rem;color:#2e7d32;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;">Total Pendente</div>
+                                <div id="contasReceberTotal" style="font-size:1rem;font-weight:900;color:#28a745;margin-top:2px;">R$ 0,00</div>
+                            </div>
+                            <div style="background:#fff3e0;border-radius:8px;padding:8px 10px;text-align:center;">
+                                <div style="font-size:0.62rem;color:#e65100;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;">⚠ Vencidas</div>
+                                <div id="contasVencidasTotal" style="font-size:1rem;font-weight:900;color:#c62828;margin-top:2px;">R$ 0,00</div>
+                            </div>
+                            <div style="background:#e3f2fd;border-radius:8px;padding:8px 10px;text-align:center;">
+                                <div style="font-size:0.62rem;color:#1565c0;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;">A Vencer</div>
+                                <div id="contasAVencerTotal" style="font-size:1rem;font-weight:900;color:#1565c0;margin-top:2px;">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <!-- Aging mini-panel -->
+                        <div id="agingPanel" style="display:none;background:#f8f9fa;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:0.75rem;">
+                            <div style="font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.5px;">📊 Aging — Distribuição de Inadimplência</div>
+                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+                                <div style="text-align:center;"><div style="color:#28a745;font-weight:700;" id="aging0_30">R$ 0</div><div style="color:#888;font-size:0.65rem;">0-30 dias</div></div>
+                                <div style="text-align:center;"><div style="color:#ffc107;font-weight:700;" id="aging31_60">R$ 0</div><div style="color:#888;font-size:0.65rem;">31-60 dias</div></div>
+                                <div style="text-align:center;"><div style="color:#e65100;font-weight:700;" id="aging61_90">R$ 0</div><div style="color:#888;font-size:0.65rem;">61-90 dias</div></div>
+                                <div style="text-align:center;"><div style="color:#c62828;font-weight:700;" id="aging90plus">R$ 0</div><div style="color:#888;font-size:0.65rem;">+90 dias</div></div>
+                            </div>
+                        </div>
+                        <!-- Filtros — padrão de sistemas profissionais -->
+                        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+                            <input type="text" id="contasReceberBusca" placeholder="🔍 Buscar cliente ou OS..." oninput="ContasManager.filtrar()"
+                                style="flex:2;min-width:130px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;">
+                            <select id="contasReceberFiltro" onchange="ContasManager.filtrar()"
+                                style="flex:1;min-width:100px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;">
+                                <option value="todos">Todos</option>
+                                <option value="vencida">Vencidas</option>
+                                <option value="pendente">A Vencer</option>
+                                <option value="pago">Pagos</option>
+                            </select>
+                        </div>
+                        <div id="contasReceberList" style="max-height:360px;overflow-y:auto;">
                             <p style="color:var(--gray);font-size:0.85rem;text-align:center;padding:1rem 0;">Nenhuma conta a receber</p>
                         </div>
                     </div>
@@ -4328,8 +4367,30 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 <i class="fas fa-plus"></i> Nova
                             </button>
                         </div>
-                        <div id="contasPagarTotal" style="font-size:1.3rem;font-weight:700;color:#dc3545;margin-bottom:0.75rem;">R$ 0,00</div>
-                        <div id="contasPagarList" style="max-height:220px;overflow-y:auto;">
+                        <!-- Totais resumo -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                            <div style="background:#fce4ec;border-radius:8px;padding:8px 10px;text-align:center;">
+                                <div style="font-size:0.62rem;color:#c62828;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;">Total a Pagar</div>
+                                <div id="contasPagarTotal" style="font-size:1rem;font-weight:900;color:#dc3545;margin-top:2px;">R$ 0,00</div>
+                            </div>
+                            <div style="background:#fff3e0;border-radius:8px;padding:8px 10px;text-align:center;">
+                                <div style="font-size:0.62rem;color:#e65100;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;">⚠ Vencidas</div>
+                                <div id="contasPagarVencidas" style="font-size:1rem;font-weight:900;color:#c62828;margin-top:2px;">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <!-- Filtros Pagar -->
+                        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+                            <input type="text" id="contasPagarBusca" placeholder="🔍 Buscar fornecedor ou descrição..." oninput="ContasManager.filtrar()"
+                                style="flex:2;min-width:130px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;">
+                            <select id="contasPagarFiltro" onchange="ContasManager.filtrar()"
+                                style="flex:1;min-width:100px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;">
+                                <option value="todos">Todos</option>
+                                <option value="vencida">Vencidas</option>
+                                <option value="pendente">A Vencer</option>
+                                <option value="pago">Pagos</option>
+                            </select>
+                        </div>
+                        <div id="contasPagarList" style="max-height:360px;overflow-y:auto;">
                             <p style="color:var(--gray);font-size:0.85rem;text-align:center;padding:1rem 0;">Nenhuma conta a pagar</p>
                         </div>
                     </div>
@@ -4962,12 +5023,12 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 <button type="button" class="payment-card" data-method="pix" onclick="Sales.selectPayment('pix')">
                                     <i class="fas fa-qrcode"></i>
                                     <span>PIX</span>
-                                    <small>5% desc</small>
+                                    <small><span id="pixCardDesc">5</span>% desc</small>
                                 </button>
                                 <button type="button" class="payment-card" data-method="cash" onclick="Sales.selectPayment('cash')">
                                     <i class="fas fa-money-bill-wave"></i>
                                     <span>Dinheiro</span>
-                                    <small>3% desc</small>
+                                    <small><span id="cashCardDesc">3</span>% desc</small>
                                 </button>
                                 <button type="button" class="payment-card" data-method="debit" onclick="Sales.selectPayment('debit')">
                                     <i class="fas fa-credit-card"></i>
@@ -5250,6 +5311,12 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                             <option value="10">10x — 2,5% a.m.</option>
                                             <option value="11">11x — 2,5% a.m.</option>
                                             <option value="12">12x — 2,5% a.m.</option>
+                                            <option value="13">13x — 2,5% a.m.</option>
+                                            <option value="14">14x — 2,5% a.m.</option>
+                                            <option value="15">15x — 2,5% a.m.</option>
+                                            <option value="16">16x — 2,5% a.m.</option>
+                                            <option value="17">17x — 2,5% a.m.</option>
+                                            <option value="18">18x — 2,5% a.m.</option>
                                         </select>
                                     </div>
                                     <div>
@@ -5311,6 +5378,18 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                             <option value="10">10x</option>
                                             <option value="11">11x</option>
                                             <option value="12">12x</option>
+                                            <option value="13">13x</option>
+                                            <option value="14">14x</option>
+                                            <option value="15">15x</option>
+                                            <option value="16">16x</option>
+                                            <option value="17">17x</option>
+                                            <option value="18">18x</option>
+                                            <option value="19">19x</option>
+                                            <option value="20">20x</option>
+                                            <option value="21">21x</option>
+                                            <option value="22">22x</option>
+                                            <option value="23">23x</option>
+                                            <option value="24">24x</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -5444,6 +5523,15 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                             <option value="month">Este mês</option>
                             <option value="year">Este ano</option>
                         </select>
+                        <select id="filterSalePayment" onchange="Sales.filterHistory()">
+                            <option value="">Qualquer pagamento</option>
+                            <option value="pix">PIX</option>
+                            <option value="cash">Dinheiro</option>
+                            <option value="debit">Débito</option>
+                            <option value="credit">Crédito</option>
+                            <option value="installment">Crediário</option>
+                            <option value="dual">Duplo</option>
+                        </select>
                         <button class="btn btn-secondary btn-sm" onclick="Sales.clearHistoryFilter()" title="Limpar filtros"><i class="fas fa-times"></i> Limpar</button>
                     </div>
                     <table id="salesHistoryTable">
@@ -5453,6 +5541,7 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 <th>Cliente</th>
                                 <th>Total</th>
                                 <th>Pagamento</th>
+                                <th>Saldo / Fin.</th>
                                 <th>Status</th>
                                 <th>Data</th>
                                 <th>Ações</th>
@@ -8355,6 +8444,28 @@ ORDER BY t.table_name;
                     const parcelas     = det.parcels || [];
                     const method       = sale.paymentMethod || '';
 
+                    // ── Pagamento Misto (múltiplas formas) ────────────────────
+                    // Bug #2 Fix: mixedPayments não era processado em ContasManager
+                    if (sale.paymentMethod === 'mixed' && Array.isArray(sale.mixedPayments) && sale.mixedPayments.length > 0) {
+                        // Vendas mistas são pagas integralmente no ato — só gera conta se houver retirada pendente
+                        const retiradaMista = parseFloat(det.retiradaValue || 0);
+                        if (retiradaMista > 0.01 && !sale.retiradaPaga) {
+                            const mixLabel = sale.mixedPayments.map(r => ({pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'}[r.method]||r.method)).join('+');
+                            contasVendas.push({
+                                id: 'venda_' + sale.id + '_retirada',
+                                tipo: 'receber',
+                                descricao: `OS ${sale.number} — Saldo na Retirada (${mixLabel})`,
+                                parte: nomeCliente,
+                                categoria: 'Retirada',
+                                valor: retiradaMista,
+                                vencimento: sale.deliveryForecast || sale.date || '',
+                                pago: false,
+                                _readonly: true
+                            });
+                        }
+                        continue;
+                    }
+
                     // ── Pagamento Duplo (2 formas) ─────────────────────────────
                     if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
                         for (const [idx, slot] of sale.dualPayments.entries()) {
@@ -8391,8 +8502,8 @@ ORDER BY t.table_name;
                                     });
                                 }
                             } else {
-                                // À vista com retirada pendente
-                                if ((slot.retirada || 0) > 0.01 && (slot.entry || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) {
+                                // À vista com retirada pendente (não precisa de entrada > 0)
+                                if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) {
                                     contasVendas.push({
                                         id: `venda_${sale.id}_dual${idx}_retirada`,
                                         tipo: 'receber',
@@ -8453,8 +8564,8 @@ ORDER BY t.table_name;
                         // Só gera conta a receber se foi explicitamente salvo um saldo de retirada
                         // (det.retiradaValue > 0) E a entrada foi menor que o total
                         const retiradaAVista = parseFloat(det.retiradaValue || 0);
-                        const entradaAVista  = parseFloat(det.entradaValue  || 0);
-                        if (retiradaAVista > 0.01 && entradaAVista > 0 && !sale.retiradaPaga) {
+                        // Bug fix: remover condição entradaAVista > 0 — retirada existe independente de ter entrada gravada
+                        if (retiradaAVista > 0.01 && !sale.retiradaPaga) {
                             contasVendas.push({
                                 id: 'venda_' + sale.id + '_retirada',
                                 tipo: 'receber',
@@ -8514,13 +8625,73 @@ ORDER BY t.table_name;
                 const totalRec = receber.filter(c=>!c.pago).reduce((s,c)=>s+parseFloat(c.valor||0),0);
                 const totalPag = pagar.filter(c=>!c.pago).reduce((s,c)=>s+parseFloat(c.valor||0),0);
 
+                // Novos totais: vencidas e a vencer
+                const agora = new Date(); agora.setHours(0,0,0,0);
+                const fmtDate = v => new Date(v+'T12:00:00');
+                const recVencidas  = receber.filter(c => !c.pago && c.vencimento && fmtDate(c.vencimento) < agora).reduce((s,c)=>s+parseFloat(c.valor||0),0);
+                const recAVencer   = receber.filter(c => !c.pago && c.vencimento && fmtDate(c.vencimento) >= agora).reduce((s,c)=>s+parseFloat(c.valor||0),0);
+                const pagVencidas  = pagar.filter(c => !c.pago && c.vencimento && fmtDate(c.vencimento) < agora).reduce((s,c)=>s+parseFloat(c.valor||0),0);
+
+                // Aging — distribuição das vencidas por faixa
+                const aging = { a30:0, a60:0, a90:0, a90plus:0 };
+                receber.filter(c => !c.pago && c.vencimento && fmtDate(c.vencimento) < agora).forEach(c => {
+                    const days = Math.ceil((agora - fmtDate(c.vencimento)) / 86400000);
+                    const v = parseFloat(c.valor||0);
+                    if (days <= 30)      aging.a30 += v;
+                    else if (days <= 60) aging.a60 += v;
+                    else if (days <= 90) aging.a90 += v;
+                    else                 aging.a90plus += v;
+                });
+
                 const elRec = document.getElementById('contasReceberTotal');
                 const elPag = document.getElementById('contasPagarTotal');
                 if(elRec) elRec.textContent = this.fmt(totalRec);
                 if(elPag) elPag.textContent = this.fmt(totalPag);
 
+                // Novos elementos de totais
+                const elVenc  = document.getElementById('contasVencidasTotal');  if(elVenc) elVenc.textContent = this.fmt(recVencidas);
+                const elAVenc = document.getElementById('contasAVencerTotal');   if(elAVenc) elAVenc.textContent = this.fmt(recAVencer);
+                const elPagV  = document.getElementById('contasPagarVencidas');  if(elPagV) elPagV.textContent = this.fmt(pagVencidas);
+
+                // Aging panel
+                const agPanel = document.getElementById('agingPanel');
+                if (agPanel) {
+                    agPanel.style.display = recVencidas > 0 ? 'block' : 'none';
+                    const fmtShort = v => 'R$\u00a0' + v.toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2});
+                    const set = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = fmtShort(v); };
+                    set('aging0_30', aging.a30);
+                    set('aging31_60', aging.a60);
+                    set('aging61_90', aging.a90);
+                    set('aging90plus', aging.a90plus);
+                }
+
                 this._renderList('contasReceberList', receber, hoje);
                 this._renderList('contasPagarList', pagar, hoje);
+                // Cache completo para filtro em tempo real
+                this._allReceber = receber;
+                this._allPagar   = pagar;
+                this._hoje       = hoje;
+            },
+
+            // Filtro em tempo real — padrão de sistemas profissionais (Glasscurvex, OticaManager)
+            filtrar() {
+                const hoje = this._hoje || new Date().toISOString().split('T')[0];
+                const buscarec = (document.getElementById('contasReceberBusca')?.value || '').toLowerCase();
+                const filtrorec = document.getElementById('contasReceberFiltro')?.value || 'todos';
+                const buscapag = (document.getElementById('contasPagarBusca')?.value || '').toLowerCase();
+                const filtropag = document.getElementById('contasPagarFiltro')?.value || 'todos';
+
+                const aplicar = (lista, busca, filtro) => lista.filter(c => {
+                    const texto = ((c.descricao||'') + ' ' + (c.parte||'')).toLowerCase();
+                    if (busca && !texto.includes(busca)) return false;
+                    if (filtro === 'pago')   return c.pago;
+                    if (filtro === 'vencida') return !c.pago && c.vencimento && c.vencimento < hoje;
+                    if (filtro === 'pendente') return !c.pago && (!c.vencimento || c.vencimento >= hoje);
+                    return true;
+                });
+
+                this._renderList('contasReceberList', aplicar(this._allReceber || [], buscarec, filtrorec), hoje);
+                this._renderList('contasPagarList', aplicar(this._allPagar || [], buscapag, filtropag), hoje);
             },
 
             _renderList(elId, contas, hoje) {
@@ -8542,23 +8713,34 @@ ORDER BY t.table_name;
                     const classes = ['conta-item', c.tipo, c.pago?'paga':'', vencida?'vencida':''].filter(Boolean).join(' ');
                     const vencLabel = venc ? new Date(venc+'T12:00:00').toLocaleDateString('pt-BR') : '—';
                     const statusBadge = c.pago
-                        ? '<span style="background:#28a745;color:white;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">✓ Pago</span>'
+                        ? `<span style="background:#28a745;color:white;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">✓ Pago${c.paidValue ? ' R$'+parseFloat(c.paidValue).toFixed(2).replace('.',',') : ''}</span>`
                         : vencida
                             ? '<span style="background:#ffc107;color:#000;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">⚠ Vencida</span>'
                             : '<span style="background:#e9ecef;color:#555;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;">Pendente</span>';
+
+                    // WhatsApp cobrança — disponível para itens de venda com cliente
+                    const hasWpp = c._readonly && c.parte && c.parte !== 'Cliente';
+                    const clientObj = (state.clients||[]).find(cl => cl.name === c.parte);
+                    const phone = clientObj?.whatsapp || clientObj?.phone || '';
+                    const wppBtn = (hasWpp && phone && !c.pago) ? `<button class="btn btn-sm" style="background:rgba(37,211,102,0.15);color:#25d366;border:1px solid rgba(37,211,102,0.3);padding:4px 8px;font-size:0.75rem;" title="Cobrar via WhatsApp"
+                        onclick="ContasManager.enviarCobrancaWhatsApp('${c.id}')"><i class="fab fa-whatsapp"></i></button>` : '';
+
                     return `<div class="${classes}">
-                        <div class="conta-item-info">
-                            <div class="conta-item-nome">${c.descricao||'—'}</div>
-                            <div class="conta-item-det">${c.parte||''} ${c.categoria ? '· '+c.categoria : ''} · Venc: ${vencLabel} ${statusBadge}</div>
+                        <div class="conta-item-row1">
+                            <div class="conta-item-nome" title="${c.descricao||''}">${c.descricao||'—'}</div>
+                            <span class="conta-item-valor">${this.fmt(c.valor)}</span>
                         </div>
-                        <span class="conta-item-valor">${this.fmt(c.valor)}</span>
-                        <div class="conta-item-actions">
-                            ${!c.pago && !c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixa('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
-                            ${!c.pago && c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixaVenda('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
-                            ${!c._readonly ? `<button class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.75rem;" title="Comprovante" onclick="ContasManager.gerarComprovante('${c.id}')"><i class="fas fa-receipt"></i></button>` : ''}
-                            ${!c._readonly ? `<button class="btn btn-sm" style="background:#17a2b8;color:white;padding:4px 8px;font-size:0.75rem;" title="Editar" onclick="ContasManager.editarConta('${c.id}')"><i class="fas fa-pen"></i></button>` : ''}
-                            ${!c._readonly ? `<button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.75rem;" title="Excluir" onclick="ContasManager.excluirConta('${c.id}')"><i class="fas fa-trash"></i></button>` : ''}
-                            ${c._readonly ? `<span style="font-size:0.72rem;color:var(--gray);padding:4px 6px;" title="Gerado automaticamente pela venda">🔗 Auto</span>` : ''}
+                        <div class="conta-item-row2">
+                            <div class="conta-item-det" title="${c.parte||''}">${c.parte||''} ${c.categoria ? '· '+c.categoria : ''} · ${vencLabel} ${statusBadge}</div>
+                            <div class="conta-item-actions">
+                                ${!c.pago && !c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixa('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
+                                ${!c.pago && c._readonly ? `<button class="btn btn-sm" style="background:#28a745;color:white;padding:4px 8px;font-size:0.75rem;" title="Dar Baixa" onclick="ContasManager.darBaixaVenda('${c.id}')"><i class="fas fa-check"></i></button>` : ''}
+                                ${wppBtn}
+                                ${!c._readonly ? `<button class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.75rem;" title="Comprovante" onclick="ContasManager.gerarComprovante('${c.id}')"><i class="fas fa-receipt"></i></button>` : ''}
+                                ${!c._readonly ? `<button class="btn btn-sm" style="background:#17a2b8;color:white;padding:4px 8px;font-size:0.75rem;" title="Editar" onclick="ContasManager.editarConta('${c.id}')"><i class="fas fa-pen"></i></button>` : ''}
+                                ${!c._readonly ? `<button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.75rem;" title="Excluir" onclick="ContasManager.excluirConta('${c.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                                ${c._readonly ? `<span style="font-size:0.7rem;color:var(--gray);padding:2px 5px;" title="Gerado automaticamente pela venda">🔗</span>` : ''}
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
@@ -8622,40 +8804,122 @@ ORDER BY t.table_name;
             },
 
             async darBaixa(id) {
-                if(!confirm('Confirmar baixa nesta conta?')) return;
+                // Profissional: modal com valor recebido + forma de pagamento
                 const contas = await this.getAll();
-                const idx = contas.findIndex(c=>c.id===id);
-                if(idx>=0) {
-                    contas[idx].pago = true;
-                    contas[idx].dataPagamento = new Date().toISOString();
-                    await this.saveAll(contas);
-                    Toast.show('Baixa registrada!','success');
-                    this.renderAll();
-                    this.gerarComprovante(id);
-                }
+                const conta = contas.find(c => c.id === id);
+                if (!conta) return;
+                const defaultVal = parseFloat(conta.valor || 0).toFixed(2).replace('.', ',');
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `<div style="background:#fff;border-radius:14px;padding:24px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.25);font-family:inherit;">
+                    <h3 style="margin:0 0 6px;font-size:1rem;color:#28a745;">💰 Registrar Baixa</h3>
+                    <p style="font-size:0.8rem;color:#666;margin:0 0 14px;">${conta.descricao || 'Conta'} — Valor original: <strong>R$ ${defaultVal}</strong></p>
+                    <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">Valor recebido (R$)</label>
+                    <input type="number" id="_bxVal" value="${parseFloat(conta.valor||0).toFixed(2)}" step="0.01" min="0"
+                        style="width:100%;padding:10px;border:2px solid #28a745;border-radius:8px;font-size:1rem;box-sizing:border-box;margin-bottom:12px;">
+                    <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">Forma de pagamento</label>
+                    <select id="_bxForma" style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:0.9rem;box-sizing:border-box;margin-bottom:14px;">
+                        <option value="">— Selecionar —</option>
+                        <option value="PIX">PIX</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Débito">Cartão Débito</option>
+                        <option value="Crédito">Cartão Crédito</option>
+                        <option value="Transferência">Transferência</option>
+                        <option value="Boleto">Boleto</option>
+                    </select>
+                    <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">Observação (opcional)</label>
+                    <input type="text" id="_bxObs" placeholder="Ex: Pago com desconto..." 
+                        style="width:100%;padding:8px;border:2px solid #ddd;border-radius:8px;font-size:0.88rem;box-sizing:border-box;margin-bottom:14px;">
+                    <div style="display:flex;gap:10px;">
+                        <button id="_bxCancel" style="flex:1;padding:10px;border:2px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">Cancelar</button>
+                        <button id="_bxConfirm" style="flex:1;padding:10px;border:none;border-radius:8px;background:#28a745;color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">✔ Confirmar</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(overlay);
+                overlay.querySelector('#_bxCancel').onclick = () => overlay.remove();
+                overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+                overlay.querySelector('#_bxConfirm').onclick = async () => {
+                    const paidVal = parseFloat(overlay.querySelector('#_bxVal').value) || 0;
+                    const forma   = overlay.querySelector('#_bxForma').value;
+                    const obs     = overlay.querySelector('#_bxObs').value.trim();
+                    if (paidVal <= 0) { Toast.show('Informe um valor válido', 'warning'); return; }
+                    const idx2 = contas.findIndex(c => c.id === id);
+                    if (idx2 >= 0) {
+                        contas[idx2].pago = true;
+                        contas[idx2].dataPagamento = new Date().toISOString();
+                        contas[idx2].paidValue = paidVal;
+                        contas[idx2].formaPagamento = forma || '—';
+                        if (obs) contas[idx2].obs = obs;
+                        await this.saveAll(contas);
+                        Toast.show('Baixa registrada! ✅', 'success');
+                        overlay.remove();
+                        this.renderAll();
+                        this.gerarComprovante(id);
+                    }
+                };
             },
 
-            // Dar baixa em parcela ou retirada gerada automaticamente pela venda
             darBaixaVenda(itemId) {
                 // Formato dos IDs:
                 //   venda_{saleId}_p{N}       → parcela N do crediário
                 //   venda_{saleId}_retirada   → pagamento na retirada
                 //   venda_{saleId}_total      → total da venda (outros métodos)
-                if (!confirm('Confirmar baixa neste item? Esta ação marca o pagamento como recebido.')) return;
                 const parts = itemId.split('_');
                 if (parts.length < 3) return;
                 const saleId = parts[1];
-                const tipo   = parts.slice(2).join('_'); // "p1", "p2", "retirada", "total"
+                const tipo   = parts.slice(2).join('_');
                 const sale   = (state.sales || []).find(s => s.id === saleId);
                 if (!sale) { Toast.show('Venda não encontrada','warning'); return; }
 
-                // Captura os dados do item do cache ANTES de qualquer modificação
-                const cachedItem = (this._itemCache || {})[itemId] || {};
+                const cachedItem   = (this._itemCache || {})[itemId] || {};
                 const itemValor    = parseFloat(cachedItem.valor || 0);
                 const itemDescricao = cachedItem.descricao || '';
-                const itemCliente  = cachedItem.parte || sale.clientName || sale.client || '—';
+                const itemCliente  = cachedItem.parte || sale.clientName || '—';
                 const itemCategoria = cachedItem.categoria || 'Venda';
                 const itemVencimento = cachedItem.vencimento || '';
+
+                // Modal de baixa com valor recebido + forma pagamento
+                const defaultVal = itemValor.toFixed(2).replace('.', ',');
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `<div style="background:#fff;border-radius:14px;padding:24px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.25);font-family:inherit;">
+                    <h3 style="margin:0 0 6px;font-size:1rem;color:#28a745;">💰 Dar Baixa</h3>
+                    <p style="font-size:0.8rem;color:#666;margin:0 0 14px;">${itemDescricao} — Valor original: <strong>R$ ${defaultVal}</strong></p>
+                    <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">Valor recebido (R$) *</label>
+                    <input type="number" id="_vbxVal" value="${itemValor.toFixed(2)}" step="0.01" min="0"
+                        style="width:100%;padding:10px;border:2px solid #28a745;border-radius:8px;font-size:1rem;box-sizing:border-box;margin-bottom:12px;">
+                    <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">Forma de pagamento</label>
+                    <select id="_vbxForma" style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:0.9rem;box-sizing:border-box;margin-bottom:12px;">
+                        <option value="">— Selecionar —</option>
+                        <option value="PIX">PIX</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Débito">Cartão Débito</option>
+                        <option value="Crédito">Cartão Crédito</option>
+                        <option value="Transferência">Transferência</option>
+                    </select>
+                    <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">Observação (opcional)</label>
+                    <input type="text" id="_vbxObs" placeholder="Ex: Pago com desconto, negociado..."
+                        style="width:100%;padding:8px;border:2px solid #ddd;border-radius:8px;font-size:0.88rem;box-sizing:border-box;margin-bottom:14px;">
+                    <div style="display:flex;gap:10px;">
+                        <button id="_vbxCancel" style="flex:1;padding:10px;border:2px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">Cancelar</button>
+                        <button id="_vbxConfirm" style="flex:1;padding:10px;border:none;border-radius:8px;background:#28a745;color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">✔ Confirmar Baixa</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(overlay);
+                overlay.querySelector('#_vbxCancel').onclick = () => overlay.remove();
+                overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+                overlay.querySelector('#_vbxConfirm').onclick = () => {
+                    const paidVal = parseFloat(overlay.querySelector('#_vbxVal').value) || 0;
+                    const forma   = overlay.querySelector('#_vbxForma').value || '—';
+                    const obs     = overlay.querySelector('#_vbxObs')?.value?.trim() || '';
+                    if (paidVal <= 0) { Toast.show('Informe um valor válido','warning'); return; }
+                    overlay.remove();
+                    this._executarBaixaVenda(itemId, tipo, sale, paidVal, forma, itemValor, itemDescricao, itemCliente, itemCategoria, itemVencimento, obs);
+                };
+            },
+
+            // Executa a baixa após confirmação modal
+            _executarBaixaVenda(itemId, tipo, sale, paidVal, forma, itemValor, itemDescricao, itemCliente, itemCategoria, itemVencimento, obs) {
 
                 // Suporte ao modo dual: venda_{id}_dual{N}_p{M} ou venda_{id}_dual{N}_retirada
                 if (tipo.startsWith('dual')) {
@@ -8667,15 +8931,20 @@ ORDER BY t.table_name;
                         if (sale.dualPayments?.[dualIdx]?.parcelas) {
                             const parc = sale.dualPayments[dualIdx].parcelas.find(p => p.number === num);
                             if (parc) {
-                                parc.paid = true; parc.status = 'pago'; parc.paidDate = new Date().toISOString().slice(0,10);
+                                parc.paid = true; parc.status = 'pago';
+                                parc.paidDate = new Date().toISOString().slice(0,10);
+                                parc.paidValue = paidVal; parc.formaPagamento = forma;
+                                if (this.checkPaymentComplete(sale)) sale.paymentStatus = 'pago';
                                 App.saveData();
                                 Toast.show(`Parcela ${num} quitada! ✅`, 'success');
                                 this.renderAll();
-                                this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento);
+                                this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento, forma, obs);
                             }
                         }
                     } else if (dualSub === 'retirada') {
                         sale[`retiradaPaga_dual${dualIdx}`] = true;
+                        // Fix: verifica quitação total após registrar retirada dual
+                        if (ContasManager.checkPaymentComplete(sale)) sale.paymentStatus = 'pago';
                         App.saveData();
                         Toast.show('Retirada registrada! ✅', 'success');
                         this.renderAll();
@@ -8692,6 +8961,8 @@ ORDER BY t.table_name;
                             parc.paid     = true;
                             parc.status   = 'pago';
                             parc.paidDate = new Date().toISOString().slice(0,10);
+                            parc.paidValue = paidVal;
+                            parc.formaPagamento = forma;
                             // Fix Bug #5: usa checkPaymentComplete que verifica parcelas + retirada
                             if (this.checkPaymentComplete(sale)) {
                                 sale.paymentStatus = 'pago';
@@ -8699,7 +8970,7 @@ ORDER BY t.table_name;
                             App.saveData();
                             Toast.show(`Parcela ${num} quitada! ✅`, 'success');
                             this.renderAll();
-                            this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento);
+                            this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento, forma, obs);
                         }
                     }
                 } else if (tipo === 'retirada') {
@@ -8717,19 +8988,25 @@ ORDER BY t.table_name;
                     App.saveData();
                     Toast.show('Pagamento na retirada registrado! ✅', 'success');
                     this.renderAll();
-                    this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento na Retirada', itemValor, itemCliente, itemCategoria, itemVencimento);
+                    this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento na Retirada', itemValor, itemCliente, itemCategoria, itemVencimento, forma, obs);
                 } else if (tipo === 'total') {
                     sale.paymentStatus = 'pago';
                     App.saveData();
                     Toast.show('Pagamento registrado! ✅', 'success');
                     this.renderAll();
-                    this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento Total', itemValor||sale.total||0, itemCliente, itemCategoria, itemVencimento);
+                    this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento Total', itemValor||sale.total||0, itemCliente, itemCategoria, itemVencimento, forma, obs);
                 }
             },
 
             // Fix Bug #5: verifica se venda está completamente quitada (parcelas + retirada)
             checkPaymentComplete(sale) {
                 const det = sale.paymentDetails || {};
+                // Vendas mistas (múltiplas formas) — pagas no ato; só bloqueia se houver retirada pendente
+                if (sale.paymentMethod === 'mixed') {
+                    const retiradaMista = parseFloat(det.retiradaValue || 0);
+                    if (retiradaMista > 0.01 && !sale.retiradaPaga) return false;
+                    return true;
+                }
                 // Verifica parcelas do crediário simples
                 if (sale.paymentMethod === 'installment' || det.parcels?.length) {
                     const todasPagas = (det.parcels || []).every(p => p.paid || p.status === 'pago' || p.status === 'paid');
@@ -8763,17 +9040,18 @@ ORDER BY t.table_name;
             },
 
             // Gera comprovante para itens de venda (parcelas, retirada, total)
-            gerarComprovanteVenda(itemId, descricao, valor, cliente, categoria, vencimento) {
+            gerarComprovanteVenda(itemId, descricao, valor, cliente, categoria, vencimento, formaPagamento, obs) {
                 const obj = {
                     tipo: 'receber',
                     descricao: descricao || 'Pagamento de venda',
                     valor: valor || 0,
                     parte: cliente || '—',
                     categoria: categoria || 'Venda',
-                    obs: '',
+                    obs: obs || '',
                     vencimento: vencimento || '',
                     pago: true,
                     dataPagamento: new Date().toISOString(),
+                    formaPagamento: formaPagamento || '—',
                 };
                 this._exibirComprovanteModal(obj);
             },
@@ -8917,12 +9195,43 @@ ORDER BY t.table_name;
             },
 
             async excluirConta(id) {
-                if(!confirm('Excluir esta conta?')) return;
-                const contas = await this.getAll();
-                await this.saveAll(contas.filter(c=>c.id!==id));
-                Toast.show('Conta excluída','info');
-                this.renderAll();
-            }
+                // Bug #3 Fix: substituído confirm() nativo por micro-modal (PWA-safe)
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `<div style="background:#fff;border-radius:14px;padding:24px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.25);font-family:inherit;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:8px;">🗑️</div>
+                    <h3 style="margin:0 0 8px;font-size:1rem;color:#dc3545;">Excluir Conta?</h3>
+                    <p style="font-size:0.82rem;color:#666;margin:0 0 18px;">Esta ação não pode ser desfeita.</p>
+                    <div style="display:flex;gap:10px;">
+                        <button id="_excCancelar" style="flex:1;padding:10px;border:2px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">Cancelar</button>
+                        <button id="_excConfirmar" style="flex:1;padding:10px;border:none;border-radius:8px;background:#dc3545;color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">🗑 Excluir</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(overlay);
+                overlay.querySelector('#_excCancelar').onclick = () => overlay.remove();
+                overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+                overlay.querySelector('#_excConfirmar').onclick = async () => {
+                    overlay.remove();
+                    const contas = await this.getAll();
+                    await this.saveAll(contas.filter(c => c.id !== id));
+                    Toast.show('Conta excluída', 'info');
+                    this.renderAll();
+                };
+            },
+
+            enviarCobrancaWhatsApp(itemId) {
+                const c = (this._itemCache || {})[itemId];
+                if (!c) { Toast.show('Item não encontrado','warning'); return; }
+                const clientObj = (state.clients||[]).find(cl => cl.name === c.parte);
+                const phone = (clientObj?.whatsapp || clientObj?.phone || '').replace(/\D/g,'');
+                if (!phone) { Toast.show('Cliente sem WhatsApp/telefone cadastrado','warning'); return; }
+                const emp = state.company?.name || 'Ótica';
+                const vencLabel = c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                const valor = this.fmt(c.valor);
+                const msg = `Olá, *${c.parte}*! 👋\n\nPassando para lembrar sobre o seguinte lançamento em aberto:\n\n📋 *${c.descricao}*\n💰 Valor: *${valor}*\n📅 Vencimento: *${vencLabel}*\n\nQualquer dúvida estamos à disposição!\n\n_${emp}_`;
+                const url = `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
+                WppConfirm.show({ nome: c.parte, phone, subtitle: 'Cobrança via WhatsApp', msg, url });
+            },
         };
         window.ContasManager = ContasManager;
         const WppConfirm = {
@@ -9474,12 +9783,12 @@ ORDER BY t.table_name;
                 // ==================== MOTOR DE PDF — ALTA QUALIDADE ====================
         // Configurações globais de qualidade
         const PDF_CONFIG = {
-            SCALE:      3,          // 3× = ~285 DPI equivalente (impressão profissional nítida, ótima performance)
+            SCALE:      2,          // 2× = ~190 DPI — ótima qualidade + 2× mais rápido que SCALE:3
             PX_PER_MM:  3.7795275591,
-            FORMAT:     'PNG',      // PNG sem perda — textos nítidos, sem artefatos JPEG
-            COMPRESSION:'NONE',     // Sem compressão na imagem = máxima fidelidade
-            JPEG_Q:     1.0,        // Fallback JPEG qualidade máxima
-            RENDER_DELAY: 600,      // ms aguardar renderização completa do DOM + estilos injetados
+            FORMAT:     'JPEG',     // JPEG é muito mais rápido que PNG para documentos
+            COMPRESSION:'FAST',     // Compressão rápida no jsPDF
+            JPEG_Q:     0.92,       // Qualidade alta mas arquivo menor
+            RENDER_DELAY: 180,      // ms — reduzido de 600ms (DOM já está renderizado)
         };
 
         // ── Coleta todos os CSS da página em uma string ─────────────────────
@@ -9592,16 +9901,9 @@ ORDER BY t.table_name;
             });
         }
 
-        // ── PNG base64 de alta qualidade a partir do canvas ─────────────────
+        // ── JPEG rápido para todos os documentos (qualidade 0.92 = ótima para impressão)
         function _canvasParaImagem(canvas) {
-            // Tenta PNG primeiro (sem perda). Fallback JPEG qualidade máxima.
-            try {
-                const png = canvas.toDataURL('image/png');
-                // PNG pode ser muito grande para documentos com logos; usa PNG sempre pois qualidade é prioridade
-                return { data: png, format: 'PNG' };
-            } catch(e) {
-                return { data: canvas.toDataURL('image/jpeg', PDF_CONFIG.JPEG_Q), format: 'JPEG' };
-            }
+            return { data: canvas.toDataURL('image/jpeg', PDF_CONFIG.JPEG_Q), format: 'JPEG' };
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -9673,15 +9975,11 @@ ORDER BY t.table_name;
                     }
                 }
 
-                if (opcoes.preview) {
-                    const blobUrl = pdf.output('bloburl');
-                    const tab = window.open(blobUrl, '_blank');
-                    if (!tab) Toast.show('Permita popups para visualizar o PDF', 'warning');
-                    else Toast.show('PDF aberto para visualização!', 'success');
-                } else {
-                    pdf.save(`${nomeArquivo}.pdf`);
-                    Toast.show('PDF gerado com sucesso!', 'success');
-                }
+                // Sempre abre para visualização — nunca baixa automaticamente
+                const blobUrl = pdf.output('bloburl');
+                const tab = window.open(blobUrl, '_blank');
+                if (!tab) Toast.show('Permita popups para visualizar o PDF', 'warning');
+                else Toast.show('PDF aberto para visualização! ✅', 'success');
             } catch (err) {
                 console.error('[PDF] Erro:', err);
                 Toast.show('Erro ao gerar PDF: ' + err.message, 'error');
@@ -9721,9 +10019,12 @@ ORDER BY t.table_name;
                     compress: false,
                 });
                 pdf.setProperties({ title: nomeArquivo, creator: 'ÓticaVision Pro' });
-                pdf.addImage(data, format, 0, 0, larguraMM, alturaMM, '', 'NONE');
-                pdf.save(`${nomeArquivo}.pdf`);
-                Toast.show('PDF gerado com sucesso!', 'success');
+                pdf.addImage(data, format, 0, 0, larguraMM, alturaMM, '', 'FAST');
+                // Sempre visualiza — nunca baixa
+                const blobUrl = pdf.output('bloburl');
+                const tab = window.open(blobUrl, '_blank');
+                if (!tab) Toast.show('Permita popups para visualizar o PDF', 'warning');
+                else Toast.show('PDF aberto para visualização! ✅', 'success');
             } catch (err) {
                 console.error('[PDF] Erro:', err);
                 Toast.show('Erro ao gerar PDF: ' + err.message, 'error');
@@ -9772,8 +10073,11 @@ ORDER BY t.table_name;
                     }
                 }
 
-                pdf.save(`${nomeArquivo}.pdf`);
-                Toast.show('PDF gerado com sucesso!', 'success');
+                // Sempre visualiza — nunca baixa
+                const blobUrl = pdf.output('bloburl');
+                const tab = window.open(blobUrl, '_blank');
+                if (!tab) Toast.show('Permita popups para visualizar o PDF', 'warning');
+                else Toast.show('PDF aberto para visualização! ✅', 'success');
             } catch (err) {
                 console.error('[PDF] Erro:', err);
                 Toast.show('Erro ao gerar PDF: ' + err.message, 'error');
@@ -13531,6 +13835,7 @@ ${container.innerHTML}
                 const term    = (document.getElementById('searchSaleHistory')?.value || '').toLowerCase().trim();
                 const status  = document.getElementById('filterSaleStatus')?.value  || '';
                 const period  = document.getElementById('filterSalePeriod')?.value   || '';
+                const payFilt = document.getElementById('filterSalePayment')?.value  || '';
                 const now     = new Date();
 
                 const STATUS_MAP = {
@@ -13548,19 +13853,59 @@ ${container.innerHTML}
                     'cancelado':   { label: '❌ Cancelado',          cls: 'danger'    },
                 };
 
+                const METH_LBL = {pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário'};
+
+                // Helper: resumo de pagamento da venda
+                const getPayLabel = (s) => {
+                    if (s.paymentMode === 'dual' && s.dualPayments?.length === 2) {
+                        return s.dualPayments.map(d => METH_LBL[d.method] || d.method).join(' + ');
+                    }
+                    return METH_LBL[s.paymentMethod] || s.paymentMethod || '—';
+                };
+
+                // Helper: saldo devedor
+                const getSaldo = (s) => {
+                    if (s.paymentStatus === 'pago') return { txt: '✅ Quitado', cls: '#28a745' };
+                    const det = s.paymentDetails || {};
+                    // Crediário simples
+                    if (s.paymentMethod === 'installment' && det.parcels?.length) {
+                        const pend = det.parcels.filter(p => !p.paid && p.status !== 'pago' && p.status !== 'paid');
+                        if (!pend.length) return { txt: '✅ Quitado', cls: '#28a745' };
+                        const saldo = pend.reduce((a, p) => a + parseFloat(p.value || 0), 0);
+                        const venc  = pend.some(p => p.dueDate < new Date().toISOString().slice(0,10));
+                        return { txt: (venc ? '⚠️ ' : '') + Utils.formatCurrency(saldo), cls: venc ? '#c62828' : '#e65100' };
+                    }
+                    // Dual
+                    if (s.paymentMode === 'dual' && s.dualPayments?.length === 2) {
+                        let saldo = 0;
+                        for (const slot of s.dualPayments) {
+                            if (slot.method === 'installment') {
+                                (slot.parcelas || []).filter(p => !p.paid && p.status !== 'pago').forEach(p => { saldo += parseFloat(p.value || 0); });
+                            }
+                            if ((slot.retirada || 0) > 0.01 && !s[`retiradaPaga_dual${s.dualPayments.indexOf(slot)}`]) saldo += slot.retirada;
+                        }
+                        if (saldo < 0.01) return { txt: '✅ Quitado', cls: '#28a745' };
+                        return { txt: Utils.formatCurrency(saldo), cls: '#e65100' };
+                    }
+                    // À vista com retirada
+                    const ret = parseFloat(det.retiradaValue || 0);
+                    if (ret > 0.01 && !s.retiradaPaga) return { txt: '⏳ ' + Utils.formatCurrency(ret), cls: '#e65100' };
+                    return { txt: '—', cls: '#888' };
+                };
+
                 let filtered = state.sales.slice().reverse().filter(s => {
                     const client     = state.clients.find(c => c.id === s.clientId);
                     const clientName = (client?.name || '').toLowerCase();
                     const sNum       = (s.number || '').toLowerCase();
                     const sTotal     = Utils.formatCurrency(s.total).toLowerCase();
+                    const payLbl     = getPayLabel(s).toLowerCase();
 
-                    // Filtro texto
-                    if (term && !clientName.includes(term) && !sNum.includes(term) && !sTotal.includes(term)) return false;
-
-                    // Filtro status
+                    if (term && !clientName.includes(term) && !sNum.includes(term) && !sTotal.includes(term) && !payLbl.includes(term)) return false;
                     if (status && s.status !== status && !(status === 'producao' && s.status === 'production') && !(status === 'entregue' && s.status === 'delivered') && !(status === 'pronto' && s.status === 'ready')) return false;
-
-                    // Filtro período
+                    if (payFilt) {
+                        if (payFilt === 'dual' && s.paymentMode !== 'dual') return false;
+                        if (payFilt !== 'dual' && s.paymentMethod !== payFilt) return false;
+                    }
                     if (period) {
                         const d = new Date((s.date || '') + 'T12:00:00');
                         if (period === 'today' && d.toDateString() !== now.toDateString()) return false;
@@ -13568,21 +13913,19 @@ ${container.innerHTML}
                         if (period === 'month'  && (d.getMonth() !== now.getMonth() || d.getFullYear() !== now.getFullYear())) return false;
                         if (period === 'year'   && d.getFullYear() !== now.getFullYear()) return false;
                     }
-
                     return true;
                 });
 
-                // Atualiza badge de contagem
                 const badge = document.getElementById('salesCountBadge');
                 if (badge) badge.textContent = `${filtered.length} OS${filtered.length !== state.sales.length ? ` de ${state.sales.length}` : ''}`;
 
-                // Se filtro ativo, mostrar só as 5 últimas e rolar para cima
-                const filtroAtivo = !!(term || status || period);
-                const exibir = filtroAtivo ? filtered.slice(0, 5) : filtered;
+                const filtroAtivo = !!(term || status || period || payFilt);
+                const LIMIT = filtroAtivo ? 20 : filtered.length; // limite 20 com filtro (era 5)
+                const exibir = filtered.slice(0, LIMIT);
 
                 tbody.innerHTML = '';
                 if (filtered.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--gray);">
+                    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--gray);">
                         <i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.3;"></i>
                         Nenhuma OS encontrada com esses filtros.
                     </td></tr>`;
@@ -13594,11 +13937,17 @@ ${container.innerHTML}
                     const clientName = client?.name || 'N/A';
                     const st = STATUS_MAP[s.status] || { label: s.status || '—', cls: 'secondary' };
                     const hasPhone = !!(client?.whatsapp || client?.phone);
+                    const payLbl = getPayLabel(s);
+                    const saldo  = getSaldo(s);
+                    // Badge de pagamento colorido
+                    const isDual = s.paymentMode === 'dual';
+                    const payBadgeColor = isDual ? '#ff6b00' : {pix:'#00a884',cash:'#2e7d32',debit:'#1565c0',credit:'#6a1b9a',installment:'#e65100'}[s.paymentMethod] || '#888';
                     tbody.innerHTML += `<tr>
                         <td>${s.number}</td>
                         <td>${Utils.sanitizeHTML(clientName)}</td>
                         <td>${Utils.formatCurrency(s.total)}</td>
-                        <td>${{'pix':'PIX','cash':'Dinheiro','debit':'Débito','credit':'Crédito','installment':'Crediário'}[s.paymentMethod] || s.paymentMethod || '—'}</td>
+                        <td><span style="background:${payBadgeColor};color:#fff;border-radius:10px;padding:2px 8px;font-size:0.72rem;font-weight:700;white-space:nowrap;">${payLbl}</span></td>
+                        <td style="color:${saldo.cls};font-weight:700;font-size:0.82rem;">${saldo.txt}</td>
                         <td><span class="badge badge-${st.cls}">${st.label}</span></td>
                         <td>${Utils.formatDate(s.date)}</td>
                         <td class="action-buttons">
@@ -13626,10 +13975,9 @@ ${container.innerHTML}
                     </tr>`;
                 });
 
-                // Se filtro ativo: mostrar aviso de quantas foram exibidas e rolar para o topo
-                if (filtroAtivo && filtered.length > 5) {
-                    tbody.innerHTML += `<tr><td colspan="9" style="text-align:center;padding:0.75rem;color:var(--gray);font-size:0.82rem;background:var(--light-gray);">
-                        <i class="fas fa-filter" style="margin-right:4px;opacity:0.5;"></i>Mostrando 5 de ${filtered.length} resultados. Refine o filtro para ver mais.
+                if (filtroAtivo && filtered.length > LIMIT) {
+                    tbody.innerHTML += `<tr><td colspan="10" style="text-align:center;padding:0.75rem;color:var(--gray);font-size:0.82rem;background:var(--light-gray);">
+                        <i class="fas fa-filter" style="margin-right:4px;opacity:0.5;"></i>Mostrando ${LIMIT} de ${filtered.length} resultados. Refine o filtro para ver mais.
                     </td></tr>`;
                 }
                 if (filtroAtivo) {
@@ -13643,9 +13991,11 @@ ${container.innerHTML}
                 const s = document.getElementById('searchSaleHistory');
                 const st = document.getElementById('filterSaleStatus');
                 const p = document.getElementById('filterSalePeriod');
+                const py = document.getElementById('filterSalePayment');
                 if (s)  s.value  = '';
                 if (st) st.value = '';
                 if (p)  p.value  = '';
+                if (py) py.value = '';
                 this.filterHistory();
             },
 
@@ -13939,6 +14289,7 @@ ${container.innerHTML}
                     // Atualiza labels dinâmicos com % configurado
                     const pctLabel = isNaN(rawPct) ? 5 : rawPct;
                     const lbl1 = document.getElementById('pixDescontoPct'); if (lbl1) lbl1.textContent = pctLabel;
+                    const lbl2 = document.getElementById('pixCardDesc'); if (lbl2) lbl2.textContent = pctLabel;
                     // Atualiza state com total já com desconto
                     state.currentSale.total = final;
                     // Atualiza display principal
@@ -13966,6 +14317,7 @@ ${container.innerHTML}
                     // Atualiza labels dinâmicos com % configurado
                     const pctLabel = isNaN(rawPct) ? 3 : rawPct;
                     const lbl1 = document.getElementById('cashDescontoPct'); if (lbl1) lbl1.textContent = pctLabel;
+                    const lbl2 = document.getElementById('cashCardDesc'); if (lbl2) lbl2.textContent = pctLabel;
                     // Atualiza state com total já com desconto
                     state.currentSale.total = final;
                     // Atualiza display principal
@@ -15496,7 +15848,7 @@ ${container.innerHTML}
                     .join('\n');
                 el.prepend(style);
 
-                gerarPDF(el, `CARNE_${sale.number}`);
+                gerarPDF(el, `CARNE_${sale.number}`, { preview: true });
             },
             gerarPDF_Comprovante(parcelaIndex) {
                 const client  = state.clients.find(c => c.id === state.currentSale.clientId);
@@ -16347,17 +16699,13 @@ ${container.innerHTML}
                     <div style="margin-top:12px;padding-top:12px;border-top:1px solid #ebebeb;">
                         <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#333;margin-bottom:8px;">🖨️ Gerar O.S. em PDF</div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                            <button onclick="Sales.gerarPDF_OS('via1')"
-                                style="background:#333;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
-                                <i class="fas fa-file-pdf"></i> 1ª Via — Loja
-                            </button>
-                            <button onclick="Sales.gerarPDF_OS('via2')"
-                                style="background:#166534;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
-                                <i class="fas fa-file-pdf"></i> 2ª Via — Cliente
-                            </button>
                             <button onclick="Sales.gerarPDF_OS('ambas')"
-                                style="background:#555;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
+                                style="background:#333;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
                                 <i class="fas fa-file-pdf"></i> ✂️ Ambas as Vias (A4 — 210×297mm)
+                            </button>
+                            <button onclick="Sales._setPdfTarget('${sale.id}');Modal.close('viewModal');setTimeout(()=>Sales.gerarPDF_Carne(),80);"
+                                style="background:#6610f2;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;">
+                                <i class="fas fa-receipt"></i> Gerar Carnê PDF
                             </button>
                         </div>
                     </div>
