@@ -8062,6 +8062,10 @@ ORDER BY t.table_name;
                         // Config tem tratamento especial via pullConfig/pushConfig
                         if (stateKey === 'config') {
                             await this.pullConfig();
+                            // pullConfig também lida com contas_financeiras — atualiza ContasManager
+                            if (typeof ContasManager !== 'undefined') {
+                                try { ContasManager.renderAll?.(); } catch(e) {}
+                            }
                             continue;
                         }
 
@@ -8238,6 +8242,12 @@ ORDER BY t.table_name;
                                 try { Presc.renderForm(); } catch(e) {}
                             }
                             break;
+                        case 'config':
+                            // Config inclui contas_financeiras manuais — atualiza ContasManager
+                            if (typeof ContasManager !== 'undefined') {
+                                try { ContasManager.renderAll?.(); } catch(e) {}
+                            }
+                            break;
                     }
                     // Sempre atualiza o dashboard após qualquer mudança remota
                     if (typeof Dashboard !== 'undefined') {
@@ -8386,16 +8396,17 @@ ORDER BY t.table_name;
                     }
                     // Sincroniza contas financeiras manuais do Supabase
                     try {
-                        const { data: cfData } = await supabaseClient
+                        const { data: cfData, error: cfErr } = await supabaseClient
                             .from('config').select('_data, updated_at').eq('id', 'contas_financeiras').maybeSingle();
-                        if (cfData && cfData._data) {
+                        if (!cfErr && cfData && cfData._data) {
                             const remoteContas = typeof cfData._data === 'string' ? JSON.parse(cfData._data) : cfData._data;
-                            const localTs = await IDB.get('contas_financeiras_ts').catch(() => null);
+                            let localTs = null;
+                            try { localTs = await IDB.get('contas_financeiras_ts'); } catch(e) {}
                             if (!localTs || cfData.updated_at > localTs) {
                                 await IDB.set('contas_financeiras', JSON.stringify(remoteContas));
                                 await IDB.set('contas_financeiras_ts', cfData.updated_at);
                                 if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
-                                console.log('[LocalFirst] Contas financeiras sincronizadas da nuvem');
+                                console.log('[LocalFirst] ✅ Contas financeiras sincronizadas da nuvem (ts:', cfData.updated_at, ')');
                             }
                         }
                     } catch(e) { console.warn('[LocalFirst] pullConfig contas:', e.message); }
@@ -8470,24 +8481,29 @@ ORDER BY t.table_name;
 
             async getAll() {
                 try {
-                    // Tenta sincronizar contas manuais do Supabase antes de retornar local
+                    // Tenta buscar contas manuais do Supabase (chave contas_financeiras na tabela config)
                     if (navigator.onLine) {
                         try {
-                            const { data } = await supabaseClient.from('config').select('_data,updated_at').eq('id','contas_financeiras').maybeSingle();
-                            if (data && data._data) {
+                            const { data, error } = await supabaseClient
+                                .from('config')
+                                .select('_data, updated_at')
+                                .eq('id', 'contas_financeiras')
+                                .maybeSingle();
+                            if (!error && data && data._data) {
                                 const remoteContas = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
-                                const localTs = await IDB.get(this._key + '_ts').catch(() => null);
+                                // Compara com timestamp local (chave própria, NÃO usa _TS_KEY do LocalFirst)
+                                let localTs = null;
+                                try { localTs = await IDB.get('contas_financeiras_ts'); } catch(e) {}
                                 if (!localTs || data.updated_at > localTs) {
                                     await IDB.set(this._key, JSON.stringify(remoteContas));
-                                    await IDB.set(this._key + '_ts', data.updated_at);
+                                    await IDB.set('contas_financeiras_ts', data.updated_at);
                                     return Array.isArray(remoteContas) ? remoteContas : [];
                                 }
                             }
-                        } catch(e) { /* fallback para local */ }
+                        } catch(e) { /* fallback para dados locais */ }
                     }
                     const raw = await IDB.get(this._key);
                     if (!raw) return [];
-                    // Fix Bug #2: suporta raw como string OU objeto (evita dupla serialização)
                     if (typeof raw === 'string') return JSON.parse(raw);
                     if (Array.isArray(raw)) return raw;
                     return [];
@@ -8517,11 +8533,14 @@ ORDER BY t.table_name;
                 // Força pull de vendas do Supabase antes de renderizar (garante dados frescos em outros dispositivos)
                 if (navigator.onLine && window.LocalFirst && !LocalFirst._syncing) {
                     try {
-                        const lastSync = await IDB.get(LocalFirst._TS_KEY);
+                        // IMPORTANTE: usa timestamp PRÓPRIO (não o _TS_KEY do LocalFirst)
+                        // para não interferir com o ciclo de sync principal
+                        const _CONTAS_SALES_TS = 'contas_sales_last_pull';
+                        const lastSalesPull = await IDB.get(_CONTAS_SALES_TS).catch(() => null);
                         const { data: salesData, error: salesErr } = await supabaseClient
                             .from('sales')
                             .select('id, _data, updated_at')
-                            .gt('updated_at', lastSync || '1970-01-01T00:00:00.000Z');
+                            .gt('updated_at', lastSalesPull || '1970-01-01T00:00:00.000Z');
                         if (!salesErr && salesData && salesData.length > 0) {
                             const localMap = {};
                             (state.sales || []).forEach(s => { localMap[s.id] = s; });
@@ -8540,7 +8559,12 @@ ORDER BY t.table_name;
                                 } catch(e) {}
                             });
                             state.sales = Object.values(localMap);
-                            await IDB.set(LocalFirst._TS_KEY, new Date().toISOString());
+                            // Salva no IDB e atualiza timestamp PRÓPRIO (não polui o _TS_KEY do LocalFirst)
+                            await App.saveData(true);
+                            await IDB.set(_CONTAS_SALES_TS, new Date().toISOString());
+                        } else if (!salesErr) {
+                            // Mesmo sem novos dados, atualiza o timestamp para não re-buscar desnecessariamente
+                            await IDB.set(_CONTAS_SALES_TS, new Date().toISOString());
                         }
                     } catch(e) { /* fallback silencioso */ }
                 }
@@ -17009,9 +17033,12 @@ ${container.innerHTML}
                 btnEl.style.boxShadow='0 2px 8px '+c+'55';
                 btnEl.dataset.ativo='1';
                 sale.status = novoStatus;
+                sale.updated_at = new Date().toISOString();
                 App.saveData();
+                if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
                 Sales.renderHistory();
                 try { Dashboard.update(); } catch(e) {}
+                if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
                 Toast.show('Status: ' + btnEl.textContent.trim(), 'success');
             },
 
@@ -17023,8 +17050,12 @@ ${container.innerHTML}
                 var sale = state.sales.find(function(s){ return s.id===saleId; });
                 if (!sale) return;
                 sale.status = sel.value;
-                App.saveData(); Sales.renderHistory();
+                sale.updated_at = new Date().toISOString();
+                App.saveData();
+                if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
+                Sales.renderHistory();
                 try { Dashboard.update(); } catch(e) {}
+                if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
                 Toast.show('Status atualizado!', 'success');
                 Modal.close('viewModal');
             },
