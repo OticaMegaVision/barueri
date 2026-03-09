@@ -8354,30 +8354,43 @@ ORDER BY t.table_name;
                 try {
                     const { data, error } = await supabaseClient
                         .from('config').select('_data, updated_at').eq('id', 'empresa').maybeSingle();
-                    if (error || !data) return;
-
-                    const cfg = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
-                    if (!cfg) return;
-
-                    // Só aplica se remoto for mais novo que local
-                    const remoteTs = data.updated_at || '0';
-                    const localTs  = state.company._supabase_at || '0';
-                    if (remoteTs <= localTs) return;
-
-                    if (cfg.company)      { Object.assign(state.company, cfg.company); state.company._supabase_at = remoteTs; }
-                    if (cfg.notificacoes) Object.assign(state.notificacoes, cfg.notificacoes);
-                    if (cfg.wppMensagens) Object.assign(state.wppMensagens, cfg.wppMensagens);
-                    if (cfg.backupConfig) Object.assign(state.backupConfig, cfg.backupConfig);
-                    if (cfg.lastOsCounter) Object.assign(state.lastOsCounter || {}, cfg.lastOsCounter);
-
-                    // Atualiza UI após sync
-                    await App.saveData(true);
-                    App.updateCompanyDisplay();
-                    if (typeof Config !== 'undefined') Config.load();
-                    if (state.company.primaryColor) document.documentElement.style.setProperty('--primary', state.company.primaryColor);
-                    if (state.company.secondaryColor) document.documentElement.style.setProperty('--secondary', state.company.secondaryColor);
-                    try { Dashboard.update?.(); } catch(e) {}
-                    console.log('[LocalFirst] Config sincronizada da nuvem (ts:', remoteTs, ')');
+                    if (!error && data) {
+                        const cfg = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
+                        if (cfg) {
+                            // Só aplica se remoto for mais novo que local
+                            const remoteTs = data.updated_at || '0';
+                            const localTs  = state.company._supabase_at || '0';
+                            if (remoteTs > localTs) {
+                                if (cfg.company)      { Object.assign(state.company, cfg.company); state.company._supabase_at = remoteTs; }
+                                if (cfg.notificacoes) Object.assign(state.notificacoes, cfg.notificacoes);
+                                if (cfg.wppMensagens) Object.assign(state.wppMensagens, cfg.wppMensagens);
+                                if (cfg.backupConfig) Object.assign(state.backupConfig, cfg.backupConfig);
+                                if (cfg.lastOsCounter) Object.assign(state.lastOsCounter || {}, cfg.lastOsCounter);
+                                await App.saveData(true);
+                                App.updateCompanyDisplay();
+                                if (typeof Config !== 'undefined') Config.load();
+                                if (state.company.primaryColor) document.documentElement.style.setProperty('--primary', state.company.primaryColor);
+                                if (state.company.secondaryColor) document.documentElement.style.setProperty('--secondary', state.company.secondaryColor);
+                                try { Dashboard.update?.(); } catch(e) {}
+                                console.log('[LocalFirst] Config empresa sincronizada da nuvem (ts:', remoteTs, ')');
+                            }
+                        }
+                    }
+                    // Sincroniza contas financeiras manuais do Supabase
+                    try {
+                        const { data: cfData } = await supabaseClient
+                            .from('config').select('_data, updated_at').eq('id', 'contas_financeiras').maybeSingle();
+                        if (cfData && cfData._data) {
+                            const remoteContas = typeof cfData._data === 'string' ? JSON.parse(cfData._data) : cfData._data;
+                            const localTs = await IDB.get('contas_financeiras_ts').catch(() => null);
+                            if (!localTs || cfData.updated_at > localTs) {
+                                await IDB.set('contas_financeiras', JSON.stringify(remoteContas));
+                                await IDB.set('contas_financeiras_ts', cfData.updated_at);
+                                if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
+                                console.log('[LocalFirst] Contas financeiras sincronizadas da nuvem');
+                            }
+                        }
+                    } catch(e) { console.warn('[LocalFirst] pullConfig contas:', e.message); }
                 } catch(e) { console.warn('[LocalFirst] pullConfig:', e.message); }
             },
 
@@ -8449,6 +8462,21 @@ ORDER BY t.table_name;
 
             async getAll() {
                 try {
+                    // Tenta sincronizar contas manuais do Supabase antes de retornar local
+                    if (navigator.onLine) {
+                        try {
+                            const { data } = await supabaseClient.from('config').select('_data,updated_at').eq('id','contas_financeiras').maybeSingle();
+                            if (data && data._data) {
+                                const remoteContas = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
+                                const localTs = await IDB.get(this._key + '_ts').catch(() => null);
+                                if (!localTs || data.updated_at > localTs) {
+                                    await IDB.set(this._key, JSON.stringify(remoteContas));
+                                    await IDB.set(this._key + '_ts', data.updated_at);
+                                    return Array.isArray(remoteContas) ? remoteContas : [];
+                                }
+                            }
+                        } catch(e) { /* fallback para local */ }
+                    }
                     const raw = await IDB.get(this._key);
                     if (!raw) return [];
                     // Fix Bug #2: suporta raw como string OU objeto (evita dupla serialização)
@@ -8461,6 +8489,16 @@ ORDER BY t.table_name;
             async saveAll(contas) {
                 // Fix Bug #2: salva sempre como string para consistência
                 await IDB.set(this._key, JSON.stringify(contas));
+                // Sincroniza contas manuais com Supabase para funcionar em múltiplos dispositivos
+                if (navigator.onLine) {
+                    try {
+                        await supabaseClient.from('config').upsert({
+                            id: 'contas_financeiras',
+                            _data: JSON.stringify(contas),
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'id' });
+                    } catch(e) { console.warn('[ContasManager] saveAll sync erro:', e.message); }
+                }
             },
 
             fmt(v) {
@@ -8979,7 +9017,9 @@ ORDER BY t.table_name;
                                 parc.paidDate = new Date().toISOString().slice(0,10);
                                 parc.paidValue = paidVal; parc.formaPagamento = forma;
                                 if (this.checkPaymentComplete(sale)) sale.paymentStatus = 'pago';
+                                sale.updated_at = new Date().toISOString();
                                 App.saveData();
+                                if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
                                 Toast.show(`Parcela ${num} quitada! ✅`, 'success');
                                 this.renderAll();
                                 this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento, forma, obs);
@@ -8989,7 +9029,9 @@ ORDER BY t.table_name;
                         sale[`retiradaPaga_dual${dualIdx}`] = true;
                         // Fix: verifica quitação total após registrar retirada dual
                         if (ContasManager.checkPaymentComplete(sale)) sale.paymentStatus = 'pago';
+                        sale.updated_at = new Date().toISOString();
                         App.saveData();
+                        if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
                         Toast.show('Retirada registrada! ✅', 'success');
                         this.renderAll();
                     }
@@ -9011,7 +9053,9 @@ ORDER BY t.table_name;
                             if (this.checkPaymentComplete(sale)) {
                                 sale.paymentStatus = 'pago';
                             }
+                            sale.updated_at = new Date().toISOString();
                             App.saveData();
+                            if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
                             Toast.show(`Parcela ${num} quitada! ✅`, 'success');
                             this.renderAll();
                             this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento, forma, obs);
@@ -9029,13 +9073,17 @@ ORDER BY t.table_name;
                     if (this.checkPaymentComplete(sale)) {
                         sale.paymentStatus = 'pago';
                     }
+                    sale.updated_at = new Date().toISOString();
                     App.saveData();
+                    if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
                     Toast.show('Pagamento na retirada registrado! ✅', 'success');
                     this.renderAll();
                     this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento na Retirada', itemValor, itemCliente, itemCategoria, itemVencimento, forma, obs);
                 } else if (tipo === 'total') {
                     sale.paymentStatus = 'pago';
+                    sale.updated_at = new Date().toISOString();
                     App.saveData();
+                    if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
                     Toast.show('Pagamento registrado! ✅', 'success');
                     this.renderAll();
                     this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento Total', itemValor||sale.total||0, itemCliente, itemCategoria, itemVencimento, forma, obs);
