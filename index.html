@@ -4356,9 +4356,17 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                             <div class="chart-title" style="margin-bottom:0; color:#28a745;">
                                 <i class="fas fa-arrow-circle-down" style="margin-right:0.4rem;"></i>Contas a Receber
                             </div>
-                            <button class="btn btn-sm" style="background:#28a745;color:white;font-size:0.78rem;" onclick="ContasManager.showModal('receber')">
-                                <i class="fas fa-plus"></i> Nova
-                            </button>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span id="contasSyncStatus" style="font-size:0.68rem;color:#888;display:flex;align-items:center;gap:3px;">
+                                    <i class="fas fa-circle" style="font-size:6px;color:#ccc;"></i><span id="contasSyncTime">—</span>
+                                </span>
+                                <button class="btn btn-sm" style="background:#17a2b8;color:white;font-size:0.72rem;padding:4px 8px;" title="Sincronizar agora" onclick="ContasManager.forcarSync()">
+                                    <i class="fas fa-sync-alt" id="contasSyncIcon"></i>
+                                </button>
+                                <button class="btn btn-sm" style="background:#28a745;color:white;font-size:0.78rem;" onclick="ContasManager.showModal('receber')">
+                                    <i class="fas fa-plus"></i> Nova
+                                </button>
+                            </div>
                         </div>
                         <!-- Totais resumo profissional -->
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
@@ -7919,7 +7927,7 @@ ORDER BY t.table_name;
         const LocalFirst = {
             _syncing: false,
             _syncTimer: null,
-            _SYNC_INTERVAL_MS: 60000, // auto-sync a cada 60s
+            _SYNC_INTERVAL_MS: 20000, // auto-sync a cada 20s (melhor para múltiplos dispositivos)
             _TS_KEY: 'lf_last_sync_ts',
 
             // Tabelas sincronizáveis com Supabase (nome local → tabela Supabase)
@@ -7955,7 +7963,7 @@ ORDER BY t.table_name;
                 }, this._SYNC_INTERVAL_MS);
 
                 // Sync inicial ao abrir (sem bloquear a UI)
-                setTimeout(() => this._triggerSync('boot'), 3000); // Aguarda push inicial antes de fazer pull
+                setTimeout(() => this._triggerSync('boot'), 1000); // Sync inicial rápido para carregar dados frescos
 
                 // ── REALTIME: escuta mudancas em todas as tabelas ──
                 this._initRealtime();
@@ -8506,6 +8514,36 @@ ORDER BY t.table_name;
             },
 
             async renderAll() {
+                // Força pull de vendas do Supabase antes de renderizar (garante dados frescos em outros dispositivos)
+                if (navigator.onLine && window.LocalFirst && !LocalFirst._syncing) {
+                    try {
+                        const lastSync = await IDB.get(LocalFirst._TS_KEY);
+                        const { data: salesData, error: salesErr } = await supabaseClient
+                            .from('sales')
+                            .select('id, _data, updated_at')
+                            .gt('updated_at', lastSync || '1970-01-01T00:00:00.000Z');
+                        if (!salesErr && salesData && salesData.length > 0) {
+                            const localMap = {};
+                            (state.sales || []).forEach(s => { localMap[s.id] = s; });
+                            const pendingIds = new Set(await LocalFirst._getPending('lf_pending_sales'));
+                            salesData.forEach(remote => {
+                                try {
+                                    const remoteItem = typeof remote._data === 'string' ? JSON.parse(remote._data) : remote._data;
+                                    if (!remoteItem || remoteItem._deleted) return;
+                                    remoteItem._supabase_at = remote.updated_at;
+                                    if (!pendingIds.has(remote.id)) {
+                                        const local = localMap[remote.id];
+                                        if (!local || remote.updated_at > (local._supabase_at || local.updated_at || '0')) {
+                                            localMap[remote.id] = remoteItem;
+                                        }
+                                    }
+                                } catch(e) {}
+                            });
+                            state.sales = Object.values(localMap);
+                            await IDB.set(LocalFirst._TS_KEY, new Date().toISOString());
+                        }
+                    } catch(e) { /* fallback silencioso */ }
+                }
                 const contas = await this.getAll();
                 const hoje = new Date().toISOString().split('T')[0];
 
@@ -8753,6 +8791,8 @@ ORDER BY t.table_name;
                 this._allReceber = receber;
                 this._allPagar   = pagar;
                 this._hoje       = hoje;
+                // Atualiza indicador de última sincronização
+                this._atualizarIndicadorSync();
             },
 
             // Filtro em tempo real — padrão de sistemas profissionais (Glasscurvex, OticaManager)
@@ -9001,7 +9041,7 @@ ORDER BY t.table_name;
             },
 
             // Executa a baixa após confirmação modal
-            _executarBaixaVenda(itemId, tipo, sale, paidVal, forma, itemValor, itemDescricao, itemCliente, itemCategoria, itemVencimento, obs) {
+            async _executarBaixaVenda(itemId, tipo, sale, paidVal, forma, itemValor, itemDescricao, itemCliente, itemCategoria, itemVencimento, obs) {
 
                 // Suporte ao modo dual: venda_{id}_dual{N}_p{M} ou venda_{id}_dual{N}_retirada
                 if (tipo.startsWith('dual')) {
@@ -9018,8 +9058,8 @@ ORDER BY t.table_name;
                                 parc.paidValue = paidVal; parc.formaPagamento = forma;
                                 if (this.checkPaymentComplete(sale)) sale.paymentStatus = 'pago';
                                 sale.updated_at = new Date().toISOString();
-                                App.saveData();
-                                if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
+                                await App.saveData(true);
+                                if (window.LocalFirst) await LocalFirst.pushItem('sales', sale);
                                 Toast.show(`Parcela ${num} quitada! ✅`, 'success');
                                 this.renderAll();
                                 this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento, forma, obs);
@@ -9030,8 +9070,8 @@ ORDER BY t.table_name;
                         // Fix: verifica quitação total após registrar retirada dual
                         if (ContasManager.checkPaymentComplete(sale)) sale.paymentStatus = 'pago';
                         sale.updated_at = new Date().toISOString();
-                        App.saveData();
-                        if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
+                        await App.saveData(true);
+                        if (window.LocalFirst) await LocalFirst.pushItem('sales', sale);
                         Toast.show('Retirada registrada! ✅', 'success');
                         this.renderAll();
                     }
@@ -9054,8 +9094,8 @@ ORDER BY t.table_name;
                                 sale.paymentStatus = 'pago';
                             }
                             sale.updated_at = new Date().toISOString();
-                            App.saveData();
-                            if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
+                            await App.saveData(true);
+                            if (window.LocalFirst) await LocalFirst.pushItem('sales', sale);
                             Toast.show(`Parcela ${num} quitada! ✅`, 'success');
                             this.renderAll();
                             this.gerarComprovanteVenda(itemId, itemDescricao||`Parcela ${num}`, itemValor||parc.value||parc.valor, itemCliente, itemCategoria, itemVencimento, forma, obs);
@@ -9074,16 +9114,16 @@ ORDER BY t.table_name;
                         sale.paymentStatus = 'pago';
                     }
                     sale.updated_at = new Date().toISOString();
-                    App.saveData();
-                    if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
+                    await App.saveData(true);
+                    if (window.LocalFirst) await LocalFirst.pushItem('sales', sale);
                     Toast.show('Pagamento na retirada registrado! ✅', 'success');
                     this.renderAll();
                     this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento na Retirada', itemValor, itemCliente, itemCategoria, itemVencimento, forma, obs);
                 } else if (tipo === 'total') {
                     sale.paymentStatus = 'pago';
                     sale.updated_at = new Date().toISOString();
-                    App.saveData();
-                    if (window.LocalFirst) LocalFirst.pushItem('sales', sale);
+                    await App.saveData(true);
+                    if (window.LocalFirst) await LocalFirst.pushItem('sales', sale);
                     Toast.show('Pagamento registrado! ✅', 'success');
                     this.renderAll();
                     this.gerarComprovanteVenda(itemId, itemDescricao||'Pagamento Total', itemValor||sale.total||0, itemCliente, itemCategoria, itemVencimento, forma, obs);
@@ -9122,6 +9162,35 @@ ORDER BY t.table_name;
                     return true;
                 }
                 return true;
+            },
+
+            // Força sincronização imediata e atualiza UI
+            async forcarSync() {
+                const icon = document.getElementById('contasSyncIcon');
+                const timeEl = document.getElementById('contasSyncTime');
+                const statusEl = document.getElementById('contasSyncStatus');
+                if (icon) icon.classList.add('fa-spin');
+                if (statusEl) statusEl.querySelector('i').style.color = '#17a2b8';
+                try {
+                    if (window.LocalFirst) await LocalFirst.sync('manual');
+                    await this.renderAll();
+                    const now = new Date().toLocaleTimeString('pt-BR');
+                    if (timeEl) timeEl.textContent = now;
+                    if (statusEl) statusEl.querySelector('i').style.color = '#28a745';
+                    Toast.show('Contas atualizadas! ✅', 'success');
+                } catch(e) {
+                    if (statusEl) statusEl.querySelector('i').style.color = '#dc3545';
+                } finally {
+                    if (icon) icon.classList.remove('fa-spin');
+                }
+            },
+
+            _atualizarIndicadorSync() {
+                const now = new Date().toLocaleTimeString('pt-BR');
+                const timeEl = document.getElementById('contasSyncTime');
+                const statusEl = document.getElementById('contasSyncStatus');
+                if (timeEl) timeEl.textContent = now;
+                if (statusEl) statusEl.querySelector('i').style.color = '#28a745';
             },
 
             async gerarComprovante(id) {
@@ -10984,7 +11053,13 @@ ORDER BY t.table_name;
                         document.getElementById(section).classList.add('active');
                         document.getElementById('pageTitle').innerText = item.querySelector('span').innerText;
                         
-                        if (section === 'dashboard') Dashboard.update();
+                        if (section === 'dashboard') {
+                            Dashboard.update();
+                            // Força sync ao abrir dashboard para garantir dados atualizados
+                            if (window.LocalFirst && navigator.onLine) {
+                                LocalFirst.sync('section_open').catch(() => {});
+                            }
+                        }
                         else if (section === 'sales') {
                             Sales.renderHistory();
                             Sales.populateSaleSelects();
