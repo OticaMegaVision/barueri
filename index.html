@@ -6729,11 +6729,12 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                                 Execute este SQL no <strong>Supabase SQL Editor</strong> para criar as <strong>8 tabelas</strong> que o app usa para sincronização: <code>clients</code>, <code>products</code>, <code>sales</code>, <code>expenses</code>, <code>prescriptions</code>, <code>suppliers</code>, <code>services</code> e <code>config</code>. Estrutura Local-First: <code>_data</code> em <strong>JSONB</strong> com <code>created_at</code> + <code>updated_at</code> automáticos. Seguro executar novamente — usa IF NOT EXISTS e migração sem perda de dados.
                             </p>
                             <div style="background:#1e1e2e;color:#a6e3a1;font-family:monospace;font-size:0.72rem;padding:1rem;border-radius:8px;max-height:320px;overflow-y:auto;line-height:1.5;margin-bottom:1rem;white-space:pre;" id="sqlSetup">-- ╔══════════════════════════════════════════════════════════════════╗
--- ║  ÓticaVision Pro — SQL Setup v3 (Local-First Sync)              ║
--- ║  Estrutura: id TEXT PK + _data JSONB + created_at + updated_at  ║
--- ║  Tabelas (8): clients, products, sales, expenses,               ║
--- ║               prescriptions, suppliers, services, config        ║
--- ║  Cole no Supabase SQL Editor e execute tudo de uma vez.         ║
+-- ║  ÓticaVision Pro — SQL Setup v4 (Multi-Device Sync Fix)         ║
+-- ║  NOVIDADES v4:                                                   ║
+-- ║  • Trigger BEFORE INSERT OR UPDATE (não só UPDATE)              ║
+-- ║  • REPLICA IDENTITY FULL (Realtime envia dados completos)       ║
+-- ║  • Índices otimizados para pull incremental                     ║
+-- ║  Seguro executar novamente — usa IF NOT EXISTS e migração.      ║
 -- ╚══════════════════════════════════════════════════════════════════╝
 
 -- ── 1. FUNÇÃO updated_at automático ──────────────────────────────
@@ -6743,7 +6744,6 @@ BEGIN NEW.updated_at = now(); RETURN NEW; END;
 $$ LANGUAGE plpgsql;
 
 -- ── 2. CRIA / ATUALIZA TABELAS ───────────────────────────────────
---    Estrutura Local-First: id (PK) + _data (JSONB) + timestamps
 DO $$ DECLARE t TEXT;
 BEGIN
   FOR t IN SELECT unnest(ARRAY[
@@ -6751,7 +6751,6 @@ BEGIN
     'prescriptions','suppliers','services','config'
   ]) LOOP
 
-    -- Cria tabela com colunas corretas
     EXECUTE format('
       CREATE TABLE IF NOT EXISTS %I (
         id         TEXT PRIMARY KEY,
@@ -6759,25 +6758,29 @@ BEGIN
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-      -- Índices de performance
       CREATE INDEX IF NOT EXISTS idx_%I_updated_at ON %I(updated_at DESC);
       CREATE INDEX IF NOT EXISTS idx_%I_created_at ON %I(created_at DESC);
     ', t, t, t, t, t);
 
-    -- Adiciona colunas novas em tabelas existentes (migração segura)
     BEGIN
       EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();', t);
     EXCEPTION WHEN others THEN NULL; END;
 
-    -- Trigger updated_at
+    BEGIN
+      EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();', t);
+    EXCEPTION WHEN others THEN NULL; END;
+
+    -- ▶ CRÍTICO v4: BEFORE INSERT OR UPDATE (antes só era UPDATE — first insert não atualizava timestamp)
     EXECUTE format('
       DROP TRIGGER IF EXISTS trg_%I_updated ON %I;
       CREATE TRIGGER trg_%I_updated
-        BEFORE UPDATE ON %I
+        BEFORE INSERT OR UPDATE ON %I
         FOR EACH ROW EXECUTE FUNCTION set_updated_at();
     ', t, t, t, t);
 
-    -- Row Level Security
+    -- ▶ CRÍTICO v4: REPLICA IDENTITY FULL (Realtime envia registro completo no UPDATE)
+    EXECUTE format('ALTER TABLE %I REPLICA IDENTITY FULL;', t);
+
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY;', t);
     BEGIN
       EXECUTE format('
@@ -6791,8 +6794,7 @@ BEGIN
   END LOOP;
 END $$;
 
--- ── 3. REALTIME — só adiciona se ainda NÃO está na publicação ──────
---    (evita erro 42710: relation already member of publication)
+-- ── 3. REALTIME ───────────────────────────────────────────────────
 DO $$ DECLARE t TEXT;
 BEGIN
   FOR t IN SELECT unnest(ARRAY[
@@ -6812,19 +6814,17 @@ BEGIN
 END $$;
 
 -- ── 4. VERIFICAÇÃO FINAL ─────────────────────────────────────────
+-- ✅ replica_identity = f (FULL) em todas · ✅ Realtime ON em todas
 SELECT
   t.table_name,
-  (SELECT count(*) FROM information_schema.columns c
-   WHERE c.table_name = t.table_name AND c.table_schema = 'public') AS colunas,
-  CASE WHEN p.tablename IS NOT NULL THEN '✅ Realtime ON' ELSE '⚠️ Realtime OFF' END AS realtime
+  CASE c.relreplident WHEN 'f' THEN '✅ FULL' ELSE '❌ ' || c.relreplident END AS replica,
+  CASE WHEN p.tablename IS NOT NULL THEN '✅ ON' ELSE '❌ OFF' END AS realtime,
+  (SELECT count(*) FROM information_schema.triggers tr WHERE tr.event_object_table = t.table_name AND tr.trigger_name LIKE 'trg_%_updated') AS triggers
 FROM information_schema.tables t
-LEFT JOIN pg_publication_tables p
-  ON p.tablename = t.table_name AND p.pubname = 'supabase_realtime'
+JOIN pg_class c ON c.relname = t.table_name
+LEFT JOIN pg_publication_tables p ON p.tablename = t.table_name AND p.pubname = 'supabase_realtime'
 WHERE t.table_schema = 'public'
-  AND t.table_name IN (
-    'clients','products','sales','expenses',
-    'prescriptions','suppliers','services','config'
-  )
+  AND t.table_name IN ('clients','products','sales','expenses','prescriptions','suppliers','services','config')
 ORDER BY t.table_name;
 -- Resultado esperado: 8 linhas · 4 colunas · ✅ Realtime ON em todas</div>
                             <div style="position:relative;display:inline-block;margin-bottom:0.5rem;">
@@ -7927,7 +7927,7 @@ ORDER BY t.table_name;
         const LocalFirst = {
             _syncing: false,
             _syncTimer: null,
-            _SYNC_INTERVAL_MS: 20000, // auto-sync a cada 20s (melhor para múltiplos dispositivos)
+            _SYNC_INTERVAL_MS: 15000, // auto-sync a cada 15s para máxima sincronização multi-dispositivo
             _TS_KEY: 'lf_last_sync_ts',
 
             // Tabelas sincronizáveis com Supabase (nome local → tabela Supabase)
@@ -7962,8 +7962,8 @@ ORDER BY t.table_name;
                     if (navigator.onLine && !document.hidden) this._triggerSync('interval');
                 }, this._SYNC_INTERVAL_MS);
 
-                // Sync inicial ao abrir (sem bloquear a UI)
-                setTimeout(() => this._triggerSync('boot'), 1000); // Sync inicial rápido para carregar dados frescos
+                // Sync periódico em background (já foi feito no DOMContentLoaded antes do primeiro render)
+                setTimeout(() => this._triggerSync('background'), 5000); // segundo sync 5s depois para pegar qualquer dado perdido
 
                 // ── REALTIME: escuta mudancas em todas as tabelas ──
                 this._initRealtime();
@@ -7979,7 +7979,9 @@ ORDER BY t.table_name;
                 }
 
                 const tables = Object.values(this._TABLES);
-                let channel = supabaseClient.channel('lf-realtime-v1');
+                // Canal único por sessão para evitar conflito entre abas do mesmo navegador
+                const sessionId = Math.random().toString(36).slice(2, 8);
+                let channel = supabaseClient.channel('lf-realtime-' + sessionId);
 
                 tables.forEach(table => {
                     channel = channel.on(
@@ -8021,8 +8023,8 @@ ORDER BY t.table_name;
                 // Eventos Realtime gerados pelo próprio push → ignorar para quebrar o loop
                 if (reason === 'realtime' && this._pushing) return;
 
-                // Realtime usa debounce maior (2s) — podem chegar vários eventos juntos
-                const delay = reason === 'realtime' ? 2000 : 800;
+                // Realtime usa debounce de 1s — resposta rápida para outros dispositivos
+                const delay = reason === 'realtime' ? 1000 : 500;
                 if (this._syncTimer) clearTimeout(this._syncTimer);
                 // Realtime só precisa de PULL (os dados já estão no Supabase)
                 this._syncTimer = setTimeout(() => this.sync(reason), delay);
@@ -8037,7 +8039,13 @@ ORDER BY t.table_name;
             // Push: registros dirty + flush da fila de deleções offline
             // Pull: mescla dados remotos; detecta tombstones (_deleted=true) e remove localmente
             async sync(reason = 'manual') {
-                if (this._syncing) return;
+                if (this._syncing) {
+                    // Evento chegou enquanto sync estava rodando — agenda re-sync para não perder
+                    if (!this._syncTimer) {
+                        this._syncTimer = setTimeout(() => this.sync('retry'), 2000);
+                    }
+                    return;
+                }
                 if (!navigator.onLine) { this._updatePanel(); return; }
 
                 this._syncing = true;
@@ -8053,6 +8061,11 @@ ORDER BY t.table_name;
                         console.log('[LocalFirst] Estado local vazio — forçando full sync do Supabase');
                     }
                     const now = new Date().toISOString();
+                    // Buffer de 30s para compensar diferença de relógio entre cliente e servidor Supabase
+                    // Sem isso, registros podem ser perdidos se o relógio do cliente estiver adiantado
+                    const lastSyncWithBuffer = lastSync === '1970-01-01T00:00:00.000Z'
+                        ? lastSync
+                        : new Date(new Date(lastSync).getTime() - 30000).toISOString();
 
                     let pushed = 0, pulled = 0;
                     const dirtyNow = new Set(this._dirtyKeys);
@@ -8090,7 +8103,7 @@ ORDER BY t.table_name;
                             if (flushed.length > 0) {
                                 await IDB.set(deletedKey, pendingDeletes.filter(id => !flushed.includes(id)));
                             }
-                            await new Promise(r => setTimeout(r, 300));
+                            await new Promise(r => setTimeout(r, 50));
                             this._pushing = false;
                         }
 
@@ -8119,7 +8132,7 @@ ORDER BY t.table_name;
                                 } else {
                                     console.warn('[LocalFirst] Push erro em', table, error.message);
                                 }
-                                await new Promise(r => setTimeout(r, 300));
+                                await new Promise(r => setTimeout(r, 50));
                                 this._pushing = false;
                             } else {
                                 this._dirtyKeys.delete(stateKey);
@@ -8127,10 +8140,11 @@ ORDER BY t.table_name;
                         }
 
                         // ── PULL: registros remotos mais novos que lastSync ───────
+                        // usa lastSyncWithBuffer (30s antes) para compensar clock skew
                         const { data, error: pullErr } = await supabaseClient
                             .from(table)
                             .select('id, _data, updated_at')
-                            .gt('updated_at', lastSync);
+                            .gt('updated_at', lastSyncWithBuffer);
 
                         if (pullErr) { console.warn('[LocalFirst] Pull erro em', table, pullErr.message); continue; }
                         if (!data || data.length === 0) continue;
@@ -8185,9 +8199,10 @@ ORDER BY t.table_name;
                     if (pulled > 0) {
                         await App.saveData(true);
                     }
-                    // Sempre atualiza o dashboard após sync
+                    // Sempre atualiza o dashboard após sync (inclui aniversariantes, contas, cards)
                     try { Dashboard.update?.(); } catch(e) {}
-                    if (pulled > 0 && typeof ContasManager !== 'undefined') {
+                    // Sempre re-renderiza contas (independente de pulled) — garante sincronização
+                    if (typeof ContasManager !== 'undefined') {
                         try { ContasManager.renderAll?.(); } catch(e) {}
                     }
 
@@ -8196,6 +8211,10 @@ ORDER BY t.table_name;
 
                     if (pushed > 0 || pulled > 0) {
                         console.log(`[LocalFirst] Sync OK — ↑${pushed} push, ↓${pulled} pull (motivo: ${reason})`);
+                        // Notifica usuário quando dados foram puxados do Supabase (outro dispositivo salvou algo)
+                        if (pulled > 0 && reason !== 'initial_load' && reason !== 'manual') {
+                            try { Toast.show(`🔄 ${pulled} registro(s) atualizado(s) de outro dispositivo`, 'info', 3000); } catch(e) {}
+                        }
                     }
 
                 } catch(e) {
@@ -8214,6 +8233,10 @@ ORDER BY t.table_name;
                     switch(stateKey) {
                         case 'clients':
                             if (typeof Clients !== 'undefined') Clients.renderTable();
+                            // Atualiza aniversariantes quando clientes são sincronizados
+                            if (typeof Dashboard !== 'undefined') {
+                                try { Dashboard.updateBirthdayAlerts?.(); } catch(e) {}
+                            }
                             break;
                         case 'products':
                             if (typeof Products !== 'undefined') Products.renderTable();
@@ -8296,7 +8319,7 @@ ORDER BY t.table_name;
                         await IDB.set(pendingKey, existing.filter(id => id !== item.id));
                         this._dirtyKeys.delete(table);
                     }
-                    await new Promise(r => setTimeout(r, 300));
+                    await new Promise(r => setTimeout(r, 50));
                     this._pushing = false;
                 } catch(e) {
                     this._pushing = false;
@@ -8375,9 +8398,12 @@ ORDER BY t.table_name;
                     if (!error && data) {
                         const cfg = typeof data._data === 'string' ? JSON.parse(data._data) : data._data;
                         if (cfg) {
-                            // Só aplica se remoto for mais novo que local
+                            // Só aplica se remoto for mais novo que local (buffer 30s para clock skew)
                             const remoteTs = data.updated_at || '0';
-                            const localTs  = state.company._supabase_at || '0';
+                            const localTsRaw = state.company._supabase_at || '0';
+                            const localTs = localTsRaw !== '0'
+                                ? new Date(new Date(localTsRaw).getTime() - 30000).toISOString()
+                                : '0';
                             if (remoteTs > localTs) {
                                 if (cfg.company)      { Object.assign(state.company, cfg.company); state.company._supabase_at = remoteTs; }
                                 if (cfg.notificacoes) Object.assign(state.notificacoes, cfg.notificacoes);
@@ -8402,7 +8428,11 @@ ORDER BY t.table_name;
                             const remoteContas = typeof cfData._data === 'string' ? JSON.parse(cfData._data) : cfData._data;
                             let localTs = null;
                             try { localTs = await IDB.get('contas_financeiras_ts'); } catch(e) {}
-                            if (!localTs || cfData.updated_at > localTs) {
+                            // Buffer 30s para compensar clock skew
+                            const localTsBuf = localTs
+                                ? new Date(new Date(localTs).getTime() - 30000).toISOString()
+                                : null;
+                            if (!localTsBuf || cfData.updated_at > localTsBuf) {
                                 await IDB.set('contas_financeiras', JSON.stringify(remoteContas));
                                 await IDB.set('contas_financeiras_ts', cfData.updated_at);
                                 if (typeof ContasManager !== 'undefined') { try { ContasManager.renderAll?.(); } catch(e) {} }
@@ -8537,10 +8567,14 @@ ORDER BY t.table_name;
                         // para não interferir com o ciclo de sync principal
                         const _CONTAS_SALES_TS = 'contas_sales_last_pull';
                         const lastSalesPull = await IDB.get(_CONTAS_SALES_TS).catch(() => null);
+                        // Buffer 30s para compensar clock skew entre cliente e Supabase
+                        const lastSalesPullBuf = lastSalesPull
+                            ? new Date(new Date(lastSalesPull).getTime() - 30000).toISOString()
+                            : '1970-01-01T00:00:00.000Z';
                         const { data: salesData, error: salesErr } = await supabaseClient
                             .from('sales')
                             .select('id, _data, updated_at')
-                            .gt('updated_at', lastSalesPull || '1970-01-01T00:00:00.000Z');
+                            .gt('updated_at', lastSalesPullBuf);
                         if (!salesErr && salesData && salesData.length > 0) {
                             const localMap = {};
                             (state.sales || []).forEach(s => { localMap[s.id] = s; });
@@ -17075,6 +17109,15 @@ ${container.innerHTML}
         // ==================== INICIALIZAÇÃO ====================
         document.addEventListener('DOMContentLoaded', async () => {
             await App.init();
+            // Sync imediato antes do primeiro render para garantir dados frescos do Supabase
+            // Especialmente importante para: aniversariantes, contas a receber, clientes
+            if (navigator.onLine && window.LocalFirst) {
+                try {
+                    await LocalFirst.sync('initial_load');
+                } catch(e) {
+                    console.warn('[Boot] Sync inicial falhou, usando dados locais:', e.message);
+                }
+            }
             Dashboard.update();
             Usuarios.renderTable();
             BackupManager.init();
