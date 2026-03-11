@@ -1953,25 +1953,30 @@
 
         /* Modo valores ocultos — card-value e sub-textos ficam borrados */
         body.valores-ocultos .card-value,
-        body.valores-ocultos .dash-card-sub,
         body.valores-ocultos #contasReceberTotal,
         body.valores-ocultos #contasPagarTotal,
-        body.valores-ocultos #contasVencidasTotal,
+        body.valores-ocultos #contasReceberVencidas,
         body.valores-ocultos #contasPagarVencidas,
-        body.valores-ocultos #contasAVencerTotal,
-        body.valores-ocultos #aging0_30,
-        body.valores-ocultos #aging31_60,
-        body.valores-ocultos #aging61_90,
-        body.valores-ocultos #aging90plus,
+        body.valores-ocultos #contasReceberAVencer,
+        body.valores-ocultos #contasPagarAVencer,
         body.valores-ocultos .conta-item-valor,
         body.valores-ocultos .carne-valor-num,
-        body.valores-ocultos .os-total-final {
+        body.valores-ocultos .os-total-final,
+        /* IDs reais do HTML (nomes diferentes dos que estavam no CSS) */
+        body.valores-ocultos #contasVencidasTotal,
+        body.valores-ocultos #contasAVencerTotal,
+        /* Subtextos dos cards do dashboard (ticket, lançamentos, positivo, entregues) */
+        body.valores-ocultos #dash-sub-vendas,
+        body.valores-ocultos #dash-sub-despesas,
+        body.valores-ocultos #dash-sub-resultado,
+        body.valores-ocultos #dash-sub-os,
+        /* Card empresa: endereço, telefone, CNPJ, PIX */
+        body.valores-ocultos .dash-info-empresa {
             filter: blur(6px);
             user-select: none;
             transition: filter .25s;
         }
         body.valores-ocultos .card-value:hover,
-        body.valores-ocultos .dash-card-sub:hover,
         body.valores-ocultos .conta-item-valor:hover {
             filter: blur(0px);
         }
@@ -11668,7 +11673,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#fff5ee;color:#ff6b00;"><i class="fas fa-arrow-trend-up"></i></div>
                         </div>
                         <div class="card-value">${Utils.formatCurrency(totalSales)}</div>
-                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${countSales} OS &nbsp;·&nbsp; Ticket: <strong>${Utils.formatCurrency(ticketMedio)}</strong></div>
+                        <div id="dash-sub-vendas" style="font-size:0.76rem;color:var(--gray);">${countSales} OS &nbsp;·&nbsp; Ticket: <strong>${Utils.formatCurrency(ticketMedio)}</strong></div>
                     </div>
                     <div class="card" style="--card-accent:#dc3545;">
                         <div class="card-header">
@@ -11676,7 +11681,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#fff0f1;color:#dc3545;"><i class="fas fa-receipt"></i></div>
                         </div>
                         <div class="card-value">${Utils.formatCurrency(totalExpenses)}</div>
-                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${expenses.length} lançamento${expenses.length !== 1 ? 's' : ''}</div>
+                        <div id="dash-sub-despesas" style="font-size:0.76rem;color:var(--gray);">${expenses.length} lançamento${expenses.length !== 1 ? 's' : ''}</div>
                     </div>
                     <div class="card" style="--card-accent:${profit >= 0 ? '#22c55e' : '#dc3545'};">
                         <div class="card-header">
@@ -11684,7 +11689,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:${profit >= 0 ? '#f0fdf4' : '#fff0f1'};color:${profit >= 0 ? '#22c55e' : '#dc3545'};"><i class="fas fa-${profit >= 0 ? 'coins' : 'exclamation-triangle'}"></i></div>
                         </div>
                         <div class="card-value" style="color:${profit >= 0 ? '#22c55e' : '#dc3545'};">${Utils.formatCurrency(profit)}</div>
-                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${profit >= 0 ? '▲ Positivo' : '▼ Negativo'}</div>
+                        <div id="dash-sub-resultado" style="font-size:0.76rem;color:var(--gray);">${profit >= 0 ? '▲ Positivo' : '▼ Negativo'}</div>
                     </div>
                     <div class="card" style="--card-accent:#0ea5e9;">
                         <div class="card-header">
@@ -11692,7 +11697,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#f0f9ff;color:#0ea5e9;"><i class="fas fa-file-alt"></i></div>
                         </div>
                         <div class="card-value" style="color:#0ea5e9;">${salesPendentes}</div>
-                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
+                        <div id="dash-sub-os" style="font-size:0.76rem;color:var(--gray);">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
                     </div>
                     <div class="card" style="--card-accent:#10b981;grid-column:span 2;">
                         <div class="card-header">
@@ -11700,10 +11705,10 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#f0fdf4;color:#10b981;"><i class="fas fa-store"></i></div>
                         </div>
                         <div style="font-size:0.8rem;color:var(--gray);display:flex;flex-wrap:wrap;gap:0.5rem 1.5rem;">
-                            <span><i class="fas fa-map-marker-alt" style="color:#dc3545;margin-right:4px;width:14px;text-align:center;"></i>${companyAddress}</span>
-                            ${company.phone ? `<span><i class="fas fa-phone" style="color:#22c55e;margin-right:4px;width:14px;text-align:center;"></i>${company.phone}</span>` : ''}
-                            ${company.cnpj  ? `<span><i class="fas fa-id-card" style="color:#0ea5e9;margin-right:4px;width:14px;text-align:center;"></i>CNPJ: ${company.cnpj}</span>` : ''}
-                            ${company.pix   ? `<span><i class="fas fa-qrcode" style="color:#8b5cf6;margin-right:4px;width:14px;text-align:center;"></i>PIX: ${company.pix}</span>` : ''}
+                            <span class="dash-info-empresa"><i class="fas fa-map-marker-alt" style="color:#dc3545;margin-right:4px;width:14px;text-align:center;"></i>${companyAddress}</span>
+                            ${company.phone ? `<span class="dash-info-empresa"><i class="fas fa-phone" style="color:#22c55e;margin-right:4px;width:14px;text-align:center;"></i>${company.phone}</span>` : ''}
+                            ${company.cnpj  ? `<span class="dash-info-empresa"><i class="fas fa-id-card" style="color:#0ea5e9;margin-right:4px;width:14px;text-align:center;"></i>CNPJ: ${company.cnpj}</span>` : ''}
+                            ${company.pix   ? `<span class="dash-info-empresa"><i class="fas fa-qrcode" style="color:#8b5cf6;margin-right:4px;width:14px;text-align:center;"></i>PIX: ${company.pix}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -12369,17 +12374,21 @@ ORDER BY t.table_name;
                     return '';
                 };
 
-                const processRows = (rows) => {
+                const processRows = async (rows) => {
                     if (rows.length < 2) { Toast.show('Arquivo inválido ou sem dados', 'error'); return; }
                     let imported = 0, errors = 0;
+                    const toSync = [];
                     for (let i = 1; i < rows.length; i++) {
                         const rawFields = rows[i];
                         const fields = rawFields.map(f => (f instanceof Date ? f : String(f || '').trim()));
                         if (fields.every(f => f === '' || f === undefined)) continue;
                         const name = String(fields[1] || '').trim();
                         if (!name) { errors++; continue; }
+                        // Verifica duplicata por nome exato (evita reimportar o mesmo cliente)
+                        const jaExiste = state.clients.some(c => c.name.trim().toLowerCase() === name.toLowerCase());
+                        if (jaExiste) continue;
                         const client = {
-                            id: 'CLI-' + (state.clients.length + 1 + imported).toString().padStart(3,'0'),
+                            id: Utils.generateId('CLI'),
                             code: String(fields[0] || '').trim(), name,
                             phone: String(fields[2] || '').trim(),
                             email: String(fields[3] || '').trim(),
@@ -12395,22 +12404,38 @@ ORDER BY t.table_name;
                             updated_at: new Date().toISOString()
                         };
                         state.clients.push(client);
+                        toSync.push(client);
                         imported++;
                     }
+                    // Salva localmente primeiro
                     App.saveData();
                     self.renderTable();
-                    Toast.show(`${imported} clientes importados. ${errors} erros.`, imported > 0 ? 'success' : 'warning');
+                    Toast.show(`${imported} clientes importados${errors ? '. ' + errors + ' erros' : ''}. Sincronizando...`, imported > 0 ? 'success' : 'warning');
+                    // Sincroniza cada cliente com o Supabase (para aparecer em outros dispositivos)
+                    if (toSync.length > 0) {
+                        let syncOk = 0;
+                        for (const c of toSync) {
+                            try {
+                                await SupaSync.upsertCliente(c);
+                                syncOk++;
+                            } catch(e) {
+                                console.warn('[Import] Falha ao sincronizar cliente:', c.name, e.message);
+                            }
+                        }
+                        if (syncOk > 0) Toast.show(`${syncOk} cliente${syncOk !== 1 ? 's' : ''} sincronizado${syncOk !== 1 ? 's' : ''} com a nuvem ✅`, 'success');
+                        else Toast.show('Clientes salvos localmente. Sincronize manualmente quando houver conexão.', 'warning');
+                    }
                 };
 
                 if (isExcel) {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
+                    reader.onload = async (e) => {
                         try {
                             const data = new Uint8Array(e.target.result);
                             const wb = XLSX.read(data, { type: 'array', cellDates: true });
                             const ws = wb.Sheets[wb.SheetNames[0]];
                             const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: true });
-                            processRows(rows);
+                            await processRows(rows);
                         } catch(err) {
                             Toast.show('Erro ao ler Excel: ' + err.message, 'error');
                         }
@@ -12418,7 +12443,7 @@ ORDER BY t.table_name;
                     reader.readAsArrayBuffer(file);
                 } else {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
+                    reader.onload = async (e) => {
                         const content = e.target.result;
                         const clean = content.charCodeAt(0) === 0xFEFF ? content.slice(1) : content;
                         const lines = clean.split('\n').filter(l => l.trim() !== '');
@@ -12431,7 +12456,7 @@ ORDER BY t.table_name;
                             }
                             return fields;
                         });
-                        processRows(rows);
+                        await processRows(rows);
                     };
                     reader.readAsText(file);
                 }
