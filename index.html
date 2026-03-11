@@ -1953,12 +1953,16 @@
 
         /* Modo valores ocultos — card-value e sub-textos ficam borrados */
         body.valores-ocultos .card-value,
+        body.valores-ocultos .dash-card-sub,
         body.valores-ocultos #contasReceberTotal,
         body.valores-ocultos #contasPagarTotal,
-        body.valores-ocultos #contasReceberVencidas,
+        body.valores-ocultos #contasVencidasTotal,
         body.valores-ocultos #contasPagarVencidas,
-        body.valores-ocultos #contasReceberAVencer,
-        body.valores-ocultos #contasPagarAVencer,
+        body.valores-ocultos #contasAVencerTotal,
+        body.valores-ocultos #aging0_30,
+        body.valores-ocultos #aging31_60,
+        body.valores-ocultos #aging61_90,
+        body.valores-ocultos #aging90plus,
         body.valores-ocultos .conta-item-valor,
         body.valores-ocultos .carne-valor-num,
         body.valores-ocultos .os-total-final {
@@ -1967,6 +1971,7 @@
             transition: filter .25s;
         }
         body.valores-ocultos .card-value:hover,
+        body.valores-ocultos .dash-card-sub:hover,
         body.valores-ocultos .conta-item-valor:hover {
             filter: blur(0px);
         }
@@ -6971,27 +6976,6 @@ ORDER BY t.table_name;
                                         <div class="wpp-nav-desc">Parcelas do crediário</div>
                                     </div>
                                 </div>
-                                <div class="wpp-nav-item" id="navCobranca" onclick="ConfigWpp.selectMsg('cobranca')">
-                                    <div class="wpp-nav-icon" style="background:#fff3e0;">💸</div>
-                                    <div class="wpp-nav-label">
-                                        Cobrança
-                                        <div class="wpp-nav-desc">Contas a Receber · lembrete</div>
-                                    </div>
-                                </div>
-                                <div class="wpp-nav-item" id="navConfirmacaoOS" onclick="ConfigWpp.selectMsg('confirmacaoOS')">
-                                    <div class="wpp-nav-icon" style="background:#e8eaf6;">📋</div>
-                                    <div class="wpp-nav-label">
-                                        Confirmação de OS
-                                        <div class="wpp-nav-desc">Vendas · após salvar pedido</div>
-                                    </div>
-                                </div>
-                                <div class="wpp-nav-item" id="navLembreteRetirada" onclick="ConfigWpp.selectMsg('lembreteRetirada')">
-                                    <div class="wpp-nav-icon" style="background:#fce4ec;">🎉</div>
-                                    <div class="wpp-nav-label">
-                                        Lembrete de Retirada
-                                        <div class="wpp-nav-desc">Vendas · óculos prontos</div>
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Painel editor -->
@@ -7719,56 +7703,35 @@ ORDER BY t.table_name;
 
     <!-- Modal de confirmação WhatsApp -->
     <div class="wpp-confirm-modal" id="wppConfirmModal">
-        <div class="wpp-confirm-box" style="max-width:520px;width:95%;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <!-- Header -->
-            <div class="wpp-confirm-header" style="background:linear-gradient(135deg,#25d366,#128c7e);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;">
-                <div style="background:rgba(255,255,255,0.2);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="fab fa-whatsapp" style="font-size:1.4rem;"></i>
-                </div>
-                <div style="flex:1;">
-                    <div style="font-weight:800;font-size:1rem;">Enviar via WhatsApp</div>
-                    <div style="font-size:0.78rem;opacity:0.88;" id="wppConfirmSubtitle">Verifique e edite antes de enviar</div>
-                </div>
-                <button onclick="WppConfirm.close()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">&times;</button>
-            </div>
-            <!-- Info destinatário -->
-            <div style="background:#f0fdf4;padding:10px 18px;display:flex;gap:18px;border-bottom:1px solid #d1fae5;">
-                <div style="display:flex;flex-direction:column;gap:1px;">
-                    <small style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">👤 Destinatário</small>
-                    <strong id="wppConfirmName" style="color:#065f46;font-size:0.92rem;">—</strong>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:1px;">
-                    <small style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">📱 Número</small>
-                    <strong id="wppConfirmPhone" style="color:#065f46;font-size:0.92rem;">—</strong>
+        <div class="wpp-confirm-box">
+            <div class="wpp-confirm-header">
+                <i class="fab fa-whatsapp"></i>
+                <div>
+                    <h3>Confirmar envio via WhatsApp</h3>
+                    <small id="wppConfirmSubtitle">Verifique os dados antes de enviar</small>
                 </div>
             </div>
-            <!-- Tabs: Prévia / Editar -->
-            <div style="display:flex;border-bottom:2px solid #e5e7eb;background:#fff;">
-                <button id="wppTabPreview" onclick="WppConfirm.showTab('preview')" style="flex:1;padding:9px;border:none;background:transparent;font-weight:700;font-size:0.82rem;color:#25d366;border-bottom:2px solid #25d366;margin-bottom:-2px;cursor:pointer;"><i class="fas fa-eye"></i> Prévia</button>
-                <button id="wppTabEdit" onclick="WppConfirm.showTab('edit')" style="flex:1;padding:9px;border:none;background:transparent;font-weight:700;font-size:0.82rem;color:#888;cursor:pointer;"><i class="fas fa-edit"></i> Editar Mensagem</button>
+            <div class="wpp-confirm-body">
+                <div class="wpp-confirm-info">
+                    <div class="wpp-confirm-info-item">
+                        <small>👤 Destinatário</small>
+                        <strong id="wppConfirmName">—</strong>
+                    </div>
+                    <div class="wpp-confirm-info-item">
+                        <small>📱 Número</small>
+                        <strong id="wppConfirmPhone">—</strong>
+                    </div>
+                </div>
+                <div class="wpp-confirm-preview">
+                    <div class="wpp-confirm-preview-label"><i class="fas fa-eye"></i> Prévia da mensagem</div>
+                    <div class="wpp-confirm-bubble" id="wppConfirmPreview"></div>
+                </div>
             </div>
-            <!-- Aba Prévia -->
-            <div id="wppPanePreview" style="padding:14px 18px;background:#e5ddd5;max-height:280px;overflow-y:auto;">
-                <div style="font-size:10px;color:#777;text-align:center;margin-bottom:8px;">Como aparecerá no WhatsApp</div>
-                <div style="background:#fff;border-radius:12px;border-bottom-left-radius:3px;padding:10px 14px;font-size:0.84rem;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,0.1);max-width:90%;word-break:break-word;" id="wppConfirmPreview"></div>
-                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;" id="wppConfirmPreviewTime"></div>
-            </div>
-            <!-- Aba Editar -->
-            <div id="wppPaneEdit" style="display:none;padding:14px 18px;background:#fff;">
-                <div style="font-size:11px;color:#888;margin-bottom:6px;"><i class="fas fa-info-circle"></i> Edite a mensagem antes de enviar. Alterações não afetam o template salvo.</div>
-                <textarea id="wppConfirmEdit" style="width:100%;height:200px;border:1.5px solid #d1d5db;border-radius:10px;padding:10px;font-size:0.83rem;line-height:1.5;resize:vertical;font-family:inherit;" oninput="WppConfirm.syncEdit()"></textarea>
-            </div>
-            <!-- Footer -->
-            <div style="padding:12px 18px;background:#fff;border-top:1px solid #e5e7eb;display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn" id="wppConfirmSendBtn" style="flex:1;background:#25d366;color:#fff;border:none;font-weight:700;font-size:0.88rem;min-width:140px;">
-                    <i class="fab fa-whatsapp"></i> Abrir WhatsApp
+            <div class="wpp-confirm-footer">
+                <button class="btn btn-success" style="flex:1;" id="wppConfirmSendBtn">
+                    <i class="fab fa-whatsapp"></i> Enviar agora
                 </button>
-                <button onclick="WppConfirm.copiar()" style="padding:8px 14px;background:#f0fdf4;color:#25d366;border:1.5px solid #25d366;border-radius:8px;font-weight:700;font-size:0.82rem;cursor:pointer;" title="Copiar mensagem">
-                    <i class="fas fa-copy"></i> Copiar
-                </button>
-                <button onclick="WppConfirm.close()" style="padding:8px 14px;background:#f3f4f6;color:#555;border:1px solid #d1d5db;border-radius:8px;font-weight:600;font-size:0.82rem;cursor:pointer;">
-                    Cancelar
-                </button>
+                <button class="btn btn-secondary" onclick="WppConfirm.close()">Cancelar</button>
             </div>
         </div>
     </div>
@@ -7826,20 +7789,6 @@ ORDER BY t.table_name;
                         <button id="osGeradoBtnPendente" onclick="Sales._setOsGeradoPagamento('pendente')" style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all .2s;">⏳ PENDENTE</button>
                     </div>
                     <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
-                </div>
-            </div>
-            <!-- Botões WhatsApp na OS gerada -->
-            <div style="padding:0 1.5rem 0.75rem;">
-                <div style="font-size:0.78rem;font-weight:700;color:#25d366;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                    <button id="osGeradoBtnWppConfirmacao" onclick="Sales._wppOSGerada('confirmacao')"
-                        style="padding:8px 6px;background:rgba(37,211,102,0.1);color:#25d366;border:1.5px solid rgba(37,211,102,0.35);border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;text-align:center;">
-                        <i class="fab fa-whatsapp"></i> Confirmação de OS
-                    </button>
-                    <button id="osGeradoBtnWppStatus" onclick="Sales._wppOSGerada('status')"
-                        style="padding:8px 6px;background:rgba(37,211,102,0.1);color:#25d366;border:1.5px solid rgba(37,211,102,0.35);border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;text-align:center;">
-                        <i class="fab fa-whatsapp"></i> Status do Pedido
-                    </button>
                 </div>
             </div>
             <div class="modal-footer" style="justify-content:center;border-top:none;padding-top:0;">
@@ -9506,19 +9455,10 @@ ORDER BY t.table_name;
                 const clientObj = (state.clients||[]).find(cl => cl.name === c.parte);
                 const phone = (clientObj?.whatsapp || clientObj?.phone || '').replace(/\D/g,'');
                 if (!phone) { Toast.show('Cliente sem WhatsApp/telefone cadastrado','warning'); return; }
-                const emp      = state.company?.name || 'Ótica';
-                const tel      = state.company?.whatsapp || state.company?.phone || '';
-                const vencLabel= c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
-                const nome1    = (c.parte || '').split(' ')[0];
-                // Usa template configurável (cobrança), com fallback para mensagem básica
-                const msg = (typeof ConfigWpp !== 'undefined' ? ConfigWpp.get('cobranca') : null
-                    || `Olá *{{NOME}}*! 👋\n\nPassando para te lembrar de um valor em aberto:\n📋 *{{DESCRICAO}}*\n💰 *{{VALOR}}*\n📅 Vencimento: {{VENCIMENTO}}\n\n📞 {{TELEFONE}}\n_{{EMPRESA}}_`)
-                    .replace(/{{NOME}}/g,       nome1)
-                    .replace(/{{DESCRICAO}}/g,  c.descricao || '—')
-                    .replace(/{{VALOR}}/g,      this.fmt(c.valor))
-                    .replace(/{{VENCIMENTO}}/g, vencLabel)
-                    .replace(/{{EMPRESA}}/g,    emp)
-                    .replace(/{{TELEFONE}}/g,   tel);
+                const emp = state.company?.name || 'Ótica';
+                const vencLabel = c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                const valor = this.fmt(c.valor);
+                const msg = `Olá, *${c.parte}*! 👋\n\nPassando para lembrar sobre o seguinte lançamento em aberto:\n\n📋 *${c.descricao}*\n💰 Valor: *${valor}*\n📅 Vencimento: *${vencLabel}*\n\nQualquer dúvida estamos à disposição!\n\n_${emp}_`;
                 const url = `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
                 WppConfirm.show({ nome: c.parte, phone, subtitle: 'Cobrança via WhatsApp', msg, url });
             },
@@ -9526,99 +9466,25 @@ ORDER BY t.table_name;
         window.ContasManager = ContasManager;
         const WppConfirm = {
             _url: '',
-            _msg: '',
-            _phone: '',
 
             show({ nome, phone, subtitle, msg, url }) {
-                this._url   = url;
-                this._msg   = msg;
-                this._phone = phone;
-                document.getElementById('wppConfirmName').textContent     = nome    || '—';
-                document.getElementById('wppConfirmPhone').textContent    = this._formatPhone(phone);
-                document.getElementById('wppConfirmSubtitle').textContent = subtitle || 'Verifique e edite antes de enviar';
-                // Renderiza prévia com formatação WhatsApp
-                this._renderPreview(msg);
-                // Preenche textarea de edição
-                const ta = document.getElementById('wppConfirmEdit');
-                if (ta) ta.value = msg;
-                // Timestamp
-                const tEl = document.getElementById('wppConfirmPreviewTime');
-                if (tEl) tEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-                // Botão de envio usa mensagem editada
-                document.getElementById('wppConfirmSendBtn').onclick = () => this.send();
-                // Mostra aba Prévia por padrão
-                this.showTab('preview');
+                this._url = url;
+                document.getElementById('wppConfirmName').textContent    = nome    || '—';
+                document.getElementById('wppConfirmPhone').textContent   = this._formatPhone(phone);
+                document.getElementById('wppConfirmSubtitle').textContent = subtitle || 'Verifique os dados antes de enviar';
+                document.getElementById('wppConfirmPreview').textContent = msg     || '';
+                document.getElementById('wppConfirmSendBtn').onclick = () => { this.send(); };
                 document.getElementById('wppConfirmModal').classList.add('show');
             },
 
-            showTab(tab) {
-                const preview = document.getElementById('wppPanePreview');
-                const edit    = document.getElementById('wppPaneEdit');
-                const btnP    = document.getElementById('wppTabPreview');
-                const btnE    = document.getElementById('wppTabEdit');
-                if (tab === 'preview') {
-                    if (preview) preview.style.display = 'block';
-                    if (edit)    edit.style.display    = 'none';
-                    if (btnP) { btnP.style.color = '#25d366'; btnP.style.borderBottom = '2px solid #25d366'; btnP.style.marginBottom = '-2px'; }
-                    if (btnE) { btnE.style.color = '#888'; btnE.style.borderBottom = 'none'; btnE.style.marginBottom = '0'; }
-                } else {
-                    if (preview) preview.style.display = 'none';
-                    if (edit)    edit.style.display    = 'block';
-                    if (btnE) { btnE.style.color = '#25d366'; btnE.style.borderBottom = '2px solid #25d366'; btnE.style.marginBottom = '-2px'; }
-                    if (btnP) { btnP.style.color = '#888'; btnP.style.borderBottom = 'none'; btnP.style.marginBottom = '0'; }
-                }
-            },
-
-            syncEdit() {
-                // Atualiza prévia em tempo real ao editar
-                const ta = document.getElementById('wppConfirmEdit');
-                if (ta) {
-                    this._msg = ta.value;
-                    this._renderPreview(ta.value);
-                    this._url = `https://wa.me/55${this._phone}?text=${encodeURIComponent(ta.value)}`;
-                }
-            },
-
-            _renderPreview(msg) {
-                const el = document.getElementById('wppConfirmPreview');
-                if (!el) return;
-                // Renderiza formatação WhatsApp: *bold*, _italic_, ~strike~, quebras de linha
-                let html = msg
-                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                    .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
-                    .replace(/_(.*?)_/g, '<em>$1</em>')
-                    .replace(/~(.*?)~/g, '<s>$1</s>')
-                    .replace(/\n/g, '<br>');
-                el.innerHTML = html;
-            },
-
             send() {
-                const ta  = document.getElementById('wppConfirmEdit');
-                const msg = (ta ? ta.value : this._msg) || this._msg;
-                const url = `https://wa.me/55${this._phone}?text=${encodeURIComponent(msg)}`;
-                window.open(url, '_blank');
+                window.open(this._url, '_blank');
                 this.close();
-            },
-
-            copiar() {
-                const ta  = document.getElementById('wppConfirmEdit');
-                const msg = (ta ? ta.value : this._msg) || this._msg;
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(msg).then(() => Toast.show('Mensagem copiada! ✅', 'success'));
-                } else {
-                    // Fallback para iOS/Safari
-                    const tmp = document.createElement('textarea');
-                    tmp.value = msg; tmp.style.position = 'fixed'; tmp.style.opacity = '0';
-                    document.body.appendChild(tmp); tmp.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tmp);
-                    Toast.show('Mensagem copiada! ✅', 'success');
-                }
             },
 
             close() {
                 document.getElementById('wppConfirmModal').classList.remove('show');
-                this._url = ''; this._msg = ''; this._phone = '';
+                this._url = '';
             },
 
             _formatPhone(raw = '') {
@@ -11802,7 +11668,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#fff5ee;color:#ff6b00;"><i class="fas fa-arrow-trend-up"></i></div>
                         </div>
                         <div class="card-value">${Utils.formatCurrency(totalSales)}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${countSales} OS &nbsp;·&nbsp; Ticket: <strong>${Utils.formatCurrency(ticketMedio)}</strong></div>
+                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${countSales} OS &nbsp;·&nbsp; Ticket: <strong>${Utils.formatCurrency(ticketMedio)}</strong></div>
                     </div>
                     <div class="card" style="--card-accent:#dc3545;">
                         <div class="card-header">
@@ -11810,7 +11676,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#fff0f1;color:#dc3545;"><i class="fas fa-receipt"></i></div>
                         </div>
                         <div class="card-value">${Utils.formatCurrency(totalExpenses)}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${expenses.length} lançamento${expenses.length !== 1 ? 's' : ''}</div>
+                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${expenses.length} lançamento${expenses.length !== 1 ? 's' : ''}</div>
                     </div>
                     <div class="card" style="--card-accent:${profit >= 0 ? '#22c55e' : '#dc3545'};">
                         <div class="card-header">
@@ -11818,7 +11684,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:${profit >= 0 ? '#f0fdf4' : '#fff0f1'};color:${profit >= 0 ? '#22c55e' : '#dc3545'};"><i class="fas fa-${profit >= 0 ? 'coins' : 'exclamation-triangle'}"></i></div>
                         </div>
                         <div class="card-value" style="color:${profit >= 0 ? '#22c55e' : '#dc3545'};">${Utils.formatCurrency(profit)}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${profit >= 0 ? '▲ Positivo' : '▼ Negativo'}</div>
+                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${profit >= 0 ? '▲ Positivo' : '▼ Negativo'}</div>
                     </div>
                     <div class="card" style="--card-accent:#0ea5e9;">
                         <div class="card-header">
@@ -11826,7 +11692,7 @@ ORDER BY t.table_name;
                             <div class="card-icon" style="background:#f0f9ff;color:#0ea5e9;"><i class="fas fa-file-alt"></i></div>
                         </div>
                         <div class="card-value" style="color:#0ea5e9;">${salesPendentes}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
+                        <div class="dash-card-sub" style="font-size:0.76rem;color:var(--gray);">${salesEntregues} entregue${salesEntregues !== 1 ? 's' : ''} no período</div>
                     </div>
                     <div class="card" style="--card-accent:#10b981;grid-column:span 2;">
                         <div class="card-header">
@@ -13032,10 +12898,7 @@ ORDER BY t.table_name;
             oculosVencido: "Olá *{{NOME}}*! 👋\n\nPassando para dar um recado importante! 😊\n\nVerificamos que faz aproximadamente *{{MESES}} meses* que você adquiriu seus óculos conosco (OS {{OS}} — {{DATA_VENDA}}).\n\n👓 Especialistas recomendam *revisão anual* da receita para garantir a saúde dos seus olhos e o conforto visual!\n\nQue tal agendar uma consulta de revisão? Temos condições especiais para clientes recorrentes! 🎁\n\n━━━━━━━━━━━━━━━━━━━━\n*{{EMPRESA}}*\n📍 {{ENDERECO}}\n📞 {{TELEFONE}}",
             statusPedido: "Olá *{{NOME}}*! 👋\n\nSegue a atualização do seu pedido:\n\n🏪 *{{EMPRESA}}*\n━━━━━━━━━━━━━━━━━━━━\n📋 *OS Nº:* {{OS}}\n📅 *Data da compra:* {{DATA_VENDA}}\n🚚 *Previsão de entrega:* {{PREVISAO}}\n\n🔄 *Status atual:*\n➡️ *{{STATUS}}*\n\n{{MSG_STATUS}}\n━━━━━━━━━━━━━━━━━━━━\nDúvidas? Fale conosco! 😊\n📞 {{TELEFONE}}",
             receituario: "👁️ *RECEITUÁRIO ÓPTICO*\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📍 {{ENDERECO}}\n📞 {{TELEFONE}}\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Paciente:* {{PACIENTE}}\n📅 *Data:* {{DATA}}\n\n*🔵 OLHO DIREITO (OD)*\n{{DADOS_OD}}\n\n*🔴 OLHO ESQUERDO (OE)*\n{{DADOS_OE}}\n\n{{DADOS_EXTRA}}\n━━━━━━━━━━━━━━━━━━━━\n_Documento gerado por {{EMPRESA}}_\n_Válido mediante assinatura do profissional._",
-            comprovante: "✅ *COMPROVANTE DE PAGAMENTO*\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📍 {{ENDERECO}}\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Cliente:* {{NOME}}\n🆔 *CPF:* {{CPF}}\n\n📋 *OS Nº:* {{OS}}\n🔢 *Parcela:* {{PARCELA}}\n📅 *Vencimento:* {{VENCIMENTO}}\n📅 *Data Pagamento:* {{DATA_PAGAMENTO}}\n\n💵 *VALOR PAGO: {{VALOR}}*\n💳 *Forma:* {{FORMA_PAGAMENTO}}\n\n✅ *PAGAMENTO CONFIRMADO*\n\n━━━━━━━━━━━━━━━━━━━━\n📞 {{TELEFONE}}\n_Documento gerado por {{EMPRESA}}_",
-            cobranca: "Olá *{{NOME}}*! 👋\n\nPassando para te lembrar de um valor em aberto conosco:\n\n━━━━━━━━━━━━━━━━━━━━\n📋 *{{DESCRICAO}}*\n💰 *Valor:* {{VALOR}}\n📅 *Vencimento:* {{VENCIMENTO}}\n━━━━━━━━━━━━━━━━━━━━\n\nPor favor, entre em contato para regularizar ou combinar o pagamento. 😊\n\n📞 {{TELEFONE}}\n_{{EMPRESA}}_",
-            confirmacaoOS: "Olá *{{NOME}}*! 👋\n\n✅ Seu pedido foi registrado com sucesso na *{{EMPRESA}}*!\n\n━━━━━━━━━━━━━━━━━━━━\n📋 *OS Nº:* {{OS}}\n📅 *Data:* {{DATA_VENDA}}\n🚚 *Previsão de entrega:* {{PREVISAO}}\n💳 *Pagamento:* {{PAGAMENTO}}\n💰 *Total:* {{TOTAL}}\n━━━━━━━━━━━━━━━━━━━━\n\nAcompanharemos seu pedido e avisaremos quando estiver pronto! 👓\n\nQualquer dúvida estamos à disposição.\n📞 {{TELEFONE}}",
-            lembreteRetirada: "Olá *{{NOME}}*! 👋\n\n🎉 *Seus óculos estão prontos para retirada!*\n\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📋 *OS Nº:* {{OS}}\n━━━━━━━━━━━━━━━━━━━━\n\n{{SALDO_RETIRADA}}\n\nVenha nos visitar, estamos aguardando você! 😊\n\n📍 {{ENDERECO}}\n📞 {{TELEFONE}}"
+            comprovante: "✅ *COMPROVANTE DE PAGAMENTO*\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📍 {{ENDERECO}}\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Cliente:* {{NOME}}\n🆔 *CPF:* {{CPF}}\n\n📋 *OS Nº:* {{OS}}\n🔢 *Parcela:* {{PARCELA}}\n📅 *Vencimento:* {{VENCIMENTO}}\n📅 *Data Pagamento:* {{DATA_PAGAMENTO}}\n\n💵 *VALOR PAGO: {{VALOR}}*\n💳 *Forma:* {{FORMA_PAGAMENTO}}\n\n✅ *PAGAMENTO CONFIRMADO*\n\n━━━━━━━━━━━━━━━━━━━━\n📞 {{TELEFONE}}\n_Documento gerado por {{EMPRESA}}_"
         };
 
         const WPP_META = {
@@ -13068,24 +12931,6 @@ ORDER BY t.table_name;
                 sub:    'Tabela de parcelas do crediário → botão WhatsApp',
                 vars:   ['{{NOME}}','{{CPF}}','{{OS}}','{{PARCELA}}','{{VENCIMENTO}}','{{DATA_PAGAMENTO}}','{{VALOR}}','{{FORMA_PAGAMENTO}}','{{EMPRESA}}','{{ENDERECO}}','{{TELEFONE}}'],
                 exemplo:{ '{{NOME}}':'João Silva', '{{CPF}}':'123.456.789-00', '{{OS}}':'2025/042', '{{PARCELA}}':'2 de 5', '{{VENCIMENTO}}':'10/02/2025', '{{DATA_PAGAMENTO}}':'10/02/2025', '{{VALOR}}':'R$ 250,00', '{{FORMA_PAGAMENTO}}':'Dinheiro', '{{EMPRESA}}':'Ótica Exemplo', '{{ENDERECO}}':'Av. Paulista, 100 — São Paulo/SP', '{{TELEFONE}}':'(11) 9999-9999' }
-            },
-            cobranca: {
-                title:  '💸 Cobrança / Lembrete de Pagamento',
-                sub:    'Contas a Receber → botão WhatsApp em cada lançamento',
-                vars:   ['{{NOME}}','{{DESCRICAO}}','{{VALOR}}','{{VENCIMENTO}}','{{EMPRESA}}','{{TELEFONE}}'],
-                exemplo:{ '{{NOME}}':'João', '{{DESCRICAO}}':'OS 2025/042 — Parcela 2/5', '{{VALOR}}':'R$ 200,00', '{{VENCIMENTO}}':'15/03/2025', '{{EMPRESA}}':'Ótica Exemplo', '{{TELEFONE}}':'(11) 9999-9999' }
-            },
-            confirmacaoOS: {
-                title:  '📋 Confirmação de OS / Pedido',
-                sub:    'Vendas → botão WhatsApp após salvar a OS',
-                vars:   ['{{NOME}}','{{OS}}','{{DATA_VENDA}}','{{PREVISAO}}','{{PAGAMENTO}}','{{TOTAL}}','{{EMPRESA}}','{{TELEFONE}}'],
-                exemplo:{ '{{NOME}}':'João', '{{OS}}':'2025/042', '{{DATA_VENDA}}':'15/01/2025', '{{PREVISAO}}':'20/01/2025', '{{PAGAMENTO}}':'Crédito 5x', '{{TOTAL}}':'R$ 690,00', '{{EMPRESA}}':'Ótica Exemplo', '{{TELEFONE}}':'(11) 9999-9999' }
-            },
-            lembreteRetirada: {
-                title:  '🎉 Lembrete de Retirada (Óculos Prontos)',
-                sub:    'Vendas com status "Pronto" → botão enviar lembrete',
-                vars:   ['{{NOME}}','{{OS}}','{{SALDO_RETIRADA}}','{{EMPRESA}}','{{ENDERECO}}','{{TELEFONE}}'],
-                exemplo:{ '{{NOME}}':'João', '{{OS}}':'2025/042', '{{SALDO_RETIRADA}}':'💰 *Saldo a pagar na retirada: R$ 400,00*', '{{EMPRESA}}':'Ótica Exemplo', '{{ENDERECO}}':'Av. Paulista, 100 — São Paulo/SP', '{{TELEFONE}}':'(11) 9999-9999' }
             }
         };
 
@@ -14430,13 +14275,12 @@ ${container.innerHTML}
                                 <span style="font-size:8px;line-height:1;margin-top:1px;font-weight:700;">Cliente</span>
                             </button>
                         </td>
-                        <td class="action-buttons" style="white-space:nowrap;">
+                        <td class="action-buttons">
                             <button class="btn-icon" style="background:${hasPhone ? 'rgba(37,211,102,0.15)' : 'rgba(0,0,0,0.05)'};color:${hasPhone ? '#25d366' : '#aaa'};"
                                 onclick="Sales.enviarStatusPedidoWhatsApp('${s.id}')"
-                                title="${hasPhone ? 'Status do Pedido via WhatsApp' : 'Cliente sem WhatsApp/telefone'}">
+                                title="${hasPhone ? 'Enviar status do pedido por WhatsApp' : 'Cliente sem WhatsApp/telefone'}">
                                 <i class="fab fa-whatsapp"></i>
                             </button>
-                            ${s.status === 'pronto' && hasPhone ? `<button class="btn-icon" style="background:rgba(37,211,102,0.22);color:#128c7e;margin-left:2px;" onclick="Sales.enviarLembreteRetiradaWhatsApp('${s.id}')" title="Avisar que óculos estão prontos para retirada"><i class="fab fa-whatsapp" style="font-size:11px;"></i><i class="fas fa-glasses" style="font-size:9px;margin-left:1px;"></i></button>` : ''}
                         </td>
                     </tr>`;
                 });
@@ -16694,88 +16538,6 @@ ${container.innerHTML}
                     return;
                 }
                 this.enviarStatusPedidoWhatsApp(sale.id);
-            },
-
-            // ── WhatsApp: Confirmação de OS (após salvar venda) ──
-            // Helper: enviar WhatsApp a partir do modal de OS gerada
-            _wppOSGerada(tipo) {
-                const saleId = Sales._osGeradoSaleId;
-                if (!saleId) { Toast.show('Salve a OS primeiro', 'warning'); return; }
-                if (tipo === 'confirmacao') this.enviarConfirmacaoOS(saleId);
-                else if (tipo === 'status') this.enviarStatusPedidoWhatsApp(saleId);
-                else if (tipo === 'retirada') this.enviarLembreteRetiradaWhatsApp(saleId);
-            },
-
-            enviarConfirmacaoOS(saleId) {
-                const sale    = state.sales.find(s => s.id === saleId);
-                const client  = state.clients.find(c => c.id === sale?.clientId);
-                const company = state.company;
-                if (!sale || !client) { Toast.show('Dados da venda não encontrados', 'warning'); return; }
-                const phone   = (client.whatsapp || client.phone || '').replace(/\D/g, '');
-                if (!phone)   { Toast.show('Cliente sem WhatsApp/telefone cadastrado', 'warning'); return; }
-                const fd      = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
-                const METH    = { pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário', mixed:'Múltiplas formas' };
-                let pagamento = METH[sale.paymentMethod] || sale.paymentMethod || '—';
-                if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
-                    pagamento = sale.dualPayments.map(d => METH[d.method] || d.method).join(' + ');
-                }
-                const det     = sale.paymentDetails || {};
-                if (det.parcels?.length) pagamento += ` ${det.parcels.length}x`;
-                const msg = ConfigWpp.get('confirmacaoOS')
-                    .replace(/{{NOME}}/g,       client.name.split(' ')[0])
-                    .replace(/{{OS}}/g,         sale.number || '')
-                    .replace(/{{DATA_VENDA}}/g, fd(sale.date))
-                    .replace(/{{PREVISAO}}/g,   sale.deliveryForecast ? fd(sale.deliveryForecast) : '—')
-                    .replace(/{{PAGAMENTO}}/g,  pagamento)
-                    .replace(/{{TOTAL}}/g,      Utils.formatCurrency(sale.total || 0))
-                    .replace(/{{EMPRESA}}/g,    company.name || '')
-                    .replace(/{{TELEFONE}}/g,   [company.phone, company.whatsapp].filter(Boolean).join(' | '));
-                WppConfirm.show({
-                    nome:     client.name,
-                    phone,
-                    subtitle: `Confirmação da OS ${sale.number}`,
-                    msg,
-                    url: `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`
-                });
-            },
-
-            // ── WhatsApp: Lembrete de Retirada (óculos prontos) ──
-            enviarLembreteRetiradaWhatsApp(saleId) {
-                const sale    = state.sales.find(s => s.id === saleId);
-                const client  = state.clients.find(c => c.id === sale?.clientId);
-                const company = state.company;
-                if (!sale || !client) { Toast.show('Dados da venda não encontrados', 'warning'); return; }
-                const phone   = (client.whatsapp || client.phone || '').replace(/\D/g, '');
-                if (!phone)   { Toast.show('Cliente sem WhatsApp/telefone cadastrado', 'warning'); return; }
-                const endereco = [company.address, company.number ? ', ' + company.number : '', company.city ? ' — ' + company.city : '', company.state ? '/' + company.state : ''].filter(Boolean).join('');
-                // Calcula saldo na retirada
-                const det     = sale.paymentDetails || {};
-                let saldoRetStr = '';
-                const retVal  = parseFloat(det.retiradaValue || 0);
-                const retEntry= parseFloat(det.retiradaEntry || 0);
-                const retFinal= retVal || retEntry || 0;
-                if (retFinal > 0.01 && !sale.retiradaPaga) {
-                    saldoRetStr = `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(retFinal)}*`;
-                } else if (sale.paymentMode === 'dual' && sale.dualPayments?.length) {
-                    const totRet = sale.dualPayments.reduce((a, sl, idx) =>
-                        (sl.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`] ? a + sl.retirada : a, 0);
-                    if (totRet > 0.01) saldoRetStr = `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(totRet)}*`;
-                }
-                if (!saldoRetStr) saldoRetStr = '✅ Pedido totalmente quitado!';
-                const msg = ConfigWpp.get('lembreteRetirada')
-                    .replace(/{{NOME}}/g,            client.name.split(' ')[0])
-                    .replace(/{{OS}}/g,              sale.number || '')
-                    .replace(/{{SALDO_RETIRADA}}/g,  saldoRetStr)
-                    .replace(/{{EMPRESA}}/g,         company.name || '')
-                    .replace(/{{ENDERECO}}/g,        endereco)
-                    .replace(/{{TELEFONE}}/g,        [company.phone, company.whatsapp].filter(Boolean).join(' | '));
-                WppConfirm.show({
-                    nome:     client.name,
-                    phone,
-                    subtitle: `Retirada da OS ${sale.number}`,
-                    msg,
-                    url: `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`
-                });
             },
 
             sendWhatsApp() {
