@@ -9225,6 +9225,10 @@ ORDER BY t.table_name;
                     }
                     return true;
                 }
+                // Fix: Métodos à vista (PIX, Dinheiro, Débito, Crédito) com retirada pendente
+                // Antes caía direto no return true, marcando como pago mesmo com saldo na retirada
+                const retiradaAvista = parseFloat(det.retiradaValue || 0);
+                if (retiradaAvista > 0.01 && !sale.retiradaPaga) return false;
                 return true;
             },
 
@@ -16743,7 +16747,10 @@ ${container.innerHTML}
                         const entradaVal = entradaEl ? (parseFloat(entradaEl.value) || 0) : 0;
                         const totalFinal = state.currentSale.total || 0;
                         const retiradaVal = Math.max(0, totalFinal - entradaVal);
-                        if (entradaVal > 0.01 && retiradaVal > 0.01) {
+                        // Fix Bug: condição anterior exigia entradaVal > 0.01, o que impedia
+                        // que vendas com pagamento TOTAL na retirada (entrada = 0) fossem
+                        // registradas em Contas a Receber. Agora basta retiradaVal > 0.
+                        if (retiradaVal > 0.01) {
                             paymentDetailsToSave = { retiradaValue: retiradaVal, entradaValue: entradaVal };
                         } else {
                             paymentDetailsToSave = null; // venda à vista integral — sem detalhes extras
