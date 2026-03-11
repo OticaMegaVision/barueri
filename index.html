@@ -5118,96 +5118,61 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
 
                         <!-- ── PAINEL PAGAMENTO DUPLO ── -->
                         <div id="dualPaymentPanel" style="display:none;background:#fff8f0;border:2px solid #ffcc80;border-radius:12px;padding:14px;margin-top:8px;">
-                            <div style="font-weight:700;color:#e65100;font-size:0.88rem;margin-bottom:4px;">⚡ Dividir em 2 formas de pagamento</div>
-                            <div style="font-size:0.75rem;color:#888;margin-bottom:10px;">Informe o valor de cada forma. Use <b>Retirada</b> para o saldo cobrado na entrega dos óculos.</div>
+                            <div style="font-weight:700;color:#e65100;font-size:0.88rem;margin-bottom:10px;">⚡ Dividir em 2 formas de pagamento</div>
 
                             <!-- Forma 1 -->
-                            <div style="margin-bottom:10px;background:#fff;border:1px solid #ffe0b2;border-radius:10px;padding:10px;">
-                                <div style="font-size:0.8rem;font-weight:700;color:#e65100;margin-bottom:6px;">1ª Forma de Pagamento</div>
-                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                            <div style="margin-bottom:10px;">
+                                <div style="font-size:0.78rem;font-weight:600;color:#666;margin-bottom:4px;">1ª Forma</div>
+                                <div style="display:flex;gap:8px;align-items:center;">
                                     <select id="dual1Method" class="form-control" style="flex:1.2;font-size:0.83rem;" onchange="Sales.calcDual()">
-                                        <option value="debit">Débito</option>
                                         <option value="pix">PIX</option>
                                         <option value="cash">Dinheiro</option>
+                                        <option value="debit">Débito</option>
                                         <option value="credit">Crédito</option>
                                         <option value="installment">Crediário</option>
                                     </select>
-                                    <div style="flex:1;">
-                                        <label style="font-size:10px;color:#888;display:block;margin-bottom:2px;">Valor total desta forma (R$)</label>
-                                        <input type="number" id="dual1Value" class="form-control" placeholder="0,00" min="0" step="0.01"
-                                            style="font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
+                                    <input type="number" id="dual1Value" class="form-control" placeholder="R$ 0,00" min="0" step="0.01"
+                                        style="flex:1;font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
+                                </div>
+                                <div id="dual1Crediario" style="display:none;margin-top:8px;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px;">
+                                    <div style="font-size:0.78rem;font-weight:600;color:#e65100;margin-bottom:6px;">📅 Crediário — 1ª forma</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                                        <div><label style="font-size:11px;color:#666;">Entrada (R$)</label><input type="number" id="dual1Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Retirada (R$)</label><input type="number" id="dual1Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Nº Parcelas</label><input type="number" id="dual1Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
                                     </div>
+                                    <div style="margin-top:6px;font-size:0.78rem;color:#e65100;" id="dual1ParcelaInfo">—</div>
                                 </div>
-                                <!-- Campos Entrada / Retirada — visíveis para TODOS os métodos -->
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
-                                    <div id="dual1EntradaWrap">
-                                        <label style="font-size:11px;color:#2e7d32;font-weight:700;">💰 Entrada (pago no ato — R$)</label>
-                                        <input type="number" id="dual1Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#a5d6a7;" oninput="Sales.calcDual()">
-                                    </div>
-                                    <div>
-                                        <label style="font-size:11px;color:#e65100;font-weight:700;">🕐 Retirada (cobrar na entrega — R$)</label>
-                                        <input type="number" id="dual1Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#ffcc80;" oninput="Sales.calcDual()">
-                                    </div>
-                                </div>
-                                <!-- Parcelas crediário — só para installment -->
-                                <div id="dual1ParcelasWrap" style="display:none;margin-top:4px;">
-                                    <label style="font-size:11px;color:#666;">Nº Parcelas (Crediário)</label>
-                                    <input type="number" id="dual1Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()">
-                                </div>
-                                <!-- Parcelas crédito — só para credit -->
-                                <div id="dual1CreditParcelasWrap" style="display:none;margin-top:4px;">
-                                    <label style="font-size:11px;color:#6a1b9a;font-weight:700;">💳 Parcelas Cartão de Crédito (informativo)</label>
-                                    <input type="number" id="dual1CreditParcelas" class="form-control" value="1" min="1" max="24" style="font-size:0.83rem;border-color:#ce93d8;" oninput="Sales.calcDual()">
-                                </div>
-                                <div style="margin-top:6px;font-size:0.78rem;color:#e65100;font-weight:600;" id="dual1ParcelaInfo"></div>
                             </div>
 
                             <!-- Forma 2 -->
-                            <div style="margin-bottom:10px;background:#fff;border:1px solid #ffe0b2;border-radius:10px;padding:10px;">
-                                <div style="font-size:0.8rem;font-weight:700;color:#e65100;margin-bottom:6px;">2ª Forma de Pagamento</div>
-                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                            <div style="margin-bottom:10px;">
+                                <div style="font-size:0.78rem;font-weight:600;color:#666;margin-bottom:4px;">2ª Forma</div>
+                                <div style="display:flex;gap:8px;align-items:center;">
                                     <select id="dual2Method" class="form-control" style="flex:1.2;font-size:0.83rem;" onchange="Sales.calcDual()">
-                                        <option value="credit" selected>Crédito</option>
                                         <option value="pix">PIX</option>
-                                        <option value="cash">Dinheiro</option>
+                                        <option value="cash" selected>Dinheiro</option>
                                         <option value="debit">Débito</option>
+                                        <option value="credit">Crédito</option>
                                         <option value="installment">Crediário</option>
                                     </select>
-                                    <div style="flex:1;">
-                                        <label style="font-size:10px;color:#888;display:block;margin-bottom:2px;">Valor total desta forma (R$)</label>
-                                        <input type="number" id="dual2Value" class="form-control" placeholder="0,00" min="0" step="0.01"
-                                            style="font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
+                                    <input type="number" id="dual2Value" class="form-control" placeholder="R$ 0,00" min="0" step="0.01"
+                                        style="flex:1;font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
+                                </div>
+                                <div id="dual2Crediario" style="display:none;margin-top:8px;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px;">
+                                    <div style="font-size:0.78rem;font-weight:600;color:#e65100;margin-bottom:6px;">📅 Crediário — 2ª forma</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                                        <div><label style="font-size:11px;color:#666;">Entrada (R$)</label><input type="number" id="dual2Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Retirada (R$)</label><input type="number" id="dual2Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                        <div><label style="font-size:11px;color:#666;">Nº Parcelas</label><input type="number" id="dual2Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
                                     </div>
+                                    <div style="margin-top:6px;font-size:0.78rem;color:#e65100;" id="dual2ParcelaInfo">—</div>
                                 </div>
-                                <!-- Campos Entrada / Retirada — visíveis para TODOS os métodos -->
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
-                                    <div id="dual2EntradaWrap">
-                                        <label style="font-size:11px;color:#2e7d32;font-weight:700;">💰 Entrada (pago no ato — R$)</label>
-                                        <input type="number" id="dual2Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#a5d6a7;" oninput="Sales.calcDual()">
-                                    </div>
-                                    <div>
-                                        <label style="font-size:11px;color:#e65100;font-weight:700;">🕐 Retirada (cobrar na entrega — R$)</label>
-                                        <input type="number" id="dual2Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#ffcc80;" oninput="Sales.calcDual()">
-                                    </div>
-                                </div>
-                                <!-- Parcelas crediário — só para installment -->
-                                <div id="dual2ParcelasWrap" style="display:none;margin-top:4px;">
-                                    <label style="font-size:11px;color:#666;">Nº Parcelas (Crediário)</label>
-                                    <input type="number" id="dual2Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()">
-                                </div>
-                                <!-- Parcelas crédito — só para credit -->
-                                <div id="dual2CreditParcelasWrap" style="display:none;margin-top:4px;">
-                                    <label style="font-size:11px;color:#6a1b9a;font-weight:700;">💳 Parcelas Cartão de Crédito (informativo)</label>
-                                    <input type="number" id="dual2CreditParcelas" class="form-control" value="1" min="1" max="24" style="font-size:0.83rem;border-color:#ce93d8;" oninput="Sales.calcDual()">
-                                </div>
-                                <div style="margin-top:6px;font-size:0.78rem;color:#e65100;font-weight:600;" id="dual2ParcelaInfo"></div>
                             </div>
 
                             <!-- Resumo -->
                             <div style="background:#fff;border-radius:8px;border:1px solid #ffe0b2;padding:10px;font-size:0.83rem;">
                                 <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Total da OS:</span><strong id="dualTotalOS">R$ 0,00</strong></div>
-                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Pago no ato (entradas):</span><strong id="dualTotalEntrada" style="color:#2e7d32;">R$ 0,00</strong></div>
-                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Saldo na retirada:</span><strong id="dualTotalRetirada" style="color:#e65100;">R$ 0,00</strong></div>
                                 <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Total distribuído:</span><strong id="dualTotalDistrib">R$ 0,00</strong></div>
                                 <div id="dualDiffRow" style="display:none;justify-content:space-between;padding:4px 8px;border-radius:6px;background:#ffebee;">
                                     <span style="color:#c62828;font-weight:700;">Falta / Excede:</span>
@@ -7006,6 +6971,27 @@ ORDER BY t.table_name;
                                         <div class="wpp-nav-desc">Parcelas do crediário</div>
                                     </div>
                                 </div>
+                                <div class="wpp-nav-item" id="navCobranca" onclick="ConfigWpp.selectMsg('cobranca')">
+                                    <div class="wpp-nav-icon" style="background:#fff3e0;">💸</div>
+                                    <div class="wpp-nav-label">
+                                        Cobrança
+                                        <div class="wpp-nav-desc">Contas a Receber · lembrete</div>
+                                    </div>
+                                </div>
+                                <div class="wpp-nav-item" id="navConfirmacaoOS" onclick="ConfigWpp.selectMsg('confirmacaoOS')">
+                                    <div class="wpp-nav-icon" style="background:#e8eaf6;">📋</div>
+                                    <div class="wpp-nav-label">
+                                        Confirmação de OS
+                                        <div class="wpp-nav-desc">Vendas · após salvar pedido</div>
+                                    </div>
+                                </div>
+                                <div class="wpp-nav-item" id="navLembreteRetirada" onclick="ConfigWpp.selectMsg('lembreteRetirada')">
+                                    <div class="wpp-nav-icon" style="background:#fce4ec;">🎉</div>
+                                    <div class="wpp-nav-label">
+                                        Lembrete de Retirada
+                                        <div class="wpp-nav-desc">Vendas · óculos prontos</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Painel editor -->
@@ -7733,35 +7719,56 @@ ORDER BY t.table_name;
 
     <!-- Modal de confirmação WhatsApp -->
     <div class="wpp-confirm-modal" id="wppConfirmModal">
-        <div class="wpp-confirm-box">
-            <div class="wpp-confirm-header">
-                <i class="fab fa-whatsapp"></i>
-                <div>
-                    <h3>Confirmar envio via WhatsApp</h3>
-                    <small id="wppConfirmSubtitle">Verifique os dados antes de enviar</small>
+        <div class="wpp-confirm-box" style="max-width:520px;width:95%;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <!-- Header -->
+            <div class="wpp-confirm-header" style="background:linear-gradient(135deg,#25d366,#128c7e);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;">
+                <div style="background:rgba(255,255,255,0.2);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fab fa-whatsapp" style="font-size:1.4rem;"></i>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight:800;font-size:1rem;">Enviar via WhatsApp</div>
+                    <div style="font-size:0.78rem;opacity:0.88;" id="wppConfirmSubtitle">Verifique e edite antes de enviar</div>
+                </div>
+                <button onclick="WppConfirm.close()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">&times;</button>
+            </div>
+            <!-- Info destinatário -->
+            <div style="background:#f0fdf4;padding:10px 18px;display:flex;gap:18px;border-bottom:1px solid #d1fae5;">
+                <div style="display:flex;flex-direction:column;gap:1px;">
+                    <small style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">👤 Destinatário</small>
+                    <strong id="wppConfirmName" style="color:#065f46;font-size:0.92rem;">—</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:1px;">
+                    <small style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">📱 Número</small>
+                    <strong id="wppConfirmPhone" style="color:#065f46;font-size:0.92rem;">—</strong>
                 </div>
             </div>
-            <div class="wpp-confirm-body">
-                <div class="wpp-confirm-info">
-                    <div class="wpp-confirm-info-item">
-                        <small>👤 Destinatário</small>
-                        <strong id="wppConfirmName">—</strong>
-                    </div>
-                    <div class="wpp-confirm-info-item">
-                        <small>📱 Número</small>
-                        <strong id="wppConfirmPhone">—</strong>
-                    </div>
-                </div>
-                <div class="wpp-confirm-preview">
-                    <div class="wpp-confirm-preview-label"><i class="fas fa-eye"></i> Prévia da mensagem</div>
-                    <div class="wpp-confirm-bubble" id="wppConfirmPreview"></div>
-                </div>
+            <!-- Tabs: Prévia / Editar -->
+            <div style="display:flex;border-bottom:2px solid #e5e7eb;background:#fff;">
+                <button id="wppTabPreview" onclick="WppConfirm.showTab('preview')" style="flex:1;padding:9px;border:none;background:transparent;font-weight:700;font-size:0.82rem;color:#25d366;border-bottom:2px solid #25d366;margin-bottom:-2px;cursor:pointer;"><i class="fas fa-eye"></i> Prévia</button>
+                <button id="wppTabEdit" onclick="WppConfirm.showTab('edit')" style="flex:1;padding:9px;border:none;background:transparent;font-weight:700;font-size:0.82rem;color:#888;cursor:pointer;"><i class="fas fa-edit"></i> Editar Mensagem</button>
             </div>
-            <div class="wpp-confirm-footer">
-                <button class="btn btn-success" style="flex:1;" id="wppConfirmSendBtn">
-                    <i class="fab fa-whatsapp"></i> Enviar agora
+            <!-- Aba Prévia -->
+            <div id="wppPanePreview" style="padding:14px 18px;background:#e5ddd5;max-height:280px;overflow-y:auto;">
+                <div style="font-size:10px;color:#777;text-align:center;margin-bottom:8px;">Como aparecerá no WhatsApp</div>
+                <div style="background:#fff;border-radius:12px;border-bottom-left-radius:3px;padding:10px 14px;font-size:0.84rem;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,0.1);max-width:90%;word-break:break-word;" id="wppConfirmPreview"></div>
+                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;" id="wppConfirmPreviewTime"></div>
+            </div>
+            <!-- Aba Editar -->
+            <div id="wppPaneEdit" style="display:none;padding:14px 18px;background:#fff;">
+                <div style="font-size:11px;color:#888;margin-bottom:6px;"><i class="fas fa-info-circle"></i> Edite a mensagem antes de enviar. Alterações não afetam o template salvo.</div>
+                <textarea id="wppConfirmEdit" style="width:100%;height:200px;border:1.5px solid #d1d5db;border-radius:10px;padding:10px;font-size:0.83rem;line-height:1.5;resize:vertical;font-family:inherit;" oninput="WppConfirm.syncEdit()"></textarea>
+            </div>
+            <!-- Footer -->
+            <div style="padding:12px 18px;background:#fff;border-top:1px solid #e5e7eb;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn" id="wppConfirmSendBtn" style="flex:1;background:#25d366;color:#fff;border:none;font-weight:700;font-size:0.88rem;min-width:140px;">
+                    <i class="fab fa-whatsapp"></i> Abrir WhatsApp
                 </button>
-                <button class="btn btn-secondary" onclick="WppConfirm.close()">Cancelar</button>
+                <button onclick="WppConfirm.copiar()" style="padding:8px 14px;background:#f0fdf4;color:#25d366;border:1.5px solid #25d366;border-radius:8px;font-weight:700;font-size:0.82rem;cursor:pointer;" title="Copiar mensagem">
+                    <i class="fas fa-copy"></i> Copiar
+                </button>
+                <button onclick="WppConfirm.close()" style="padding:8px 14px;background:#f3f4f6;color:#555;border:1px solid #d1d5db;border-radius:8px;font-weight:600;font-size:0.82rem;cursor:pointer;">
+                    Cancelar
+                </button>
             </div>
         </div>
     </div>
@@ -7819,6 +7826,20 @@ ORDER BY t.table_name;
                         <button id="osGeradoBtnPendente" onclick="Sales._setOsGeradoPagamento('pendente')" style="padding:0.65rem 0.5rem;border-radius:8px;border:2px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all .2s;">⏳ PENDENTE</button>
                     </div>
                     <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
+                </div>
+            </div>
+            <!-- Botões WhatsApp na OS gerada -->
+            <div style="padding:0 1.5rem 0.75rem;">
+                <div style="font-size:0.78rem;font-weight:700;color:#25d366;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <button id="osGeradoBtnWppConfirmacao" onclick="Sales._wppOSGerada('confirmacao')"
+                        style="padding:8px 6px;background:rgba(37,211,102,0.1);color:#25d366;border:1.5px solid rgba(37,211,102,0.35);border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;text-align:center;">
+                        <i class="fab fa-whatsapp"></i> Confirmação de OS
+                    </button>
+                    <button id="osGeradoBtnWppStatus" onclick="Sales._wppOSGerada('status')"
+                        style="padding:8px 6px;background:rgba(37,211,102,0.1);color:#25d366;border:1.5px solid rgba(37,211,102,0.35);border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;text-align:center;">
+                        <i class="fab fa-whatsapp"></i> Status do Pedido
+                    </button>
                 </div>
             </div>
             <div class="modal-footer" style="justify-content:center;border-top:none;padding-top:0;">
@@ -8721,19 +8742,12 @@ ORDER BY t.table_name;
                                     });
                                 }
                             } else {
-                                // FIX BUG: À vista (PIX/Dinheiro/Débito/Crédito) com retirada pendente
-                                // Antes: slot.retirada era sempre 0 porque calcDual não capturava para não-crediário
-                                // Agora: slot.retirada é corretamente salvo pelo calcDual corrigido
+                                // À vista com retirada pendente (não precisa de entrada > 0)
                                 if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) {
-                                    // Para crédito, incluir info de parcelas na descrição se informado
-                                    let descExtra = '';
-                                    if (slot.method === 'credit' && (slot.creditParcelas || 0) > 1) {
-                                        descExtra = ` — ${slot.creditParcelas}x no crédito`;
-                                    }
                                     contasVendas.push({
                                         id: `venda_${sale.id}_dual${idx}_retirada`,
                                         tipo: 'receber',
-                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (${mLbl}) Retirada${descExtra}`,
+                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (${mLbl}) Retirada`,
                                         parte: nomeCliente,
                                         categoria: 'Retirada',
                                         valor: parseFloat(slot.retirada),
@@ -9260,15 +9274,13 @@ ORDER BY t.table_name;
                         if (slot.method === 'installment') {
                             const todasPagas = (slot.parcelas || []).every(p => p.paid || p.status === 'pago' || p.status === 'paid');
                             if (!todasPagas) return false;
+                            if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
+                        } else {
+                            if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
                         }
-                        // FIX: verifica retirada para TODOS os métodos no dual (não só installment)
-                        if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
                     }
                     return true;
                 }
-                // Métodos à vista (PIX, Dinheiro, Débito, Crédito) com saldo na retirada
-                const retiradaAvista = parseFloat(det.retiradaValue || 0);
-                if (retiradaAvista > 0.01 && !sale.retiradaPaga) return false;
                 return true;
             },
 
@@ -9494,10 +9506,19 @@ ORDER BY t.table_name;
                 const clientObj = (state.clients||[]).find(cl => cl.name === c.parte);
                 const phone = (clientObj?.whatsapp || clientObj?.phone || '').replace(/\D/g,'');
                 if (!phone) { Toast.show('Cliente sem WhatsApp/telefone cadastrado','warning'); return; }
-                const emp = state.company?.name || 'Ótica';
-                const vencLabel = c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
-                const valor = this.fmt(c.valor);
-                const msg = `Olá, *${c.parte}*! 👋\n\nPassando para lembrar sobre o seguinte lançamento em aberto:\n\n📋 *${c.descricao}*\n💰 Valor: *${valor}*\n📅 Vencimento: *${vencLabel}*\n\nQualquer dúvida estamos à disposição!\n\n_${emp}_`;
+                const emp      = state.company?.name || 'Ótica';
+                const tel      = state.company?.whatsapp || state.company?.phone || '';
+                const vencLabel= c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                const nome1    = (c.parte || '').split(' ')[0];
+                // Usa template configurável (cobrança), com fallback para mensagem básica
+                const msg = (typeof ConfigWpp !== 'undefined' ? ConfigWpp.get('cobranca') : null
+                    || `Olá *{{NOME}}*! 👋\n\nPassando para te lembrar de um valor em aberto:\n📋 *{{DESCRICAO}}*\n💰 *{{VALOR}}*\n📅 Vencimento: {{VENCIMENTO}}\n\n📞 {{TELEFONE}}\n_{{EMPRESA}}_`)
+                    .replace(/{{NOME}}/g,       nome1)
+                    .replace(/{{DESCRICAO}}/g,  c.descricao || '—')
+                    .replace(/{{VALOR}}/g,      this.fmt(c.valor))
+                    .replace(/{{VENCIMENTO}}/g, vencLabel)
+                    .replace(/{{EMPRESA}}/g,    emp)
+                    .replace(/{{TELEFONE}}/g,   tel);
                 const url = `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
                 WppConfirm.show({ nome: c.parte, phone, subtitle: 'Cobrança via WhatsApp', msg, url });
             },
@@ -9505,25 +9526,99 @@ ORDER BY t.table_name;
         window.ContasManager = ContasManager;
         const WppConfirm = {
             _url: '',
+            _msg: '',
+            _phone: '',
 
             show({ nome, phone, subtitle, msg, url }) {
-                this._url = url;
-                document.getElementById('wppConfirmName').textContent    = nome    || '—';
-                document.getElementById('wppConfirmPhone').textContent   = this._formatPhone(phone);
-                document.getElementById('wppConfirmSubtitle').textContent = subtitle || 'Verifique os dados antes de enviar';
-                document.getElementById('wppConfirmPreview').textContent = msg     || '';
-                document.getElementById('wppConfirmSendBtn').onclick = () => { this.send(); };
+                this._url   = url;
+                this._msg   = msg;
+                this._phone = phone;
+                document.getElementById('wppConfirmName').textContent     = nome    || '—';
+                document.getElementById('wppConfirmPhone').textContent    = this._formatPhone(phone);
+                document.getElementById('wppConfirmSubtitle').textContent = subtitle || 'Verifique e edite antes de enviar';
+                // Renderiza prévia com formatação WhatsApp
+                this._renderPreview(msg);
+                // Preenche textarea de edição
+                const ta = document.getElementById('wppConfirmEdit');
+                if (ta) ta.value = msg;
+                // Timestamp
+                const tEl = document.getElementById('wppConfirmPreviewTime');
+                if (tEl) tEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+                // Botão de envio usa mensagem editada
+                document.getElementById('wppConfirmSendBtn').onclick = () => this.send();
+                // Mostra aba Prévia por padrão
+                this.showTab('preview');
                 document.getElementById('wppConfirmModal').classList.add('show');
             },
 
+            showTab(tab) {
+                const preview = document.getElementById('wppPanePreview');
+                const edit    = document.getElementById('wppPaneEdit');
+                const btnP    = document.getElementById('wppTabPreview');
+                const btnE    = document.getElementById('wppTabEdit');
+                if (tab === 'preview') {
+                    if (preview) preview.style.display = 'block';
+                    if (edit)    edit.style.display    = 'none';
+                    if (btnP) { btnP.style.color = '#25d366'; btnP.style.borderBottom = '2px solid #25d366'; btnP.style.marginBottom = '-2px'; }
+                    if (btnE) { btnE.style.color = '#888'; btnE.style.borderBottom = 'none'; btnE.style.marginBottom = '0'; }
+                } else {
+                    if (preview) preview.style.display = 'none';
+                    if (edit)    edit.style.display    = 'block';
+                    if (btnE) { btnE.style.color = '#25d366'; btnE.style.borderBottom = '2px solid #25d366'; btnE.style.marginBottom = '-2px'; }
+                    if (btnP) { btnP.style.color = '#888'; btnP.style.borderBottom = 'none'; btnP.style.marginBottom = '0'; }
+                }
+            },
+
+            syncEdit() {
+                // Atualiza prévia em tempo real ao editar
+                const ta = document.getElementById('wppConfirmEdit');
+                if (ta) {
+                    this._msg = ta.value;
+                    this._renderPreview(ta.value);
+                    this._url = `https://wa.me/55${this._phone}?text=${encodeURIComponent(ta.value)}`;
+                }
+            },
+
+            _renderPreview(msg) {
+                const el = document.getElementById('wppConfirmPreview');
+                if (!el) return;
+                // Renderiza formatação WhatsApp: *bold*, _italic_, ~strike~, quebras de linha
+                let html = msg
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+                    .replace(/_(.*?)_/g, '<em>$1</em>')
+                    .replace(/~(.*?)~/g, '<s>$1</s>')
+                    .replace(/\n/g, '<br>');
+                el.innerHTML = html;
+            },
+
             send() {
-                window.open(this._url, '_blank');
+                const ta  = document.getElementById('wppConfirmEdit');
+                const msg = (ta ? ta.value : this._msg) || this._msg;
+                const url = `https://wa.me/55${this._phone}?text=${encodeURIComponent(msg)}`;
+                window.open(url, '_blank');
                 this.close();
+            },
+
+            copiar() {
+                const ta  = document.getElementById('wppConfirmEdit');
+                const msg = (ta ? ta.value : this._msg) || this._msg;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(msg).then(() => Toast.show('Mensagem copiada! ✅', 'success'));
+                } else {
+                    // Fallback para iOS/Safari
+                    const tmp = document.createElement('textarea');
+                    tmp.value = msg; tmp.style.position = 'fixed'; tmp.style.opacity = '0';
+                    document.body.appendChild(tmp); tmp.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tmp);
+                    Toast.show('Mensagem copiada! ✅', 'success');
+                }
             },
 
             close() {
                 document.getElementById('wppConfirmModal').classList.remove('show');
-                this._url = '';
+                this._url = ''; this._msg = ''; this._phone = '';
             },
 
             _formatPhone(raw = '') {
@@ -12937,7 +13032,10 @@ ORDER BY t.table_name;
             oculosVencido: "Olá *{{NOME}}*! 👋\n\nPassando para dar um recado importante! 😊\n\nVerificamos que faz aproximadamente *{{MESES}} meses* que você adquiriu seus óculos conosco (OS {{OS}} — {{DATA_VENDA}}).\n\n👓 Especialistas recomendam *revisão anual* da receita para garantir a saúde dos seus olhos e o conforto visual!\n\nQue tal agendar uma consulta de revisão? Temos condições especiais para clientes recorrentes! 🎁\n\n━━━━━━━━━━━━━━━━━━━━\n*{{EMPRESA}}*\n📍 {{ENDERECO}}\n📞 {{TELEFONE}}",
             statusPedido: "Olá *{{NOME}}*! 👋\n\nSegue a atualização do seu pedido:\n\n🏪 *{{EMPRESA}}*\n━━━━━━━━━━━━━━━━━━━━\n📋 *OS Nº:* {{OS}}\n📅 *Data da compra:* {{DATA_VENDA}}\n🚚 *Previsão de entrega:* {{PREVISAO}}\n\n🔄 *Status atual:*\n➡️ *{{STATUS}}*\n\n{{MSG_STATUS}}\n━━━━━━━━━━━━━━━━━━━━\nDúvidas? Fale conosco! 😊\n📞 {{TELEFONE}}",
             receituario: "👁️ *RECEITUÁRIO ÓPTICO*\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📍 {{ENDERECO}}\n📞 {{TELEFONE}}\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Paciente:* {{PACIENTE}}\n📅 *Data:* {{DATA}}\n\n*🔵 OLHO DIREITO (OD)*\n{{DADOS_OD}}\n\n*🔴 OLHO ESQUERDO (OE)*\n{{DADOS_OE}}\n\n{{DADOS_EXTRA}}\n━━━━━━━━━━━━━━━━━━━━\n_Documento gerado por {{EMPRESA}}_\n_Válido mediante assinatura do profissional._",
-            comprovante: "✅ *COMPROVANTE DE PAGAMENTO*\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📍 {{ENDERECO}}\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Cliente:* {{NOME}}\n🆔 *CPF:* {{CPF}}\n\n📋 *OS Nº:* {{OS}}\n🔢 *Parcela:* {{PARCELA}}\n📅 *Vencimento:* {{VENCIMENTO}}\n📅 *Data Pagamento:* {{DATA_PAGAMENTO}}\n\n💵 *VALOR PAGO: {{VALOR}}*\n💳 *Forma:* {{FORMA_PAGAMENTO}}\n\n✅ *PAGAMENTO CONFIRMADO*\n\n━━━━━━━━━━━━━━━━━━━━\n📞 {{TELEFONE}}\n_Documento gerado por {{EMPRESA}}_"
+            comprovante: "✅ *COMPROVANTE DE PAGAMENTO*\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📍 {{ENDERECO}}\n━━━━━━━━━━━━━━━━━━━━\n\n👤 *Cliente:* {{NOME}}\n🆔 *CPF:* {{CPF}}\n\n📋 *OS Nº:* {{OS}}\n🔢 *Parcela:* {{PARCELA}}\n📅 *Vencimento:* {{VENCIMENTO}}\n📅 *Data Pagamento:* {{DATA_PAGAMENTO}}\n\n💵 *VALOR PAGO: {{VALOR}}*\n💳 *Forma:* {{FORMA_PAGAMENTO}}\n\n✅ *PAGAMENTO CONFIRMADO*\n\n━━━━━━━━━━━━━━━━━━━━\n📞 {{TELEFONE}}\n_Documento gerado por {{EMPRESA}}_",
+            cobranca: "Olá *{{NOME}}*! 👋\n\nPassando para te lembrar de um valor em aberto conosco:\n\n━━━━━━━━━━━━━━━━━━━━\n📋 *{{DESCRICAO}}*\n💰 *Valor:* {{VALOR}}\n📅 *Vencimento:* {{VENCIMENTO}}\n━━━━━━━━━━━━━━━━━━━━\n\nPor favor, entre em contato para regularizar ou combinar o pagamento. 😊\n\n📞 {{TELEFONE}}\n_{{EMPRESA}}_",
+            confirmacaoOS: "Olá *{{NOME}}*! 👋\n\n✅ Seu pedido foi registrado com sucesso na *{{EMPRESA}}*!\n\n━━━━━━━━━━━━━━━━━━━━\n📋 *OS Nº:* {{OS}}\n📅 *Data:* {{DATA_VENDA}}\n🚚 *Previsão de entrega:* {{PREVISAO}}\n💳 *Pagamento:* {{PAGAMENTO}}\n💰 *Total:* {{TOTAL}}\n━━━━━━━━━━━━━━━━━━━━\n\nAcompanharemos seu pedido e avisaremos quando estiver pronto! 👓\n\nQualquer dúvida estamos à disposição.\n📞 {{TELEFONE}}",
+            lembreteRetirada: "Olá *{{NOME}}*! 👋\n\n🎉 *Seus óculos estão prontos para retirada!*\n\n━━━━━━━━━━━━━━━━━━━━\n🏪 *{{EMPRESA}}*\n📋 *OS Nº:* {{OS}}\n━━━━━━━━━━━━━━━━━━━━\n\n{{SALDO_RETIRADA}}\n\nVenha nos visitar, estamos aguardando você! 😊\n\n📍 {{ENDERECO}}\n📞 {{TELEFONE}}"
         };
 
         const WPP_META = {
@@ -12970,6 +13068,24 @@ ORDER BY t.table_name;
                 sub:    'Tabela de parcelas do crediário → botão WhatsApp',
                 vars:   ['{{NOME}}','{{CPF}}','{{OS}}','{{PARCELA}}','{{VENCIMENTO}}','{{DATA_PAGAMENTO}}','{{VALOR}}','{{FORMA_PAGAMENTO}}','{{EMPRESA}}','{{ENDERECO}}','{{TELEFONE}}'],
                 exemplo:{ '{{NOME}}':'João Silva', '{{CPF}}':'123.456.789-00', '{{OS}}':'2025/042', '{{PARCELA}}':'2 de 5', '{{VENCIMENTO}}':'10/02/2025', '{{DATA_PAGAMENTO}}':'10/02/2025', '{{VALOR}}':'R$ 250,00', '{{FORMA_PAGAMENTO}}':'Dinheiro', '{{EMPRESA}}':'Ótica Exemplo', '{{ENDERECO}}':'Av. Paulista, 100 — São Paulo/SP', '{{TELEFONE}}':'(11) 9999-9999' }
+            },
+            cobranca: {
+                title:  '💸 Cobrança / Lembrete de Pagamento',
+                sub:    'Contas a Receber → botão WhatsApp em cada lançamento',
+                vars:   ['{{NOME}}','{{DESCRICAO}}','{{VALOR}}','{{VENCIMENTO}}','{{EMPRESA}}','{{TELEFONE}}'],
+                exemplo:{ '{{NOME}}':'João', '{{DESCRICAO}}':'OS 2025/042 — Parcela 2/5', '{{VALOR}}':'R$ 200,00', '{{VENCIMENTO}}':'15/03/2025', '{{EMPRESA}}':'Ótica Exemplo', '{{TELEFONE}}':'(11) 9999-9999' }
+            },
+            confirmacaoOS: {
+                title:  '📋 Confirmação de OS / Pedido',
+                sub:    'Vendas → botão WhatsApp após salvar a OS',
+                vars:   ['{{NOME}}','{{OS}}','{{DATA_VENDA}}','{{PREVISAO}}','{{PAGAMENTO}}','{{TOTAL}}','{{EMPRESA}}','{{TELEFONE}}'],
+                exemplo:{ '{{NOME}}':'João', '{{OS}}':'2025/042', '{{DATA_VENDA}}':'15/01/2025', '{{PREVISAO}}':'20/01/2025', '{{PAGAMENTO}}':'Crédito 5x', '{{TOTAL}}':'R$ 690,00', '{{EMPRESA}}':'Ótica Exemplo', '{{TELEFONE}}':'(11) 9999-9999' }
+            },
+            lembreteRetirada: {
+                title:  '🎉 Lembrete de Retirada (Óculos Prontos)',
+                sub:    'Vendas com status "Pronto" → botão enviar lembrete',
+                vars:   ['{{NOME}}','{{OS}}','{{SALDO_RETIRADA}}','{{EMPRESA}}','{{ENDERECO}}','{{TELEFONE}}'],
+                exemplo:{ '{{NOME}}':'João', '{{OS}}':'2025/042', '{{SALDO_RETIRADA}}':'💰 *Saldo a pagar na retirada: R$ 400,00*', '{{EMPRESA}}':'Ótica Exemplo', '{{ENDERECO}}':'Av. Paulista, 100 — São Paulo/SP', '{{TELEFONE}}':'(11) 9999-9999' }
             }
         };
 
@@ -14227,15 +14343,14 @@ ${container.innerHTML}
                     // Dual
                     if (s.paymentMode === 'dual' && s.dualPayments?.length === 2) {
                         let saldo = 0;
-                        for (const [idx, slot] of s.dualPayments.entries()) {
+                        for (const slot of s.dualPayments) {
                             if (slot.method === 'installment') {
                                 (slot.parcelas || []).filter(p => !p.paid && p.status !== 'pago').forEach(p => { saldo += parseFloat(p.value || 0); });
                             }
-                            // FIX: verifica retirada para TODOS os métodos (não só installment)
-                            if ((slot.retirada || 0) > 0.01 && !s[`retiradaPaga_dual${idx}`]) saldo += slot.retirada;
+                            if ((slot.retirada || 0) > 0.01 && !s[`retiradaPaga_dual${s.dualPayments.indexOf(slot)}`]) saldo += slot.retirada;
                         }
                         if (saldo < 0.01) return { txt: '✅ Quitado', cls: '#28a745' };
-                        return { txt: '⏳ ' + Utils.formatCurrency(saldo), cls: '#e65100' };
+                        return { txt: Utils.formatCurrency(saldo), cls: '#e65100' };
                     }
                     // À vista com retirada
                     const ret = parseFloat(det.retiradaValue || 0);
@@ -14315,12 +14430,13 @@ ${container.innerHTML}
                                 <span style="font-size:8px;line-height:1;margin-top:1px;font-weight:700;">Cliente</span>
                             </button>
                         </td>
-                        <td class="action-buttons">
+                        <td class="action-buttons" style="white-space:nowrap;">
                             <button class="btn-icon" style="background:${hasPhone ? 'rgba(37,211,102,0.15)' : 'rgba(0,0,0,0.05)'};color:${hasPhone ? '#25d366' : '#aaa'};"
                                 onclick="Sales.enviarStatusPedidoWhatsApp('${s.id}')"
-                                title="${hasPhone ? 'Enviar status do pedido por WhatsApp' : 'Cliente sem WhatsApp/telefone'}">
+                                title="${hasPhone ? 'Status do Pedido via WhatsApp' : 'Cliente sem WhatsApp/telefone'}">
                                 <i class="fab fa-whatsapp"></i>
                             </button>
+                            ${s.status === 'pronto' && hasPhone ? `<button class="btn-icon" style="background:rgba(37,211,102,0.22);color:#128c7e;margin-left:2px;" onclick="Sales.enviarLembreteRetiradaWhatsApp('${s.id}')" title="Avisar que óculos estão prontos para retirada"><i class="fab fa-whatsapp" style="font-size:11px;"></i><i class="fas fa-glasses" style="font-size:9px;margin-left:1px;"></i></button>` : ''}
                         </td>
                     </tr>`;
                 });
@@ -15115,96 +15231,49 @@ ${container.innerHTML}
             calcDual() {
                 const lbl   = {pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'};
                 const total = state.currentSale._grossTotal || state.currentSale.total || 0;
-                const m1    = document.getElementById('dual1Method')?.value || 'debit';
-                const m2    = document.getElementById('dual2Method')?.value || 'credit';
+                const m1    = document.getElementById('dual1Method')?.value || 'pix';
+                const m2    = document.getElementById('dual2Method')?.value || 'cash';
                 const v1    = parseFloat(document.getElementById('dual1Value')?.value) || 0;
                 const v2    = parseFloat(document.getElementById('dual2Value')?.value) || 0;
                 const sum   = v1 + v2;
                 const diff  = total - sum;
 
-                // Lê entrada e retirada para TODOS os métodos (campos sempre visíveis agora)
-                const entry1    = parseFloat(document.getElementById('dual1Entry')?.value)    || 0;
-                const ret1      = parseFloat(document.getElementById('dual1Retirada')?.value) || 0;
-                const entry2    = parseFloat(document.getElementById('dual2Entry')?.value)    || 0;
-                const ret2      = parseFloat(document.getElementById('dual2Retirada')?.value) || 0;
+                // Mostra/oculta painel crediário por forma
+                const c1 = document.getElementById('dual1Crediario');
+                const c2 = document.getElementById('dual2Crediario');
+                if (c1) c1.style.display = (m1 === 'installment') ? 'block' : 'none';
+                if (c2) c2.style.display = (m2 === 'installment') ? 'block' : 'none';
 
-                // Mostra/oculta parcelas crediário e crédito por forma
-                const pw1 = document.getElementById('dual1ParcelasWrap');
-                const pw2 = document.getElementById('dual2ParcelasWrap');
-                const cw1 = document.getElementById('dual1CreditParcelasWrap');
-                const cw2 = document.getElementById('dual2CreditParcelasWrap');
-                if (pw1) pw1.style.display = (m1 === 'installment') ? 'block' : 'none';
-                if (pw2) pw2.style.display = (m2 === 'installment') ? 'block' : 'none';
-                if (cw1) cw1.style.display = (m1 === 'credit') ? 'block' : 'none';
-                if (cw2) cw2.style.display = (m2 === 'credit') ? 'block' : 'none';
-
-                // Resumo textual forma 1
-                const el1 = document.getElementById('dual1ParcelaInfo');
-                if (el1 && v1 > 0) {
-                    if (m1 === 'installment') {
-                        const nparc1   = parseInt(document.getElementById('dual1Parcelas')?.value) || 2;
-                        const saldo1   = Math.max(0, v1 - entry1 - ret1);
-                        const parcVal1 = nparc1 > 0 ? saldo1 / nparc1 : 0;
-                        el1.textContent = `Entrada: R$ ${entry1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} | ${nparc1}x de R$ ${parcVal1.toFixed(2).replace('.',',')}`;
-                    } else if (m1 === 'credit') {
-                        const cp1 = parseInt(document.getElementById('dual1CreditParcelas')?.value) || 1;
-                        const pago1 = v1 - ret1;
-                        if (cp1 > 1) {
-                            el1.textContent = `Pago no ato: R$ ${pago1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} — ${cp1}x no crédito`;
-                        } else {
-                            el1.textContent = ret1 > 0.01 ? `Pago no ato: R$ ${pago1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')}` : `R$ ${v1.toFixed(2).replace('.',',')} à vista no crédito`;
-                        }
-                    } else {
-                        const pago1 = v1 - ret1;
-                        el1.textContent = ret1 > 0.01
-                            ? `Pago no ato: R$ ${pago1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')}`
-                            : `R$ ${v1.toFixed(2).replace('.',',')} pago no ato (${lbl[m1]||m1})`;
-                    }
-                } else if (el1) { el1.textContent = ''; }
-
-                // Resumo textual forma 2
-                const el2 = document.getElementById('dual2ParcelaInfo');
-                if (el2 && v2 > 0) {
-                    if (m2 === 'installment') {
-                        const nparc2   = parseInt(document.getElementById('dual2Parcelas')?.value) || 2;
-                        const saldo2   = Math.max(0, v2 - entry2 - ret2);
-                        const parcVal2 = nparc2 > 0 ? saldo2 / nparc2 : 0;
-                        el2.textContent = `Entrada: R$ ${entry2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} | ${nparc2}x de R$ ${parcVal2.toFixed(2).replace('.',',')}`;
-                    } else if (m2 === 'credit') {
-                        const cp2 = parseInt(document.getElementById('dual2CreditParcelas')?.value) || 1;
-                        const pago2 = v2 - ret2;
-                        if (cp2 > 1) {
-                            el2.textContent = `Pago no ato: R$ ${pago2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} — ${cp2}x no crédito`;
-                        } else {
-                            el2.textContent = ret2 > 0.01 ? `Pago no ato: R$ ${pago2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')}` : `R$ ${v2.toFixed(2).replace('.',',')} à vista no crédito`;
-                        }
-                    } else {
-                        const pago2 = v2 - ret2;
-                        el2.textContent = ret2 > 0.01
-                            ? `Pago no ato: R$ ${pago2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')}`
-                            : `R$ ${v2.toFixed(2).replace('.',',')} pago no ato (${lbl[m2]||m2})`;
-                    }
-                } else if (el2) { el2.textContent = ''; }
+                // Resumo crediário forma 1
+                if (m1 === 'installment' && v1 > 0) {
+                    const entry1    = parseFloat(document.getElementById('dual1Entry')?.value) || 0;
+                    const ret1      = parseFloat(document.getElementById('dual1Retirada')?.value) || 0;
+                    const nparc1    = parseInt(document.getElementById('dual1Parcelas')?.value) || 2;
+                    const saldo1    = Math.max(0, v1 - entry1 - ret1);
+                    const parcVal1  = nparc1 > 0 ? saldo1 / nparc1 : 0;
+                    const el1 = document.getElementById('dual1ParcelaInfo');
+                    if (el1) el1.textContent = `Entrada: R$ ${entry1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} | ${nparc1}x de R$ ${parcVal1.toFixed(2).replace('.',',')}`;
+                }
+                // Resumo crediário forma 2
+                if (m2 === 'installment' && v2 > 0) {
+                    const entry2    = parseFloat(document.getElementById('dual2Entry')?.value) || 0;
+                    const ret2      = parseFloat(document.getElementById('dual2Retirada')?.value) || 0;
+                    const nparc2    = parseInt(document.getElementById('dual2Parcelas')?.value) || 2;
+                    const saldo2    = Math.max(0, v2 - entry2 - ret2);
+                    const parcVal2  = nparc2 > 0 ? saldo2 / nparc2 : 0;
+                    const el2 = document.getElementById('dual2ParcelaInfo');
+                    if (el2) el2.textContent = `Entrada: R$ ${entry2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} | ${nparc2}x de R$ ${parcVal2.toFixed(2).replace('.',',')}`;
+                }
 
                 // Resumo geral
                 const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-                const totalEntrada  = entry1 + entry2 + Math.max(0, v1 - ret1 - entry1) * (ret1 < 0.01 && entry1 < 0.01 ? 1 : 0)
-                    + Math.max(0, v2 - ret2 - entry2) * (ret2 < 0.01 && entry2 < 0.01 ? 1 : 0);
-                // Totalentrada: soma do que é pago no ato = (v - retirada) de cada slot
-                const pagoNoAto = Math.max(0, v1 - ret1) + Math.max(0, v2 - ret2);
-                const totalRetirada = ret1 + ret2;
-
-                const eTotalOS      = document.getElementById('dualTotalOS');
-                const eTotalDistrib = document.getElementById('dualTotalDistrib');
-                const eTotalEntrada = document.getElementById('dualTotalEntrada');
-                const eTotalRetirada= document.getElementById('dualTotalRetirada');
-                const eDiffRow      = document.getElementById('dualDiffRow');
-                const eDiffVal      = document.getElementById('dualDiffVal');
-                const eOkRow        = document.getElementById('dualOkRow');
-                if (eTotalOS)       eTotalOS.textContent       = fmt(total);
-                if (eTotalDistrib)  eTotalDistrib.textContent  = fmt(sum);
-                if (eTotalEntrada)  eTotalEntrada.textContent  = fmt(pagoNoAto);
-                if (eTotalRetirada) eTotalRetirada.textContent = fmt(totalRetirada);
+                const eTotalOS     = document.getElementById('dualTotalOS');
+                const eTotalDistrib= document.getElementById('dualTotalDistrib');
+                const eDiffRow     = document.getElementById('dualDiffRow');
+                const eDiffVal     = document.getElementById('dualDiffVal');
+                const eOkRow       = document.getElementById('dualOkRow');
+                if (eTotalOS)      eTotalOS.textContent      = fmt(total);
+                if (eTotalDistrib) eTotalDistrib.textContent = fmt(sum);
                 if (Math.abs(diff) > 0.01) {
                     if (eDiffRow) eDiffRow.style.display = 'flex';
                     if (eOkRow)  eOkRow.style.display   = 'none';
@@ -15215,22 +15284,16 @@ ${container.innerHTML}
                 }
 
                 // Salva no state para o save() usar
-                // FIX BUG: captura entry/retirada para TODOS os métodos, não só installment
-                const cp1final = m1 === 'credit' ? (parseInt(document.getElementById('dual1CreditParcelas')?.value) || 1) : 0;
-                const cp2final = m2 === 'credit' ? (parseInt(document.getElementById('dual2CreditParcelas')?.value) || 1) : 0;
                 state.currentSale._dualPayments = [
                     { method: m1, value: v1,
-                      entry: entry1,
-                      retirada: ret1,
-                      creditParcelas: cp1final,
+                      entry: parseFloat(document.getElementById('dual1Entry')?.value) || 0,
+                      retirada: parseFloat(document.getElementById('dual1Retirada')?.value) || 0,
                       parcelas: parseInt(document.getElementById('dual1Parcelas')?.value) || 2 },
                     { method: m2, value: v2,
-                      entry: entry2,
-                      retirada: ret2,
-                      creditParcelas: cp2final,
+                      entry: parseFloat(document.getElementById('dual2Entry')?.value) || 0,
+                      retirada: parseFloat(document.getElementById('dual2Retirada')?.value) || 0,
                       parcelas: parseInt(document.getElementById('dual2Parcelas')?.value) || 2 }
                 ];
-                state.currentSale._dualMode = true;
             },
 
             // Gera parcelas para uma das formas do pagamento duplo
@@ -16633,6 +16696,88 @@ ${container.innerHTML}
                 this.enviarStatusPedidoWhatsApp(sale.id);
             },
 
+            // ── WhatsApp: Confirmação de OS (após salvar venda) ──
+            // Helper: enviar WhatsApp a partir do modal de OS gerada
+            _wppOSGerada(tipo) {
+                const saleId = Sales._osGeradoSaleId;
+                if (!saleId) { Toast.show('Salve a OS primeiro', 'warning'); return; }
+                if (tipo === 'confirmacao') this.enviarConfirmacaoOS(saleId);
+                else if (tipo === 'status') this.enviarStatusPedidoWhatsApp(saleId);
+                else if (tipo === 'retirada') this.enviarLembreteRetiradaWhatsApp(saleId);
+            },
+
+            enviarConfirmacaoOS(saleId) {
+                const sale    = state.sales.find(s => s.id === saleId);
+                const client  = state.clients.find(c => c.id === sale?.clientId);
+                const company = state.company;
+                if (!sale || !client) { Toast.show('Dados da venda não encontrados', 'warning'); return; }
+                const phone   = (client.whatsapp || client.phone || '').replace(/\D/g, '');
+                if (!phone)   { Toast.show('Cliente sem WhatsApp/telefone cadastrado', 'warning'); return; }
+                const fd      = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                const METH    = { pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário', mixed:'Múltiplas formas' };
+                let pagamento = METH[sale.paymentMethod] || sale.paymentMethod || '—';
+                if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2) {
+                    pagamento = sale.dualPayments.map(d => METH[d.method] || d.method).join(' + ');
+                }
+                const det     = sale.paymentDetails || {};
+                if (det.parcels?.length) pagamento += ` ${det.parcels.length}x`;
+                const msg = ConfigWpp.get('confirmacaoOS')
+                    .replace(/{{NOME}}/g,       client.name.split(' ')[0])
+                    .replace(/{{OS}}/g,         sale.number || '')
+                    .replace(/{{DATA_VENDA}}/g, fd(sale.date))
+                    .replace(/{{PREVISAO}}/g,   sale.deliveryForecast ? fd(sale.deliveryForecast) : '—')
+                    .replace(/{{PAGAMENTO}}/g,  pagamento)
+                    .replace(/{{TOTAL}}/g,      Utils.formatCurrency(sale.total || 0))
+                    .replace(/{{EMPRESA}}/g,    company.name || '')
+                    .replace(/{{TELEFONE}}/g,   [company.phone, company.whatsapp].filter(Boolean).join(' | '));
+                WppConfirm.show({
+                    nome:     client.name,
+                    phone,
+                    subtitle: `Confirmação da OS ${sale.number}`,
+                    msg,
+                    url: `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`
+                });
+            },
+
+            // ── WhatsApp: Lembrete de Retirada (óculos prontos) ──
+            enviarLembreteRetiradaWhatsApp(saleId) {
+                const sale    = state.sales.find(s => s.id === saleId);
+                const client  = state.clients.find(c => c.id === sale?.clientId);
+                const company = state.company;
+                if (!sale || !client) { Toast.show('Dados da venda não encontrados', 'warning'); return; }
+                const phone   = (client.whatsapp || client.phone || '').replace(/\D/g, '');
+                if (!phone)   { Toast.show('Cliente sem WhatsApp/telefone cadastrado', 'warning'); return; }
+                const endereco = [company.address, company.number ? ', ' + company.number : '', company.city ? ' — ' + company.city : '', company.state ? '/' + company.state : ''].filter(Boolean).join('');
+                // Calcula saldo na retirada
+                const det     = sale.paymentDetails || {};
+                let saldoRetStr = '';
+                const retVal  = parseFloat(det.retiradaValue || 0);
+                const retEntry= parseFloat(det.retiradaEntry || 0);
+                const retFinal= retVal || retEntry || 0;
+                if (retFinal > 0.01 && !sale.retiradaPaga) {
+                    saldoRetStr = `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(retFinal)}*`;
+                } else if (sale.paymentMode === 'dual' && sale.dualPayments?.length) {
+                    const totRet = sale.dualPayments.reduce((a, sl, idx) =>
+                        (sl.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`] ? a + sl.retirada : a, 0);
+                    if (totRet > 0.01) saldoRetStr = `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(totRet)}*`;
+                }
+                if (!saldoRetStr) saldoRetStr = '✅ Pedido totalmente quitado!';
+                const msg = ConfigWpp.get('lembreteRetirada')
+                    .replace(/{{NOME}}/g,            client.name.split(' ')[0])
+                    .replace(/{{OS}}/g,              sale.number || '')
+                    .replace(/{{SALDO_RETIRADA}}/g,  saldoRetStr)
+                    .replace(/{{EMPRESA}}/g,         company.name || '')
+                    .replace(/{{ENDERECO}}/g,        endereco)
+                    .replace(/{{TELEFONE}}/g,        [company.phone, company.whatsapp].filter(Boolean).join(' | '));
+                WppConfirm.show({
+                    nome:     client.name,
+                    phone,
+                    subtitle: `Retirada da OS ${sale.number}`,
+                    msg,
+                    url: `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`
+                });
+            },
+
             sendWhatsApp() {
                 const client = state.clients.find(c => c.id === state.currentSale.clientId);
                 if (!client || !client.phone) {
@@ -16841,8 +16986,7 @@ ${container.innerHTML}
                         const entradaVal = entradaEl ? (parseFloat(entradaEl.value) || 0) : 0;
                         const totalFinal = state.currentSale.total || 0;
                         const retiradaVal = Math.max(0, totalFinal - entradaVal);
-                        // FIX: não exigir entradaVal > 0 — venda com pagamento total na retirada (entrada=0) também gera conta
-                        if (retiradaVal > 0.01) {
+                        if (entradaVal > 0.01 && retiradaVal > 0.01) {
                             paymentDetailsToSave = { retiradaValue: retiradaVal, entradaValue: entradaVal };
                         } else {
                             paymentDetailsToSave = null; // venda à vista integral — sem detalhes extras
