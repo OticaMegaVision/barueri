@@ -5118,61 +5118,96 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
 
                         <!-- ── PAINEL PAGAMENTO DUPLO ── -->
                         <div id="dualPaymentPanel" style="display:none;background:#fff8f0;border:2px solid #ffcc80;border-radius:12px;padding:14px;margin-top:8px;">
-                            <div style="font-weight:700;color:#e65100;font-size:0.88rem;margin-bottom:10px;">⚡ Dividir em 2 formas de pagamento</div>
+                            <div style="font-weight:700;color:#e65100;font-size:0.88rem;margin-bottom:4px;">⚡ Dividir em 2 formas de pagamento</div>
+                            <div style="font-size:0.75rem;color:#888;margin-bottom:10px;">Informe o valor de cada forma. Use <b>Retirada</b> para o saldo cobrado na entrega dos óculos.</div>
 
                             <!-- Forma 1 -->
-                            <div style="margin-bottom:10px;">
-                                <div style="font-size:0.78rem;font-weight:600;color:#666;margin-bottom:4px;">1ª Forma</div>
-                                <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="margin-bottom:10px;background:#fff;border:1px solid #ffe0b2;border-radius:10px;padding:10px;">
+                                <div style="font-size:0.8rem;font-weight:700;color:#e65100;margin-bottom:6px;">1ª Forma de Pagamento</div>
+                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
                                     <select id="dual1Method" class="form-control" style="flex:1.2;font-size:0.83rem;" onchange="Sales.calcDual()">
+                                        <option value="debit">Débito</option>
                                         <option value="pix">PIX</option>
                                         <option value="cash">Dinheiro</option>
-                                        <option value="debit">Débito</option>
                                         <option value="credit">Crédito</option>
                                         <option value="installment">Crediário</option>
                                     </select>
-                                    <input type="number" id="dual1Value" class="form-control" placeholder="R$ 0,00" min="0" step="0.01"
-                                        style="flex:1;font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
-                                </div>
-                                <div id="dual1Crediario" style="display:none;margin-top:8px;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px;">
-                                    <div style="font-size:0.78rem;font-weight:600;color:#e65100;margin-bottom:6px;">📅 Crediário — 1ª forma</div>
-                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-                                        <div><label style="font-size:11px;color:#666;">Entrada (R$)</label><input type="number" id="dual1Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
-                                        <div><label style="font-size:11px;color:#666;">Retirada (R$)</label><input type="number" id="dual1Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
-                                        <div><label style="font-size:11px;color:#666;">Nº Parcelas</label><input type="number" id="dual1Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                    <div style="flex:1;">
+                                        <label style="font-size:10px;color:#888;display:block;margin-bottom:2px;">Valor total desta forma (R$)</label>
+                                        <input type="number" id="dual1Value" class="form-control" placeholder="0,00" min="0" step="0.01"
+                                            style="font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
                                     </div>
-                                    <div style="margin-top:6px;font-size:0.78rem;color:#e65100;" id="dual1ParcelaInfo">—</div>
                                 </div>
+                                <!-- Campos Entrada / Retirada — visíveis para TODOS os métodos -->
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
+                                    <div id="dual1EntradaWrap">
+                                        <label style="font-size:11px;color:#2e7d32;font-weight:700;">💰 Entrada (pago no ato — R$)</label>
+                                        <input type="number" id="dual1Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#a5d6a7;" oninput="Sales.calcDual()">
+                                    </div>
+                                    <div>
+                                        <label style="font-size:11px;color:#e65100;font-weight:700;">🕐 Retirada (cobrar na entrega — R$)</label>
+                                        <input type="number" id="dual1Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#ffcc80;" oninput="Sales.calcDual()">
+                                    </div>
+                                </div>
+                                <!-- Parcelas crediário — só para installment -->
+                                <div id="dual1ParcelasWrap" style="display:none;margin-top:4px;">
+                                    <label style="font-size:11px;color:#666;">Nº Parcelas (Crediário)</label>
+                                    <input type="number" id="dual1Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()">
+                                </div>
+                                <!-- Parcelas crédito — só para credit -->
+                                <div id="dual1CreditParcelasWrap" style="display:none;margin-top:4px;">
+                                    <label style="font-size:11px;color:#6a1b9a;font-weight:700;">💳 Parcelas Cartão de Crédito (informativo)</label>
+                                    <input type="number" id="dual1CreditParcelas" class="form-control" value="1" min="1" max="24" style="font-size:0.83rem;border-color:#ce93d8;" oninput="Sales.calcDual()">
+                                </div>
+                                <div style="margin-top:6px;font-size:0.78rem;color:#e65100;font-weight:600;" id="dual1ParcelaInfo"></div>
                             </div>
 
                             <!-- Forma 2 -->
-                            <div style="margin-bottom:10px;">
-                                <div style="font-size:0.78rem;font-weight:600;color:#666;margin-bottom:4px;">2ª Forma</div>
-                                <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="margin-bottom:10px;background:#fff;border:1px solid #ffe0b2;border-radius:10px;padding:10px;">
+                                <div style="font-size:0.8rem;font-weight:700;color:#e65100;margin-bottom:6px;">2ª Forma de Pagamento</div>
+                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
                                     <select id="dual2Method" class="form-control" style="flex:1.2;font-size:0.83rem;" onchange="Sales.calcDual()">
+                                        <option value="credit" selected>Crédito</option>
                                         <option value="pix">PIX</option>
-                                        <option value="cash" selected>Dinheiro</option>
+                                        <option value="cash">Dinheiro</option>
                                         <option value="debit">Débito</option>
-                                        <option value="credit">Crédito</option>
                                         <option value="installment">Crediário</option>
                                     </select>
-                                    <input type="number" id="dual2Value" class="form-control" placeholder="R$ 0,00" min="0" step="0.01"
-                                        style="flex:1;font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
-                                </div>
-                                <div id="dual2Crediario" style="display:none;margin-top:8px;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px;">
-                                    <div style="font-size:0.78rem;font-weight:600;color:#e65100;margin-bottom:6px;">📅 Crediário — 2ª forma</div>
-                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-                                        <div><label style="font-size:11px;color:#666;">Entrada (R$)</label><input type="number" id="dual2Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
-                                        <div><label style="font-size:11px;color:#666;">Retirada (R$)</label><input type="number" id="dual2Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
-                                        <div><label style="font-size:11px;color:#666;">Nº Parcelas</label><input type="number" id="dual2Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()"></div>
+                                    <div style="flex:1;">
+                                        <label style="font-size:10px;color:#888;display:block;margin-bottom:2px;">Valor total desta forma (R$)</label>
+                                        <input type="number" id="dual2Value" class="form-control" placeholder="0,00" min="0" step="0.01"
+                                            style="font-size:0.9rem;font-weight:700;" oninput="Sales.calcDual()">
                                     </div>
-                                    <div style="margin-top:6px;font-size:0.78rem;color:#e65100;" id="dual2ParcelaInfo">—</div>
                                 </div>
+                                <!-- Campos Entrada / Retirada — visíveis para TODOS os métodos -->
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
+                                    <div id="dual2EntradaWrap">
+                                        <label style="font-size:11px;color:#2e7d32;font-weight:700;">💰 Entrada (pago no ato — R$)</label>
+                                        <input type="number" id="dual2Entry" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#a5d6a7;" oninput="Sales.calcDual()">
+                                    </div>
+                                    <div>
+                                        <label style="font-size:11px;color:#e65100;font-weight:700;">🕐 Retirada (cobrar na entrega — R$)</label>
+                                        <input type="number" id="dual2Retirada" class="form-control" value="0" min="0" step="0.01" style="font-size:0.83rem;border-color:#ffcc80;" oninput="Sales.calcDual()">
+                                    </div>
+                                </div>
+                                <!-- Parcelas crediário — só para installment -->
+                                <div id="dual2ParcelasWrap" style="display:none;margin-top:4px;">
+                                    <label style="font-size:11px;color:#666;">Nº Parcelas (Crediário)</label>
+                                    <input type="number" id="dual2Parcelas" class="form-control" value="2" min="1" max="48" style="font-size:0.83rem;" oninput="Sales.calcDual()">
+                                </div>
+                                <!-- Parcelas crédito — só para credit -->
+                                <div id="dual2CreditParcelasWrap" style="display:none;margin-top:4px;">
+                                    <label style="font-size:11px;color:#6a1b9a;font-weight:700;">💳 Parcelas Cartão de Crédito (informativo)</label>
+                                    <input type="number" id="dual2CreditParcelas" class="form-control" value="1" min="1" max="24" style="font-size:0.83rem;border-color:#ce93d8;" oninput="Sales.calcDual()">
+                                </div>
+                                <div style="margin-top:6px;font-size:0.78rem;color:#e65100;font-weight:600;" id="dual2ParcelaInfo"></div>
                             </div>
 
                             <!-- Resumo -->
                             <div style="background:#fff;border-radius:8px;border:1px solid #ffe0b2;padding:10px;font-size:0.83rem;">
                                 <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Total da OS:</span><strong id="dualTotalOS">R$ 0,00</strong></div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Pago no ato (entradas):</span><strong id="dualTotalEntrada" style="color:#2e7d32;">R$ 0,00</strong></div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Saldo na retirada:</span><strong id="dualTotalRetirada" style="color:#e65100;">R$ 0,00</strong></div>
                                 <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#666;">Total distribuído:</span><strong id="dualTotalDistrib">R$ 0,00</strong></div>
                                 <div id="dualDiffRow" style="display:none;justify-content:space-between;padding:4px 8px;border-radius:6px;background:#ffebee;">
                                     <span style="color:#c62828;font-weight:700;">Falta / Excede:</span>
@@ -8686,12 +8721,19 @@ ORDER BY t.table_name;
                                     });
                                 }
                             } else {
-                                // À vista com retirada pendente (não precisa de entrada > 0)
+                                // FIX BUG: À vista (PIX/Dinheiro/Débito/Crédito) com retirada pendente
+                                // Antes: slot.retirada era sempre 0 porque calcDual não capturava para não-crediário
+                                // Agora: slot.retirada é corretamente salvo pelo calcDual corrigido
                                 if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) {
+                                    // Para crédito, incluir info de parcelas na descrição se informado
+                                    let descExtra = '';
+                                    if (slot.method === 'credit' && (slot.creditParcelas || 0) > 1) {
+                                        descExtra = ` — ${slot.creditParcelas}x no crédito`;
+                                    }
                                     contasVendas.push({
                                         id: `venda_${sale.id}_dual${idx}_retirada`,
                                         tipo: 'receber',
-                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (${mLbl}) Retirada`,
+                                        descricao: `OS ${sale.number} — ${slotLabel} Forma (${mLbl}) Retirada${descExtra}`,
                                         parte: nomeCliente,
                                         categoria: 'Retirada',
                                         valor: parseFloat(slot.retirada),
@@ -9218,15 +9260,13 @@ ORDER BY t.table_name;
                         if (slot.method === 'installment') {
                             const todasPagas = (slot.parcelas || []).every(p => p.paid || p.status === 'pago' || p.status === 'paid');
                             if (!todasPagas) return false;
-                            if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
-                        } else {
-                            if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
                         }
+                        // FIX: verifica retirada para TODOS os métodos no dual (não só installment)
+                        if ((slot.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${idx}`]) return false;
                     }
                     return true;
                 }
-                // Fix: Métodos à vista (PIX, Dinheiro, Débito, Crédito) com retirada pendente
-                // Antes caía direto no return true, marcando como pago mesmo com saldo na retirada
+                // Métodos à vista (PIX, Dinheiro, Débito, Crédito) com saldo na retirada
                 const retiradaAvista = parseFloat(det.retiradaValue || 0);
                 if (retiradaAvista > 0.01 && !sale.retiradaPaga) return false;
                 return true;
@@ -14187,14 +14227,15 @@ ${container.innerHTML}
                     // Dual
                     if (s.paymentMode === 'dual' && s.dualPayments?.length === 2) {
                         let saldo = 0;
-                        for (const slot of s.dualPayments) {
+                        for (const [idx, slot] of s.dualPayments.entries()) {
                             if (slot.method === 'installment') {
                                 (slot.parcelas || []).filter(p => !p.paid && p.status !== 'pago').forEach(p => { saldo += parseFloat(p.value || 0); });
                             }
-                            if ((slot.retirada || 0) > 0.01 && !s[`retiradaPaga_dual${s.dualPayments.indexOf(slot)}`]) saldo += slot.retirada;
+                            // FIX: verifica retirada para TODOS os métodos (não só installment)
+                            if ((slot.retirada || 0) > 0.01 && !s[`retiradaPaga_dual${idx}`]) saldo += slot.retirada;
                         }
                         if (saldo < 0.01) return { txt: '✅ Quitado', cls: '#28a745' };
-                        return { txt: Utils.formatCurrency(saldo), cls: '#e65100' };
+                        return { txt: '⏳ ' + Utils.formatCurrency(saldo), cls: '#e65100' };
                     }
                     // À vista com retirada
                     const ret = parseFloat(det.retiradaValue || 0);
@@ -15074,49 +15115,96 @@ ${container.innerHTML}
             calcDual() {
                 const lbl   = {pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'};
                 const total = state.currentSale._grossTotal || state.currentSale.total || 0;
-                const m1    = document.getElementById('dual1Method')?.value || 'pix';
-                const m2    = document.getElementById('dual2Method')?.value || 'cash';
+                const m1    = document.getElementById('dual1Method')?.value || 'debit';
+                const m2    = document.getElementById('dual2Method')?.value || 'credit';
                 const v1    = parseFloat(document.getElementById('dual1Value')?.value) || 0;
                 const v2    = parseFloat(document.getElementById('dual2Value')?.value) || 0;
                 const sum   = v1 + v2;
                 const diff  = total - sum;
 
-                // Mostra/oculta painel crediário por forma
-                const c1 = document.getElementById('dual1Crediario');
-                const c2 = document.getElementById('dual2Crediario');
-                if (c1) c1.style.display = (m1 === 'installment') ? 'block' : 'none';
-                if (c2) c2.style.display = (m2 === 'installment') ? 'block' : 'none';
+                // Lê entrada e retirada para TODOS os métodos (campos sempre visíveis agora)
+                const entry1    = parseFloat(document.getElementById('dual1Entry')?.value)    || 0;
+                const ret1      = parseFloat(document.getElementById('dual1Retirada')?.value) || 0;
+                const entry2    = parseFloat(document.getElementById('dual2Entry')?.value)    || 0;
+                const ret2      = parseFloat(document.getElementById('dual2Retirada')?.value) || 0;
 
-                // Resumo crediário forma 1
-                if (m1 === 'installment' && v1 > 0) {
-                    const entry1    = parseFloat(document.getElementById('dual1Entry')?.value) || 0;
-                    const ret1      = parseFloat(document.getElementById('dual1Retirada')?.value) || 0;
-                    const nparc1    = parseInt(document.getElementById('dual1Parcelas')?.value) || 2;
-                    const saldo1    = Math.max(0, v1 - entry1 - ret1);
-                    const parcVal1  = nparc1 > 0 ? saldo1 / nparc1 : 0;
-                    const el1 = document.getElementById('dual1ParcelaInfo');
-                    if (el1) el1.textContent = `Entrada: R$ ${entry1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} | ${nparc1}x de R$ ${parcVal1.toFixed(2).replace('.',',')}`;
-                }
-                // Resumo crediário forma 2
-                if (m2 === 'installment' && v2 > 0) {
-                    const entry2    = parseFloat(document.getElementById('dual2Entry')?.value) || 0;
-                    const ret2      = parseFloat(document.getElementById('dual2Retirada')?.value) || 0;
-                    const nparc2    = parseInt(document.getElementById('dual2Parcelas')?.value) || 2;
-                    const saldo2    = Math.max(0, v2 - entry2 - ret2);
-                    const parcVal2  = nparc2 > 0 ? saldo2 / nparc2 : 0;
-                    const el2 = document.getElementById('dual2ParcelaInfo');
-                    if (el2) el2.textContent = `Entrada: R$ ${entry2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} | ${nparc2}x de R$ ${parcVal2.toFixed(2).replace('.',',')}`;
-                }
+                // Mostra/oculta parcelas crediário e crédito por forma
+                const pw1 = document.getElementById('dual1ParcelasWrap');
+                const pw2 = document.getElementById('dual2ParcelasWrap');
+                const cw1 = document.getElementById('dual1CreditParcelasWrap');
+                const cw2 = document.getElementById('dual2CreditParcelasWrap');
+                if (pw1) pw1.style.display = (m1 === 'installment') ? 'block' : 'none';
+                if (pw2) pw2.style.display = (m2 === 'installment') ? 'block' : 'none';
+                if (cw1) cw1.style.display = (m1 === 'credit') ? 'block' : 'none';
+                if (cw2) cw2.style.display = (m2 === 'credit') ? 'block' : 'none';
+
+                // Resumo textual forma 1
+                const el1 = document.getElementById('dual1ParcelaInfo');
+                if (el1 && v1 > 0) {
+                    if (m1 === 'installment') {
+                        const nparc1   = parseInt(document.getElementById('dual1Parcelas')?.value) || 2;
+                        const saldo1   = Math.max(0, v1 - entry1 - ret1);
+                        const parcVal1 = nparc1 > 0 ? saldo1 / nparc1 : 0;
+                        el1.textContent = `Entrada: R$ ${entry1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} | ${nparc1}x de R$ ${parcVal1.toFixed(2).replace('.',',')}`;
+                    } else if (m1 === 'credit') {
+                        const cp1 = parseInt(document.getElementById('dual1CreditParcelas')?.value) || 1;
+                        const pago1 = v1 - ret1;
+                        if (cp1 > 1) {
+                            el1.textContent = `Pago no ato: R$ ${pago1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')} — ${cp1}x no crédito`;
+                        } else {
+                            el1.textContent = ret1 > 0.01 ? `Pago no ato: R$ ${pago1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')}` : `R$ ${v1.toFixed(2).replace('.',',')} à vista no crédito`;
+                        }
+                    } else {
+                        const pago1 = v1 - ret1;
+                        el1.textContent = ret1 > 0.01
+                            ? `Pago no ato: R$ ${pago1.toFixed(2).replace('.',',')} | Retirada: R$ ${ret1.toFixed(2).replace('.',',')}`
+                            : `R$ ${v1.toFixed(2).replace('.',',')} pago no ato (${lbl[m1]||m1})`;
+                    }
+                } else if (el1) { el1.textContent = ''; }
+
+                // Resumo textual forma 2
+                const el2 = document.getElementById('dual2ParcelaInfo');
+                if (el2 && v2 > 0) {
+                    if (m2 === 'installment') {
+                        const nparc2   = parseInt(document.getElementById('dual2Parcelas')?.value) || 2;
+                        const saldo2   = Math.max(0, v2 - entry2 - ret2);
+                        const parcVal2 = nparc2 > 0 ? saldo2 / nparc2 : 0;
+                        el2.textContent = `Entrada: R$ ${entry2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} | ${nparc2}x de R$ ${parcVal2.toFixed(2).replace('.',',')}`;
+                    } else if (m2 === 'credit') {
+                        const cp2 = parseInt(document.getElementById('dual2CreditParcelas')?.value) || 1;
+                        const pago2 = v2 - ret2;
+                        if (cp2 > 1) {
+                            el2.textContent = `Pago no ato: R$ ${pago2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')} — ${cp2}x no crédito`;
+                        } else {
+                            el2.textContent = ret2 > 0.01 ? `Pago no ato: R$ ${pago2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')}` : `R$ ${v2.toFixed(2).replace('.',',')} à vista no crédito`;
+                        }
+                    } else {
+                        const pago2 = v2 - ret2;
+                        el2.textContent = ret2 > 0.01
+                            ? `Pago no ato: R$ ${pago2.toFixed(2).replace('.',',')} | Retirada: R$ ${ret2.toFixed(2).replace('.',',')}`
+                            : `R$ ${v2.toFixed(2).replace('.',',')} pago no ato (${lbl[m2]||m2})`;
+                    }
+                } else if (el2) { el2.textContent = ''; }
 
                 // Resumo geral
                 const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-                const eTotalOS     = document.getElementById('dualTotalOS');
-                const eTotalDistrib= document.getElementById('dualTotalDistrib');
-                const eDiffRow     = document.getElementById('dualDiffRow');
-                const eDiffVal     = document.getElementById('dualDiffVal');
-                const eOkRow       = document.getElementById('dualOkRow');
-                if (eTotalOS)      eTotalOS.textContent      = fmt(total);
-                if (eTotalDistrib) eTotalDistrib.textContent = fmt(sum);
+                const totalEntrada  = entry1 + entry2 + Math.max(0, v1 - ret1 - entry1) * (ret1 < 0.01 && entry1 < 0.01 ? 1 : 0)
+                    + Math.max(0, v2 - ret2 - entry2) * (ret2 < 0.01 && entry2 < 0.01 ? 1 : 0);
+                // Totalentrada: soma do que é pago no ato = (v - retirada) de cada slot
+                const pagoNoAto = Math.max(0, v1 - ret1) + Math.max(0, v2 - ret2);
+                const totalRetirada = ret1 + ret2;
+
+                const eTotalOS      = document.getElementById('dualTotalOS');
+                const eTotalDistrib = document.getElementById('dualTotalDistrib');
+                const eTotalEntrada = document.getElementById('dualTotalEntrada');
+                const eTotalRetirada= document.getElementById('dualTotalRetirada');
+                const eDiffRow      = document.getElementById('dualDiffRow');
+                const eDiffVal      = document.getElementById('dualDiffVal');
+                const eOkRow        = document.getElementById('dualOkRow');
+                if (eTotalOS)       eTotalOS.textContent       = fmt(total);
+                if (eTotalDistrib)  eTotalDistrib.textContent  = fmt(sum);
+                if (eTotalEntrada)  eTotalEntrada.textContent  = fmt(pagoNoAto);
+                if (eTotalRetirada) eTotalRetirada.textContent = fmt(totalRetirada);
                 if (Math.abs(diff) > 0.01) {
                     if (eDiffRow) eDiffRow.style.display = 'flex';
                     if (eOkRow)  eOkRow.style.display   = 'none';
@@ -15127,16 +15215,22 @@ ${container.innerHTML}
                 }
 
                 // Salva no state para o save() usar
+                // FIX BUG: captura entry/retirada para TODOS os métodos, não só installment
+                const cp1final = m1 === 'credit' ? (parseInt(document.getElementById('dual1CreditParcelas')?.value) || 1) : 0;
+                const cp2final = m2 === 'credit' ? (parseInt(document.getElementById('dual2CreditParcelas')?.value) || 1) : 0;
                 state.currentSale._dualPayments = [
                     { method: m1, value: v1,
-                      entry: parseFloat(document.getElementById('dual1Entry')?.value) || 0,
-                      retirada: parseFloat(document.getElementById('dual1Retirada')?.value) || 0,
+                      entry: entry1,
+                      retirada: ret1,
+                      creditParcelas: cp1final,
                       parcelas: parseInt(document.getElementById('dual1Parcelas')?.value) || 2 },
                     { method: m2, value: v2,
-                      entry: parseFloat(document.getElementById('dual2Entry')?.value) || 0,
-                      retirada: parseFloat(document.getElementById('dual2Retirada')?.value) || 0,
+                      entry: entry2,
+                      retirada: ret2,
+                      creditParcelas: cp2final,
                       parcelas: parseInt(document.getElementById('dual2Parcelas')?.value) || 2 }
                 ];
+                state.currentSale._dualMode = true;
             },
 
             // Gera parcelas para uma das formas do pagamento duplo
@@ -16747,9 +16841,7 @@ ${container.innerHTML}
                         const entradaVal = entradaEl ? (parseFloat(entradaEl.value) || 0) : 0;
                         const totalFinal = state.currentSale.total || 0;
                         const retiradaVal = Math.max(0, totalFinal - entradaVal);
-                        // Fix Bug: condição anterior exigia entradaVal > 0.01, o que impedia
-                        // que vendas com pagamento TOTAL na retirada (entrada = 0) fossem
-                        // registradas em Contas a Receber. Agora basta retiradaVal > 0.
+                        // FIX: não exigir entradaVal > 0 — venda com pagamento total na retirada (entrada=0) também gera conta
                         if (retiradaVal > 0.01) {
                             paymentDetailsToSave = { retiradaValue: retiradaVal, entradaValue: entradaVal };
                         } else {
