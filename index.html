@@ -4700,16 +4700,19 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                             </select>
                         </div>
                         <div id="selectedClientData" class="form-group" style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin-top: 10px; display: none;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex:1;">
                                     <strong id="clientNameDisplay" style="font-size: 16px;"></strong><br>
                                     <span id="clientDocDisplay"></span><br>
                                     <span id="clientContactDisplay"></span><br>
                                     <span id="clientAddressDisplay"></span>
                                 </div>
-                                <div>
-                                    <button type="button" class="btn btn-info" onclick="Sales.loadClientPrescription()">
+                                <div style="display:flex;flex-direction:column;gap:8px;min-width:140px;align-items:flex-end;">
+                                    <button type="button" class="btn btn-info btn-sm" onclick="Sales.loadClientPrescription()">
                                         <i class="fas fa-file-prescription"></i> Carregar Receita
+                                    </button>
+                                    <button type="button" class="btn btn-sm" style="background:#fff3cd;border:1.5px solid #ffc107;color:#856404;font-weight:600;" onclick="Sales.trocarCliente()" title="Limpar cliente selecionado e buscar outro">
+                                        <i class="fas fa-exchange-alt"></i> Trocar Cliente
                                     </button>
                                 </div>
                             </div>
@@ -7784,7 +7787,10 @@ ORDER BY t.table_name;
                 </div>
             </div>
             <div class="modal-footer" style="justify-content:center;border-top:none;padding-top:0;">
-                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;" onclick="Modal.close('osGeradoModal')">Fechar</button>
+                <button class="btn btn-primary" style="width:100%;font-size:0.85rem;background:#28a745;border-color:#28a745;" onclick="Modal.close('osGeradoModal'); Sales.clearForm(); window.scrollTo(0,0); setTimeout(function(){ var el=document.getElementById('searchClientSale'); if(el) el.focus(); }, 200);">
+                    <i class="fas fa-plus"></i> Nova Venda
+                </button>
+                <button class="btn btn-outline-secondary" style="width:100%;font-size:0.85rem;margin-top:6px;" onclick="Modal.close('osGeradoModal')">Fechar</button>
             </div>
         </div>
     </div>
@@ -11119,11 +11125,32 @@ ORDER BY t.table_name;
                             }
                         }
                         else if (section === 'sales') {
+                            // Sempre limpa COMPLETAMENTE ao entrar na seção de vendas
+                            state.editingSaleId = null;
+                            state.currentSale = {
+                                number: '', date: new Date().toISOString().slice(0, 10),
+                                unit: state.currentSale?.unit || 'barueri',
+                                seller: '', deliveryForecast: '', clientId: null, items: [],
+                                subtotal: 0, discount: 0, addition: 0, total: 0,
+                                paymentMethod: 'installment', paymentMode: 'single',
+                                mixedPayments: null, paymentDetails: null,
+                                observations: '', status: 'orcamento', statusHistory: []
+                            };
+                            Sales.clearForm();
                             Sales.renderHistory();
                             Sales.populateSaleSelects();
-                            document.getElementById('saleNumber') && (document.getElementById('saleNumber').value = Sales.generateOsNumber());
+                            // Garante visualmente que o painel de cliente está limpo
+                            const _sd = document.getElementById('selectedClientData');
+                            if (_sd) _sd.style.display = 'none';
+                            const _sr = document.getElementById('clientSearchResults');
+                            if (_sr) _sr.style.display = 'none';
+                            const _sc = document.getElementById('searchClientSale');
+                            if (_sc) _sc.value = '';
                         }
-                        else if (section === 'clients') Clients.renderTable();
+                        else if (section === 'clients') {
+                            Clients.clearForm();
+                            Clients.renderTable();
+                        }
                         else if (section === 'products') Products.renderTable();
                         else if (section === 'services') Services.renderTable();
                         else if (section === 'suppliers') Suppliers.renderTable();
@@ -11958,6 +11985,8 @@ ORDER BY t.table_name;
                 Clients._ultimoClienteSalvo = client;
                 var _nEl = document.getElementById('clienteSalvoNome');
                 if (_nEl) _nEl.textContent = client.name || '';
+                // Atualiza populates de venda com o novo cliente
+                if (typeof Sales !== 'undefined') { try { Sales.populateSaleSelects(); } catch(e) {} }
                 Modal.show('clienteSalvoModal');
             },
 
@@ -11966,22 +11995,25 @@ ORDER BY t.table_name;
             _criarVendaParaCliente() {
                 Modal.close('clienteSalvoModal');
                 var client = Clients._ultimoClienteSalvo;
+                if (!client) return;
                 var menuSales = document.querySelector('.menu-item[data-section="sales"]');
                 if (menuSales) menuSales.click();
+                // Aguarda a seção abrir, clearForm() rodar, e depois seleciona o cliente recém-salvo
                 setTimeout(function() {
-                    if (!client) return;
-                    var searchEl = document.getElementById('searchClientSale');
-                    if (searchEl) {
-                        searchEl.value = client.name;
-                        searchEl.dispatchEvent(new Event('input'));
-                        setTimeout(function() {
-                            if (typeof Sales !== 'undefined' && Sales.selectClient) {
+                    try {
+                        if (typeof Sales !== 'undefined') {
+                            // Garante que o select foi populado com o novo cliente
+                            Sales.populateSaleSelects();
+                            // Seleciona o cliente automaticamente
+                            if (Sales.selectClient) {
                                 Sales.selectClient(client.id);
+                                // Scroll até o campo de busca
+                                var el = document.getElementById('searchClientSale');
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
-                        }, 300);
-                    }
-                    Toast.show('Cliente ' + client.name + ' selecionado!', 'success');
-                }, 400);
+                        }
+                    } catch(e) { console.warn('_criarVendaParaCliente:', e.message); }
+                }, 700);
             },
 
             edit(id) {
@@ -12136,19 +12168,38 @@ ORDER BY t.table_name;
             },
 
             clearForm() {
-                document.getElementById('clientForm').reset();
+                const form = document.getElementById('clientForm');
+                if (form) form.reset();
                 state.editingId = null;
                 // Limpa explicitamente todos os campos de texto do cliente
-                ['clientName','clientPhone','clientEmail','clientCpf','clientCep',
+                ['clientName','clientPhone','clientWhatsapp','clientEmail','clientCpf','clientCep',
                  'clientAddress','clientNumber','clientComplement','clientNeighborhood',
                  'clientCity','clientState'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.value = '';
                 });
-                document.getElementById('clientCode').value = 'CLI-' + (state.clients.length + 1).toString().padStart(3, '0');
-                document.getElementById('clientBirthDate').value = new Date().toISOString().slice(0,10);
+                // Gera novo código único baseado no timestamp (evita duplicados)
+                const existingCodes = (state.clients || []).map(c => c.code || c.id).filter(Boolean);
+                let nextNum = (state.clients || []).length + 1;
+                let nextCode = 'CLI-' + String(nextNum).padStart(3, '0');
+                while (existingCodes.includes(nextCode)) {
+                    nextNum++;
+                    nextCode = 'CLI-' + String(nextNum).padStart(3, '0');
+                }
+                const codeEl = document.getElementById('clientCode');
+                if (codeEl) codeEl.value = nextCode;
+                const birthEl = document.getElementById('clientBirthDate');
+                if (birthEl) birthEl.value = new Date().toISOString().slice(0,10);
+                // Limpa campo de busca de cliente (se existir na tela de clientes)
+                const searchEl = document.getElementById('searchClient');
+                if (searchEl) searchEl.value = '';
                 // Limpa receituário silenciosamente (sem confirm) ao resetar o formulário
                 this._resetPrescFields();
+                // Foca no primeiro campo para facilitar novo cadastro
+                setTimeout(() => {
+                    const nameEl = document.getElementById('clientName');
+                    if (nameEl) nameEl.focus();
+                }, 100);
             },
 
             // Limpa campos de prescrição SEM pedir confirmação (uso interno após salvar)
@@ -13949,16 +14000,10 @@ ${container.innerHTML}
         // ==================== VENDAS (COM PDF) ====================
         const Sales = {
             init() {
-                this.generateOsNumber();
-                this.setDefaultDates();
+                this.clearForm(); // garante form limpo a cada inicialização
                 this.populateSaleSelects();
-                this.renderItems();
-                this.calculateTotal();
-                this.selectPayment('installment');
-                this.calculateInstallments();
                 this.renderHistory();
                 Utils.updatePixKey();
-                state.editingSaleId = null;
             },
 
             // Popula os selects de lentes, armações e serviços com dados reais do state
@@ -14259,7 +14304,22 @@ ${container.innerHTML}
 
             searchClient() {
                 const term = document.getElementById('searchClientSale').value.toLowerCase();
-                if (term.length < 3) {
+
+                // Sempre que o usuário começa a digitar, limpa o cliente anteriormente selecionado
+                // para evitar que dados de cliente antigo fiquem presos no formulário
+                state.currentSale.clientId = null;
+                const selectedEl = document.getElementById('selectedClientData');
+                if (selectedEl) selectedEl.style.display = 'none';
+                const prescEl = document.getElementById('prescSection');
+                if (prescEl) prescEl.style.display = 'none';
+                ['clientNameDisplay','clientDocDisplay'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.innerText = '';
+                });
+                ['clientContactDisplay','clientAddressDisplay'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.innerHTML = '';
+                });
+
+                if (term.length < 2) {
                     document.getElementById('clientSearchResults').style.display = 'none';
                     return;
                 }
@@ -14267,7 +14327,8 @@ ${container.innerHTML}
                 const results = state.clients.filter(c => 
                     c.name?.toLowerCase().includes(term) || 
                     c.cpf?.includes(term) || 
-                    c.phone?.includes(term)
+                    c.phone?.includes(term) ||
+                    c.whatsapp?.includes(term)
                 );
                 
                 const select = document.getElementById('clientSelect');
@@ -14275,10 +14336,66 @@ ${container.innerHTML}
                 
                 select.innerHTML = '<option value="">Selecione um cliente</option>';
                 results.forEach(c => {
-                    select.innerHTML += `<option value="${c.id}">${Utils.sanitizeHTML(c.name)} - ${c.cpf || ''}</option>`;
+                    select.innerHTML += `<option value="${c.id}">${Utils.sanitizeHTML(c.name)} - ${c.cpf || c.phone || ''}</option>`;
                 });
                 
-                document.getElementById('clientSearchResults').style.display = 'block';
+                document.getElementById('clientSearchResults').style.display = results.length > 0 ? 'block' : 'none';
+                if (results.length === 0 && term.length >= 2) {
+                    select.innerHTML = '<option value="">Nenhum cliente encontrado</option>';
+                    document.getElementById('clientSearchResults').style.display = 'block';
+                }
+            },
+
+            // Limpa o cliente selecionado e permite buscar um novo
+            trocarCliente() {
+                state.currentSale.clientId = null;
+                // Limpa todos os campos de exibição do cliente
+                const selectedEl = document.getElementById('selectedClientData');
+                if (selectedEl) selectedEl.style.display = 'none';
+                const prescEl = document.getElementById('prescSection');
+                if (prescEl) prescEl.style.display = 'none';
+                const searchEl = document.getElementById('searchClientSale');
+                if (searchEl) { searchEl.value = ''; searchEl.focus(); }
+                const resultsEl = document.getElementById('clientSearchResults');
+                if (resultsEl) resultsEl.style.display = 'none';
+                const selectEl = document.getElementById('clientSelect');
+                if (selectEl) selectEl.innerHTML = '<option value="">Selecione um cliente</option>';
+                ['clientNameDisplay','clientDocDisplay'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.innerText = '';
+                });
+                ['clientContactDisplay','clientAddressDisplay'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.innerHTML = '';
+                });
+                Toast.show('Cliente removido. Digite para buscar um novo cliente.', 'info', 2500);
+            },
+
+            // Seleciona um cliente diretamente pelo ID — usado após criar novo cliente
+            selectClient(clientId) {
+                if (!clientId) return;
+                const client = state.clients.find(c => c.id === clientId);
+                if (!client) return;
+                // Preenche o campo de busca com o nome
+                const searchEl = document.getElementById('searchClientSale');
+                if (searchEl) searchEl.value = client.name;
+                // Monta o select com o cliente
+                const select = document.getElementById('clientSelect');
+                if (select) {
+                    select.innerHTML = `<option value="">Selecione um cliente</option>
+                        <option value="${client.id}" selected>${Utils.sanitizeHTML(client.name)} - ${client.cpf || ''}</option>`;
+                    document.getElementById('clientSearchResults').style.display = 'block';
+                }
+                // Carrega os dados do cliente
+                state.currentSale.clientId = clientId;
+                const nameEl = document.getElementById('clientNameDisplay');
+                const docEl = document.getElementById('clientDocDisplay');
+                const contactEl = document.getElementById('clientContactDisplay');
+                const addrEl = document.getElementById('clientAddressDisplay');
+                if (nameEl) nameEl.innerText = client.name || '';
+                if (docEl) docEl.innerText = `CPF: ${client.cpf || ''}`;
+                if (contactEl) contactEl.innerHTML = `📞 ${client.phone || ''} ${client.email ? '| 📧 ' + client.email : ''}`;
+                if (addrEl) addrEl.innerHTML = `📍 ${client.address || ''} - ${client.neighborhood || ''} - ${client.city || ''}/${client.state || ''}`;
+                document.getElementById('selectedClientData').style.display = 'block';
+                Toast.show(`Cliente ${client.name} selecionado! ✅`, 'success');
             },
 
             loadClientData() {
@@ -16664,6 +16781,13 @@ ${container.innerHTML}
                 Modal.show('osGeradoModal');
             },
 
+            // Cancela a edição de uma venda e limpa o formulário
+            cancelEdit() {
+                state.editingSaleId = null;
+                this.clearForm();
+                Toast.show('Edição cancelada.', 'info', 1500);
+            },
+
             clearForm() {
                 state.currentSale = {
                     number: '',
@@ -16712,7 +16836,19 @@ ${container.innerHTML}
                 if (prescSectionEl) prescSectionEl.style.display = 'none';
                 if (clientSearchEl) clientSearchEl.style.display = 'none';
                 const searchClientSaleEl = document.getElementById('searchClientSale');
-                if (searchClientSaleEl) searchClientSaleEl.value = '';
+                if (searchClientSaleEl) {
+                    searchClientSaleEl.value = '';
+                    searchClientSaleEl.blur();
+                }
+                // Limpa dados do cliente selecionado completamente
+                const clientNameDisplayEl = document.getElementById('clientNameDisplay');
+                const clientDocDisplayEl  = document.getElementById('clientDocDisplay');
+                const clientContactEl     = document.getElementById('clientContactDisplay');
+                const clientAddrEl        = document.getElementById('clientAddressDisplay');
+                if (clientNameDisplayEl) clientNameDisplayEl.innerText = '';
+                if (clientDocDisplayEl)  clientDocDisplayEl.innerText  = '';
+                if (clientContactEl)     clientContactEl.innerHTML     = '';
+                if (clientAddrEl)        clientAddrEl.innerHTML        = '';
                 if (statusEl) statusEl.value = 'orcamento';
                 // Oculta todos os painéis de pagamento
                 ['pixDetails','cashDetails','debitDetails','creditDetails','installmentDetails'].forEach(id => {
@@ -16762,6 +16898,18 @@ ${container.innerHTML}
                 const totalParcelsSummary = document.getElementById('totalParcelsSummary');
                 if (totalParcelsSummary) totalParcelsSummary.textContent = '0x';
                 
+                // Limpa tabela de itens explicitamente antes de renderItems()
+                const saleItemsBody = document.getElementById('saleItems');
+                if (saleItemsBody) saleItemsBody.innerHTML = '';
+                // Garante que painel de cliente está limpo (importante para "Nova Venda" após salvar)
+                const _sdEl = document.getElementById('selectedClientData');
+                if (_sdEl) _sdEl.style.display = 'none';
+                const _srEl = document.getElementById('clientSearchResults');
+                if (_srEl) _srEl.style.display = 'none';
+                const _scEl = document.getElementById('searchClientSale');
+                if (_scEl) _scEl.value = '';
+                const _csEl = document.getElementById('clientSelect');
+                if (_csEl) _csEl.innerHTML = '<option value="">Selecione um cliente</option>';
                 this.generateOsNumber();
                 this.setDefaultDates();
                 this.renderItems();
@@ -16774,6 +16922,9 @@ ${container.innerHTML}
                 const mixedRows = document.getElementById('mixedPaymentRows');
                 if (mixedRows) mixedRows.innerHTML = '';
                 state.editingSaleId = null;
+                // Reset da seção de receituário da venda
+                const prescSect2 = document.getElementById('prescSection');
+                if (prescSect2) prescSect2.style.display = 'none';
                 // Reset modo duplo
                 state.currentSale._dualMode = false;
                 state.currentSale._dualPayments = null;
