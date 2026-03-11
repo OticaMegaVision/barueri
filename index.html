@@ -11914,7 +11914,9 @@ ORDER BY t.table_name;
                 }
                 
                 const client = {
-                    id: state.editingId || 'CLI-' + (state.clients.length + 1).toString().padStart(3, '0'),
+                    // CORREÇÃO: usa Utils.generateId para garantir ID único (o padrão anterior
+                    // usava state.clients.length+1 que gerava IDs duplicados após exclusões)
+                    id: state.editingId || Utils.generateId('CLI'),
                     code: document.getElementById('clientCode').value,
                     birthDate: document.getElementById('clientBirthDate').value,
                     name: document.getElementById('clientName').value,
@@ -14303,10 +14305,19 @@ ${container.innerHTML}
             },
 
             searchClient() {
-                const term = document.getElementById('searchClientSale').value.toLowerCase();
+                const term = document.getElementById('searchClientSale').value.toLowerCase().trim();
 
-                // Sempre que o usuário começa a digitar, limpa o cliente anteriormente selecionado
-                // para evitar que dados de cliente antigo fiquem presos no formulário
+                // CORREÇÃO: não limpa o cliente se o campo de busca ainda contém o nome do cliente
+                // já selecionado (isso impedia que teclas de navegação apagassem a seleção).
+                if (state.currentSale.clientId) {
+                    const selectedClient = state.clients.find(c => c.id === state.currentSale.clientId);
+                    if (selectedClient && selectedClient.name.toLowerCase() === term) {
+                        // Usuário não mudou a busca, não faz nada
+                        return;
+                    }
+                }
+
+                // Limpa o cliente selecionado apenas quando o usuário realmente digitou algo novo
                 state.currentSale.clientId = null;
                 const selectedEl = document.getElementById('selectedClientData');
                 if (selectedEl) selectedEl.style.display = 'none';
@@ -14334,10 +14345,14 @@ ${container.innerHTML}
                 const select = document.getElementById('clientSelect');
                 if (!select) return;
                 
-                select.innerHTML = '<option value="">Selecione um cliente</option>';
+                // CORREÇÃO: constrói todo o HTML de uma vez e atribui de uma só vez.
+                // O padrão anterior (innerHTML +=) destruía e recriava todo o DOM a cada
+                // iteração, podendo disparar eventos onchange indesejados.
+                let optHtml = '<option value="">Selecione um cliente</option>';
                 results.forEach(c => {
-                    select.innerHTML += `<option value="${c.id}">${Utils.sanitizeHTML(c.name)} - ${c.cpf || c.phone || ''}</option>`;
+                    optHtml += `<option value="${c.id}">${Utils.sanitizeHTML(c.name)} - ${c.cpf || c.phone || ''}</option>`;
                 });
+                select.innerHTML = optHtml;
                 
                 document.getElementById('clientSearchResults').style.display = results.length > 0 ? 'block' : 'none';
                 if (results.length === 0 && term.length >= 2) {
@@ -14413,6 +14428,16 @@ ${container.innerHTML}
                 document.getElementById('clientAddressDisplay').innerHTML = `📍 ${client.address || ''} - ${client.neighborhood || ''} - ${client.city || ''}/${client.state || ''}`;
                 
                 document.getElementById('selectedClientData').style.display = 'block';
+
+                // CORREÇÃO: esconde os resultados de busca após selecionar o cliente
+                // para que o usuário saiba que a seleção foi confirmada.
+                const resultsEl = document.getElementById('clientSearchResults');
+                if (resultsEl) resultsEl.style.display = 'none';
+                // Mantém o nome do cliente no campo de busca como confirmação visual
+                const searchEl = document.getElementById('searchClientSale');
+                if (searchEl) searchEl.value = client.name;
+
+                Toast.show(`Cliente ${client.name} selecionado! ✅`, 'success', 2000);
             },
 
             loadClientPrescription() {
@@ -15617,18 +15642,26 @@ ${container.innerHTML}
 
             // Permite gerar PDF de uma OS específica do histórico (sem editar)
             _setPdfTarget(saleId) {
+                // CORREÇÃO: usa variável separada _pdfSale para não sobrescrever
+                // state.currentSale (que é o formulário de nova venda em andamento).
+                // Antes isso causava o cliente antigo aparecer em novas vendas.
                 const sale = state.sales.find(s => s.id === saleId);
-                if (sale) state.currentSale = JSON.parse(JSON.stringify(sale));
+                if (sale) state._pdfSale = JSON.parse(JSON.stringify(sale));
             },
 
             gerarPDF_OS(tipo) {
-                const sale    = state.currentSale;
+                // CORREÇÃO: usa _pdfSale (definido por _setPdfTarget) quando disponível,
+                // senão usa state.currentSale (para PDF da venda sendo editada no formulário).
+                // Isso evita que state.currentSale seja substituído pelo registro antigo.
+                const sale    = state._pdfSale || state.currentSale;
                 const client  = state.clients.find(c => c.id === sale?.clientId);
                 const presc   = state.prescriptions?.find(p => p.clientId === client?.id);
                 const details = sale?.paymentDetails;
                 const company = state.company;
 
                 if (!sale) { Toast.show('Nenhuma OS selecionada.', 'error'); return; }
+                // Limpa o alvo temporário após uso para evitar contaminação futura
+                state._pdfSale = null;
 
                 const fd = d => {
                     if (!d) return '—';
@@ -16101,10 +16134,14 @@ ${container.innerHTML}
             },
 
             gerarPDF_Carne() {
-                const client  = state.clients.find(c => c.id === state.currentSale.clientId);
-                const sale    = state.currentSale;
-                const details = state.currentSale.paymentDetails;
+                // CORREÇÃO: usa _pdfSale quando disponível (chamado via _setPdfTarget),
+                // senão usa state.currentSale (formulário ativo)
+                const sale    = state._pdfSale || state.currentSale;
+                const client  = state.clients.find(c => c.id === sale.clientId);
+                const details = sale.paymentDetails;
                 const company = state.company;
+                // Limpa o alvo temporário após uso
+                state._pdfSale = null;
 
                 if (!details || !details.parcels || details.parcels.length === 0) {
                     Toast.show('Calcule as parcelas antes de gerar o carnê', 'warning');
@@ -16922,7 +16959,8 @@ ${container.innerHTML}
                 const mixedRows = document.getElementById('mixedPaymentRows');
                 if (mixedRows) mixedRows.innerHTML = '';
                 state.editingSaleId = null;
-                // Reset da seção de receituário da venda
+                // CORREÇÃO: limpa _pdfSale para não contaminar próxima geração de PDF
+                state._pdfSale = null;
                 const prescSect2 = document.getElementById('prescSection');
                 if (prescSect2) prescSect2.style.display = 'none';
                 // Reset modo duplo
