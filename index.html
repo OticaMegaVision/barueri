@@ -8008,8 +8008,21 @@ ORDER BY t.table_name;
             boot() {
                 // ── Limpa filas pendentes corrompidas (não-array) no boot ──
                 const tableKeys = Object.keys(this._TABLES);
-                Promise.all(tableKeys.map(k => this._getPending('lf_pending_' + k))).then(() => {
-                    console.log('[LocalFirst] Filas pendentes verificadas');
+                Promise.all(tableKeys.map(k =>
+                    this._getPending('lf_pending_' + k).then(ids => ({ k, ids }))
+                )).then(results => {
+                    // FIX #6: Log filas com itens pendentes para diagnóstico
+                    const withPending = results.filter(r => r.ids.length > 0);
+                    if (withPending.length > 0) {
+                        console.log('[LocalFirst] Filas pendentes encontradas no boot:', withPending.map(r => r.k + ':' + r.ids.length).join(', '));
+                        // Dispara push imediato das filas pendentes (itens offline que voltaram online)
+                        if (navigator.onLine) {
+                            withPending.forEach(r => this._markDirty(r.k));
+                            this._triggerSync('boot_flush');
+                        }
+                    } else {
+                        console.log('[LocalFirst] Filas pendentes vazias — OK');
+                    }
                 });
 
                 window.addEventListener('online',  () => this._triggerSync('online'));
@@ -8117,11 +8130,14 @@ ORDER BY t.table_name;
 
                 try {
                     // Se o estado local está vazio, força full sync para recuperar tudo do Supabase
-                    const localIsEmpty = (!state.sales || state.sales.length === 0) && (!state.clients || state.clients.length === 0);
                     const storedSync = await IDB.get(this._TS_KEY);
-                    const lastSync = (localIsEmpty || !storedSync) ? '1970-01-01T00:00:00.000Z' : storedSync;
-                    if (localIsEmpty && storedSync) {
-                        console.log('[LocalFirst] Estado local vazio — forçando full sync do Supabase');
+                    // FIX #9: Se não há timestamp de sync salvo → full sync independente de ter dados locais
+                    // Isso garante que um dispositivo novo com dados pré-existentes (ex: config) ainda sincronize tudo
+                    const localIsEmpty = (!state.sales || state.sales.length === 0) && (!state.clients || state.clients.length === 0);
+                    const forceFullSync = !storedSync || localIsEmpty;
+                    const lastSync = forceFullSync ? '1970-01-01T00:00:00.000Z' : storedSync;
+                    if (forceFullSync) {
+                        console.log('[LocalFirst] Full sync forçado — sem timestamp ou estado local vazio');
                     }
                     const now = new Date().toISOString();
                     // BUG FIX #7: Buffer de 120s (era 30s) — compensa melhor diferença de relógio
@@ -8271,6 +8287,7 @@ ORDER BY t.table_name;
                         try { ContasManager.renderAll?.(); } catch(e) {}
                     }
 
+                    // Salva o timestamp exato do sync (buffer de 5min aplicado na consulta PULL acima)
                     await IDB.set(this._TS_KEY, now);
                     window._lastSyncTime = now;
 
@@ -8349,9 +8366,17 @@ ORDER BY t.table_name;
                 try {
                     const v = await IDB.get(key);
                     if (!v) return [];
+                    // FIX CRÍTICO #1: IDB.set serializa arrays como JSON string.
+                    // Array.isArray(v) sempre falha → queue era apagada a cada leitura!
                     if (Array.isArray(v)) return v;
-                    // Valor corrompido (número, string, objeto) → limpa e retorna []
-                    await IDB.set(key, []);
+                    if (typeof v === 'string') {
+                        try {
+                            const parsed = JSON.parse(v);
+                            if (Array.isArray(parsed)) return parsed;
+                        } catch(e) {}
+                    }
+                    // Valor genuinamente corrompido → reseta
+                    await IDB.set(key, '[]');
                     return [];
                 } catch(e) { return []; }
             },
@@ -8390,6 +8415,67 @@ ORDER BY t.table_name;
                     this._endPush();
                     console.warn('[LocalFirst] pushItem falhou:', e.message);
                 }
+            },
+
+            // ── PUSH EM LOTE (chamado ao importar vários registros de uma vez) ────
+            // Evita N chamadas individuais ao Supabase; usa upsert em batch de 50
+            async pushBatch(table, items) {
+                if (!items?.length) return 0;
+                const pendingKey = 'lf_pending_' + table;
+                const now = new Date().toISOString();
+
+                // Adiciona TODOS os IDs na fila em uma única escrita
+                try {
+                    const existing = await this._getPending(pendingKey);
+                    const existingSet = new Set(existing);
+                    items.forEach(item => { if (item?.id && !existingSet.has(item.id)) existing.push(item.id); });
+                    await IDB.set(pendingKey, existing);
+                } catch(e) {}
+
+                this._markDirty(table);
+
+                if (!navigator.onLine) {
+                    console.log('[LocalFirst] pushBatch offline — enfileirado:', items.length, table);
+                    return 0;
+                }
+
+                // Envia em lotes de 50 ao Supabase
+                let pushed = 0;
+                const flushedIds = [];
+                this._beginPush();
+                try {
+                    const rows = items.map(item => ({
+                        id: item.id,
+                        _data: JSON.stringify(item),
+                        updated_at: item.updated_at || now
+                    }));
+                    for (let i = 0; i < rows.length; i += 50) {
+                        const batch = rows.slice(i, i + 50);
+                        try {
+                            const { error } = await supabaseClient
+                                .from(this._TABLES[table] || table)
+                                .upsert(batch, { onConflict: 'id' });
+                            if (!error) {
+                                pushed += batch.length;
+                                batch.forEach(r => flushedIds.push(r.id));
+                            } else {
+                                console.warn('[LocalFirst] pushBatch erro lote', i/50, table, error.message);
+                            }
+                        } catch(e) {
+                            console.warn('[LocalFirst] pushBatch lote', i/50, 'falhou:', e.message);
+                        }
+                    }
+                    // Remove da fila apenas os que foram enviados com sucesso
+                    if (flushedIds.length > 0) {
+                        const flushedSet = new Set(flushedIds);
+                        const remaining = await this._getPending(pendingKey);
+                        await IDB.set(pendingKey, remaining.filter(id => !flushedSet.has(id)));
+                        if (flushedIds.length === items.length) this._dirtyKeys.delete(table);
+                    }
+                } finally {
+                    this._endPush();
+                }
+                return pushed;
             },
 
             // ── DELETE: soft-delete com fila offline ──────────────────────────
@@ -8467,7 +8553,7 @@ ORDER BY t.table_name;
                             const remoteTs = data.updated_at || '0';
                             const localTsRaw = state.company._supabase_at || '0';
                             const localTs = localTsRaw !== '0'
-                                ? new Date(new Date(localTsRaw).getTime() - 30000).toISOString()
+                                ? new Date(new Date(localTsRaw).getTime() - 300000).toISOString()
                                 : '0';
                             if (remoteTs > localTs) {
                                 if (cfg.company)      { Object.assign(state.company, cfg.company); state.company._supabase_at = remoteTs; }
@@ -8495,7 +8581,7 @@ ORDER BY t.table_name;
                             try { localTs = await IDB.get('contas_financeiras_ts'); } catch(e) {}
                             // Buffer 30s para compensar clock skew
                             const localTsBuf = localTs
-                                ? new Date(new Date(localTs).getTime() - 30000).toISOString()
+                                ? new Date(new Date(localTs).getTime() - 300000).toISOString()
                                 : null;
                             if (!localTsBuf || cfData.updated_at > localTsBuf) {
                                 await IDB.set('contas_financeiras', JSON.stringify(remoteContas));
@@ -8534,9 +8620,9 @@ ORDER BY t.table_name;
                     // Conta total de IDs pendentes em todas as tabelas
                     let totalPending = 0;
                     const tableKeys = Object.keys(this._TABLES);
-                    Promise.all(tableKeys.map(k => IDB.get('lf_pending_' + k).catch(() => [])))
+                    Promise.all(tableKeys.map(k => LocalFirst._getPending('lf_pending_' + k).catch(() => [])))
                         .then(results => {
-                            results.forEach(arr => { totalPending += (arr || []).length; });
+                            results.forEach(arr => { totalPending += (Array.isArray(arr) ? arr : []).length; });
                             queueEl.textContent = totalPending + ' ops';
                             queueEl.className = totalPending > 0 ? 'sync-off' : 'sync-ok';
                         });
@@ -8634,7 +8720,7 @@ ORDER BY t.table_name;
                         const lastSalesPull = await IDB.get(_CONTAS_SALES_TS).catch(() => null);
                         // Buffer 30s para compensar clock skew entre cliente e Supabase
                         const lastSalesPullBuf = lastSalesPull
-                            ? new Date(new Date(lastSalesPull).getTime() - 30000).toISOString()
+                            ? new Date(new Date(lastSalesPull).getTime() - 300000).toISOString()
                             : '1970-01-01T00:00:00.000Z';
                         const { data: salesData, error: salesErr } = await supabaseClient
                             .from('sales')
@@ -11043,6 +11129,8 @@ ORDER BY t.table_name;
                 if (erros === 0) Toast.show(`✅ ${total} registros enviados ao Supabase!`, 'success', 4000);
                 else Toast.show(`⚠️ ${total} enviados, ${erros} lotes com erro. Veja o console.`, 'warning', 5000);
             },
+            async importarClientes(clientes) { return LocalFirst.pushBatch('clients', clientes); },
+            async importarProdutos(produtos)   { return LocalFirst.pushBatch('products', produtos); },
             async _flushQueue()       {}
         };
         // ==================== /SUPABASE SYNC MODULE ====================
@@ -12716,8 +12804,13 @@ ORDER BY t.table_name;
                         imported++;
                     }
 
-                    App.saveData();
+                    await App.saveData();
                     self.renderTable();
+                    // FIX #8: Força sync imediato após importar para propagar a outros dispositivos
+                    if (window.LocalFirst) {
+                        LocalFirst._markDirty('clients');
+                        LocalFirst._triggerSync('import');
+                    }
 
                     const parts = [];
                     if (imported > 0) parts.push(`${imported} importado${imported !== 1 ? 's' : ''}`);
@@ -12725,15 +12818,22 @@ ORDER BY t.table_name;
                     if (errors   > 0) parts.push(`${errors} erro${errors !== 1 ? 's' : ''}`);
                     Toast.show(parts.join(' · ') || 'Nenhum cliente importado', imported > 0 ? 'success' : 'warning');
 
-                    // Sincroniza com Supabase para aparecer em todos os dispositivos
+                    // FIX #3: Usa pushBatch em vez de N chamadas individuais
                     if (toSync.length > 0) {
-                        let syncOk = 0;
-                        for (const c of toSync) {
-                            try { await SupaSync.upsertCliente(c); syncOk++; }
-                            catch(e) { console.warn('[Import] Falha sync:', c.name, e.message); }
+                        Toast.show(`Enviando ${toSync.length} clientes para a nuvem...`, 'info', 3000);
+                        try {
+                            const syncOk = await SupaSync.importarClientes(toSync);
+                            if (syncOk > 0) {
+                                Toast.show(`${syncOk} cliente${syncOk !== 1 ? 's' : ''} sincronizado${syncOk !== 1 ? 's' : ''} com a nuvem ✅`, 'success', 4000);
+                            } else if (navigator.onLine) {
+                                Toast.show('Erro ao enviar para a nuvem. Os dados estão salvos localmente e serão sincronizados em breve.', 'warning', 5000);
+                            } else {
+                                Toast.show('Offline — clientes salvos localmente e serão sincronizados quando a conexão retornar.', 'info', 4000);
+                            }
+                        } catch(e) {
+                            console.error('[Import] pushBatch falhou:', e.message);
+                            Toast.show('Clientes importados localmente. Pressione Sincronizar para enviar à nuvem.', 'warning', 5000);
                         }
-                        if (syncOk > 0) Toast.show(`${syncOk} cliente${syncOk !== 1 ? 's' : ''} sincronizado${syncOk !== 1 ? 's' : ''} com a nuvem ✅`, 'success');
-                        else Toast.show('Salvos localmente. Sincronize manualmente se necessário.', 'warning');
                     }
                 };
 
