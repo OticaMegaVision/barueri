@@ -8265,6 +8265,27 @@ ORDER BY t.table_name;
                             } catch(e) {}
                         });
 
+                        // FIX #5: Após merge, remove duplicatas por CPF (safety net para 
+                        // clientes importados antes do ID determinístico ser aplicado)
+                        if (stateKey === 'clients') {
+                            const byCpf = {};
+                            Object.values(localMap).forEach(c => {
+                                const cpf = (c.cpf || '').replace(/\D/g,'');
+                                if (cpf.length === 11) {
+                                    if (!byCpf[cpf] || (c.updated_at||'0') > (byCpf[cpf].updated_at||'0'))
+                                        byCpf[cpf] = c;
+                                }
+                            });
+                            // Remove entradas duplicadas (mesmo CPF, ID diferente)
+                            Object.values(localMap).forEach(c => {
+                                const cpf = (c.cpf || '').replace(/\D/g,'');
+                                if (cpf.length === 11 && byCpf[cpf] && byCpf[cpf].id !== c.id) {
+                                    delete localMap[c.id];
+                                    deletedCount++;
+                                }
+                            });
+                        }
+
                         state[stateKey] = Object.values(localMap);
 
                         // Atualiza a UI se houve deleções remotas
@@ -8278,6 +8299,8 @@ ORDER BY t.table_name;
                     }
 
                     if (pulled > 0) {
+                        // FIX #6: Sempre salva no IDB após qualquer mudança de estado
+                        // Inclui deleções remotas — sem isso o cliente volta ao recarregar
                         await App.saveData(true);
                     }
                     // Sempre atualiza o dashboard após sync (inclui aniversariantes, contas, cards)
@@ -8512,6 +8535,8 @@ ORDER BY t.table_name;
                         const remaining = (await this._getPending(deletedKey)).filter(x => x !== id);
                         await IDB.set(deletedKey, remaining);
                         console.log('[LocalFirst] deleteItem OK (tombstone):', table, id);
+                        // FIX #4: Força re-sync logo após tombstone para propagar para outros devices
+                        setTimeout(() => this._triggerSync('delete_flush'), 500);
                     } else {
                         console.warn('[LocalFirst] deleteItem falhou:', error.message);
                     }
@@ -12384,10 +12409,16 @@ ORDER BY t.table_name;
 
             delete(id) {
                 Modal.showConfirm('Excluir este cliente?', () => {
+                    // Remove prescrições vinculadas e envia tombstones delas também
+                    const prescsToRemove = state.prescriptions.filter(p => p.clientId === id);
                     state.clients = state.clients.filter(c => c.id !== id);
                     state.prescriptions = state.prescriptions.filter(p => p.clientId !== id);
                     App.saveData();
+                    // FIX #2: Tombstone do cliente E de todas as prescrições vinculadas
                     SupaSync.deletarCliente(id);
+                    prescsToRemove.forEach(p => {
+                        if (p.id) LocalFirst.deleteItem('prescriptions', p.id);
+                    });
                     this.renderTable();
                     Toast.show('Cliente excluído com sucesso!');
                 });
@@ -12615,7 +12646,12 @@ ORDER BY t.table_name;
                 state.clients = state.clients.filter(c => !toRemove.has(c.id));
                 state.prescriptions = state.prescriptions.filter(p => !toRemove.has(p.clientId));
 
+                // FIX #3: Tombstone de clientes E prescrições vinculadas
+                const prescsRemovidas = state.prescriptions.filter(p => toRemove.has(p.clientId));
                 toRemove.forEach(id => SupaSync.deletarCliente(id));
+                prescsRemovidas.forEach(p => {
+                    if (p.id) LocalFirst.deleteItem('prescriptions', p.id);
+                });
 
                 App.saveData();
                 this.renderTable();
@@ -12783,8 +12819,33 @@ ORDER BY t.table_name;
                             skipped++; continue;
                         }
 
+                        // FIX RAIZ #1: ID determinístico — mesmo arquivo importado em
+                        // qualquer dispositivo gera o MESMO id. Sem isso, tombstone de
+                        // exclusão no dispositivo A nunca encontra o cliente no dispositivo B.
+                        const stableId = (() => {
+                            // Prioridade: CPF (único) > código > nome+telefone > nome+cidade
+                            const cpfClean = cpfRaw.length === 11 ? cpfRaw : '';
+                            const codeClean = String(fields[0] || '').trim();
+                            const phoneClean = String(fields[2] || '').replace(/\D/g, '');
+                            const cityClean  = String(fields[11] || '').trim().toLowerCase().replace(/\s+/g, '');
+                            if (cpfClean)
+                                return 'CLI-CPF-' + cpfClean;
+                            if (codeClean)
+                                return 'CLI-COD-' + codeClean.replace(/[^a-zA-Z0-9]/g, '');
+                            // Fallback: hash simples de nome+telefone
+                            const seed = (name + phoneClean + cityClean).toLowerCase();
+                            let h = 0;
+                            for (let i = 0; i < seed.length; i++) {
+                                h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+                            }
+                            return 'CLI-IMP-' + (h >>> 0).toString(36);
+                        })();
+                        // Se já existe cliente com esse id (re-importação), atualiza em vez de duplicar
+                        const existingById = state.clients.find(c => c.id === stableId);
+                        if (existingById) { skipped++; continue; }
+
                         const client = {
-                            id: Utils.generateId('CLI'),
+                            id: stableId,
                             code: String(fields[0] || '').trim(), name,
                             phone: String(fields[2] || '').trim(),
                             email: String(fields[3] || '').trim(),
