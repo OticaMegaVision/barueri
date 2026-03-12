@@ -1962,15 +1962,12 @@
         body.valores-ocultos .conta-item-valor,
         body.valores-ocultos .carne-valor-num,
         body.valores-ocultos .os-total-final,
-        /* IDs reais do HTML (nomes diferentes do CSS original) */
         body.valores-ocultos #contasVencidasTotal,
         body.valores-ocultos #contasAVencerTotal,
-        /* Subtextos dos 4 cards principais do dashboard */
         body.valores-ocultos #dash-sub-vendas,
         body.valores-ocultos #dash-sub-despesas,
         body.valores-ocultos #dash-sub-resultado,
         body.valores-ocultos #dash-sub-os,
-        /* Card empresa: endereço, telefone, CNPJ, PIX */
         body.valores-ocultos .dash-info-empresa {
             filter: blur(6px);
             user-select: none;
@@ -5652,7 +5649,8 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="clientName" class="required">Nome</label>
-                                <input type="text" id="clientName" class="form-control" required>
+                                <input type="text" id="clientName" class="form-control" required onblur="Clients._checkDuplicateName(this)">
+                                <small id="clientNameDupHint" style="display:none;color:#dc3545;font-size:0.78rem;margin-top:3px;"></small>
                             </div>
                             <div class="form-group">
                                 <label for="clientPhone">Telefone</label>
@@ -5667,7 +5665,8 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                             </div>
                             <div class="form-group">
                                 <label for="clientCpf">CPF/CNPJ</label>
-                                <input type="text" id="clientCpf" class="form-control" oninput="App.maskCpfCnpj(this)">
+                                <input type="text" id="clientCpf" class="form-control" oninput="App.maskCpfCnpj(this)" onblur="Clients._checkDuplicateCpf(this)">
+                                <small id="clientCpfDupHint" style="display:none;color:#dc3545;font-size:0.78rem;margin-top:3px;"></small>
                             </div>
                         </div>
                     </form>
@@ -7730,7 +7729,6 @@ ORDER BY t.table_name;
     <!-- Modal de confirmação WhatsApp -->
     <div class="wpp-confirm-modal" id="wppConfirmModal">
         <div class="wpp-confirm-box" style="max-width:500px;width:95%;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);background:#fff;">
-            <!-- Header verde -->
             <div style="background:linear-gradient(135deg,#25d366,#128c7e);padding:14px 18px;display:flex;align-items:center;gap:12px;color:#fff;">
                 <div style="background:rgba(255,255,255,0.2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                     <i class="fab fa-whatsapp" style="font-size:1.3rem;"></i>
@@ -7741,28 +7739,23 @@ ORDER BY t.table_name;
                 </div>
                 <button onclick="WppConfirm.close()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&times;</button>
             </div>
-            <!-- Info destinatário -->
             <div style="background:#f0fdf4;padding:9px 18px;display:flex;gap:20px;border-bottom:1px solid #d1fae5;">
                 <div><small style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">👤 Destinatário</small><br><strong id="wppConfirmName" style="color:#065f46;font-size:0.9rem;">—</strong></div>
                 <div><small style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">📱 Número</small><br><strong id="wppConfirmPhone" style="color:#065f46;font-size:0.9rem;">—</strong></div>
             </div>
-            <!-- Tabs Prévia / Editar -->
             <div style="display:flex;border-bottom:2px solid #e5e7eb;background:#fff;">
                 <button id="wppTabPreview" onclick="WppConfirm.showTab('preview')" style="flex:1;padding:9px;border:none;background:transparent;font-weight:700;font-size:0.8rem;color:#25d366;border-bottom:2px solid #25d366;margin-bottom:-2px;cursor:pointer;"><i class="fas fa-eye"></i> Prévia</button>
                 <button id="wppTabEdit" onclick="WppConfirm.showTab('edit')" style="flex:1;padding:9px;border:none;background:transparent;font-weight:700;font-size:0.8rem;color:#888;cursor:pointer;"><i class="fas fa-edit"></i> Editar Mensagem</button>
             </div>
-            <!-- Painel Prévia -->
             <div id="wppPanePreview" style="padding:14px 16px;background:#e5ddd5;max-height:260px;overflow-y:auto;">
                 <div style="font-size:10px;color:#777;text-align:center;margin-bottom:8px;">Como aparecerá no WhatsApp</div>
                 <div style="background:#fff;border-radius:10px;border-bottom-left-radius:3px;padding:10px 13px;font-size:0.83rem;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,0.1);max-width:92%;word-break:break-word;" id="wppConfirmPreview"></div>
                 <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;" id="wppConfirmPreviewTime"></div>
             </div>
-            <!-- Painel Editar -->
             <div id="wppPaneEdit" style="display:none;padding:12px 16px;background:#fff;">
                 <div style="font-size:11px;color:#888;margin-bottom:5px;"><i class="fas fa-info-circle"></i> Edite a mensagem antes de enviar. Não altera o template salvo.</div>
                 <textarea id="wppConfirmEdit" style="width:100%;height:190px;border:1.5px solid #d1d5db;border-radius:10px;padding:9px;font-size:0.82rem;line-height:1.5;resize:vertical;font-family:inherit;box-sizing:border-box;" oninput="WppConfirm.syncEdit()"></textarea>
             </div>
-            <!-- Footer botões -->
             <div style="padding:11px 16px;background:#fff;border-top:1px solid #e5e7eb;display:flex;gap:7px;flex-wrap:wrap;">
                 <button id="wppConfirmSendBtn" style="flex:1;padding:9px 12px;background:#25d366;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:0.85rem;cursor:pointer;min-width:130px;">
                     <i class="fab fa-whatsapp"></i> Abrir WhatsApp
@@ -7832,7 +7825,6 @@ ORDER BY t.table_name;
                     <p id="osGeradoPagtoLabel" style="font-size:0.78rem;color:#6c757d;margin-top:0.5rem;margin-bottom:0;">Selecione a situação — isso remove da lista de Contas a Receber</p>
                 </div>
             </div>
-            <!-- Botões WhatsApp rápidos -->
             <div style="padding:0 1.5rem 0.75rem;">
                 <div style="font-size:0.75rem;font-weight:700;color:#25d366;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
@@ -9510,13 +9502,13 @@ ORDER BY t.table_name;
                 const clientObj = (state.clients||[]).find(cl => cl.name === c.parte);
                 const phone = (clientObj?.whatsapp || clientObj?.phone || '').replace(/\D/g,'');
                 if (!phone) { Toast.show('Cliente sem WhatsApp/telefone cadastrado','warning'); return; }
-                const emp       = state.company?.name || 'Ótica';
-                const tel       = state.company?.whatsapp || state.company?.phone || '';
-                const nome1     = (c.parte || '').split(' ')[0];
+                const emp  = state.company?.name || 'Ótica';
+                const tel  = state.company?.whatsapp || state.company?.phone || '';
+                const nome1= (c.parte||'').split(' ')[0];
                 const vencLabel = c.vencimento ? new Date(c.vencimento+'T12:00:00').toLocaleDateString('pt-BR') : '—';
                 const msg = (typeof ConfigWpp !== 'undefined' ? ConfigWpp.get('cobranca') : '')
                     .replace(/{{NOME}}/g,       nome1)
-                    .replace(/{{DESCRICAO}}/g,  c.descricao || '—')
+                    .replace(/{{DESCRICAO}}/g,  c.descricao||'—')
                     .replace(/{{VALOR}}/g,      this.fmt(c.valor))
                     .replace(/{{VENCIMENTO}}/g, vencLabel)
                     .replace(/{{EMPRESA}}/g,    emp)
@@ -9528,49 +9520,40 @@ ORDER BY t.table_name;
         };
         window.ContasManager = ContasManager;
         const WppConfirm = {
-            _url: '',
-            _msg: '',
-            _phone: '',
+            _url: '', _msg: '', _phone: '',
 
             show({ nome, phone, subtitle, msg, url }) {
                 this._url   = url;
                 this._msg   = msg;
                 this._phone = (phone || '').replace(/\D/g, '');
-                document.getElementById('wppConfirmName').textContent      = nome    || '—';
-                document.getElementById('wppConfirmPhone').textContent     = this._formatPhone(phone);
-                document.getElementById('wppConfirmSubtitle').textContent  = subtitle || 'Edite e confirme antes de enviar';
-                // Prévia com formatação WhatsApp
+                document.getElementById('wppConfirmName').textContent     = nome    || '—';
+                document.getElementById('wppConfirmPhone').textContent    = this._formatPhone(phone);
+                document.getElementById('wppConfirmSubtitle').textContent = subtitle || 'Edite e confirme antes de enviar';
                 this._renderPreview(msg);
-                // Textarea de edição
                 const ta = document.getElementById('wppConfirmEdit');
                 if (ta) ta.value = msg || '';
-                // Timestamp na prévia
                 const tEl = document.getElementById('wppConfirmPreviewTime');
-                if (tEl) tEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                // Botão enviar usa msg editada
+                if (tEl) tEl.textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
                 document.getElementById('wppConfirmSendBtn').onclick = () => this.send();
-                // Abre sempre na aba Prévia
                 this.showTab('preview');
                 document.getElementById('wppConfirmModal').classList.add('show');
             },
 
             showTab(tab) {
-                const pPreview = document.getElementById('wppPanePreview');
-                const pEdit    = document.getElementById('wppPaneEdit');
-                const bPreview = document.getElementById('wppTabPreview');
-                const bEdit    = document.getElementById('wppTabEdit');
-                const activeStyle   = 'color:#25d366;border-bottom:2px solid #25d366;margin-bottom:-2px;';
-                const inactiveStyle = 'color:#888;border-bottom:none;margin-bottom:0;';
+                const pp = document.getElementById('wppPanePreview');
+                const pe = document.getElementById('wppPaneEdit');
+                const bp = document.getElementById('wppTabPreview');
+                const be = document.getElementById('wppTabEdit');
                 if (tab === 'preview') {
-                    if (pPreview) pPreview.style.display = 'block';
-                    if (pEdit)    pEdit.style.display    = 'none';
-                    if (bPreview) bPreview.setAttribute('style', bPreview.getAttribute('style').replace(/color:[^;]+;border-bottom:[^;]+;margin-bottom:[^;]+;/, '') + activeStyle);
-                    if (bEdit)    bEdit.setAttribute('style', bEdit.getAttribute('style').replace(/color:[^;]+;border-bottom:[^;]*;margin-bottom:[^;]+;/, '') + inactiveStyle);
+                    if (pp) pp.style.display = 'block';
+                    if (pe) pe.style.display = 'none';
+                    if (bp) { bp.style.color='#25d366'; bp.style.borderBottom='2px solid #25d366'; bp.style.marginBottom='-2px'; }
+                    if (be) { be.style.color='#888'; be.style.borderBottom='none'; be.style.marginBottom='0'; }
                 } else {
-                    if (pPreview) pPreview.style.display = 'none';
-                    if (pEdit)    pEdit.style.display    = 'block';
-                    if (bEdit)    bEdit.setAttribute('style', bEdit.getAttribute('style').replace(/color:[^;]+;border-bottom:[^;]*;margin-bottom:[^;]+;/, '') + activeStyle);
-                    if (bPreview) bPreview.setAttribute('style', bPreview.getAttribute('style').replace(/color:[^;]+;border-bottom:[^;]+;margin-bottom:[^;]+;/, '') + inactiveStyle);
+                    if (pp) pp.style.display = 'none';
+                    if (pe) pe.style.display = 'block';
+                    if (be) { be.style.color='#25d366'; be.style.borderBottom='2px solid #25d366'; be.style.marginBottom='-2px'; }
+                    if (bp) { bp.style.color='#888'; bp.style.borderBottom='none'; bp.style.marginBottom='0'; }
                 }
             },
 
@@ -9585,21 +9568,19 @@ ORDER BY t.table_name;
             _renderPreview(msg) {
                 const el = document.getElementById('wppConfirmPreview');
                 if (!el) return;
-                // Renderiza formatação WhatsApp: *negrito*, _itálico_, ~tachado~
                 const html = (msg || '')
-                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                    .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
-                    .replace(/_(.*?)_/g, '<em>$1</em>')
-                    .replace(/~(.*?)~/g, '<s>$1</s>')
-                    .replace(/\n/g, '<br>');
+                    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                    .replace(/\*(.*?)\*/g,'<strong>$1</strong>')
+                    .replace(/_(.*?)_/g,'<em>$1</em>')
+                    .replace(/~(.*?)~/g,'<s>$1</s>')
+                    .replace(/\n/g,'<br>');
                 el.innerHTML = html;
             },
 
             send() {
                 const ta  = document.getElementById('wppConfirmEdit');
                 const msg = (ta ? ta.value.trim() : '') || this._msg;
-                const url = `https://wa.me/55${this._phone}?text=${encodeURIComponent(msg)}`;
-                window.open(url, '_blank');
+                window.open(`https://wa.me/55${this._phone}?text=${encodeURIComponent(msg)}`,'_blank');
                 this.close();
             },
 
@@ -9607,31 +9588,29 @@ ORDER BY t.table_name;
                 const ta  = document.getElementById('wppConfirmEdit');
                 const msg = (ta ? ta.value : '') || this._msg;
                 if (navigator.clipboard) {
-                    navigator.clipboard.writeText(msg).then(() => Toast.show('Mensagem copiada! ✅', 'success')).catch(() => this._copiarFallback(msg));
-                } else {
-                    this._copiarFallback(msg);
-                }
+                    navigator.clipboard.writeText(msg).then(()=>Toast.show('Mensagem copiada! ✅','success')).catch(()=>this._copiarFallback(msg));
+                } else { this._copiarFallback(msg); }
             },
 
             _copiarFallback(msg) {
                 const tmp = document.createElement('textarea');
-                tmp.value = msg; tmp.style.cssText = 'position:fixed;opacity:0;';
+                tmp.value = msg; tmp.style.cssText='position:fixed;opacity:0;';
                 document.body.appendChild(tmp); tmp.select();
-                try { document.execCommand('copy'); Toast.show('Mensagem copiada! ✅', 'success'); }
-                catch(e) { Toast.show('Não foi possível copiar', 'warning'); }
+                try { document.execCommand('copy'); Toast.show('Mensagem copiada! ✅','success'); }
+                catch(e) { Toast.show('Não foi possível copiar','warning'); }
                 document.body.removeChild(tmp);
             },
 
             close() {
                 document.getElementById('wppConfirmModal').classList.remove('show');
-                this._url = ''; this._msg = ''; this._phone = '';
+                this._url=''; this._msg=''; this._phone='';
             },
 
-            _formatPhone(raw = '') {
-                const d = (raw || '').replace(/\D/g, '');
-                if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
-                if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
-                return raw || '—';
+            _formatPhone(raw='') {
+                const d=(raw||'').replace(/\D/g,'');
+                if(d.length===11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+                if(d.length===10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+                return raw||'—';
             }
         };
 
@@ -12052,19 +12031,83 @@ ORDER BY t.table_name;
                 this._searchTimer = setTimeout(() => { this._page = 1; this.renderTable(); }, 200);
             },
 
+            _checkDuplicateName(input) {
+                const nome = (input.value || '').trim().toLowerCase();
+                if (!nome) return;
+                const existente = state.clients.find(c =>
+                    c.id !== state.editingId &&
+                    c.name.trim().toLowerCase() === nome
+                );
+                const hint = document.getElementById('clientNameDupHint');
+                if (existente) {
+                    input.style.borderColor = '#dc3545';
+                    if (hint) { hint.textContent = `⚠️ Já existe: "${existente.name}" (Cód. ${existente.code || existente.id})`; hint.style.display = 'block'; }
+                } else {
+                    input.style.borderColor = '';
+                    if (hint) hint.style.display = 'none';
+                }
+            },
+
+            _checkDuplicateCpf(input) {
+                const cpf = (input.value || '').replace(/\D/g, '');
+                if (cpf.length !== 11) return;
+                const existente = state.clients.find(c =>
+                    c.id !== state.editingId &&
+                    c.cpf && c.cpf.replace(/\D/g, '') === cpf
+                );
+                const hint = document.getElementById('clientCpfDupHint');
+                if (existente) {
+                    input.style.borderColor = '#dc3545';
+                    if (hint) { hint.textContent = `⚠️ CPF já cadastrado para: "${existente.name}"`; hint.style.display = 'block'; }
+                } else {
+                    input.style.borderColor = '';
+                    if (hint) hint.style.display = 'none';
+                }
+            },
+
             save() {
                 if (!Utils.validateRequired('clientForm')) {
                     Toast.show('Preencha todos os campos obrigatórios', 'warning');
                     return;
                 }
-                
+
+                const nomeTipado = (document.getElementById('clientName').value || '').trim();
+                const cpfTipado  = (document.getElementById('clientCpf').value  || '').replace(/\D/g, '');
+
+                // ── Verificação de duplicata ──────────────────────────────────
+                // Ignora o próprio cliente quando está editando
+                const outrosClientes = state.clients.filter(c => c.id !== state.editingId);
+
+                const duplicNome = outrosClientes.find(c =>
+                    c.name.trim().toLowerCase() === nomeTipado.toLowerCase()
+                );
+                if (duplicNome) {
+                    Toast.show(`Já existe um cliente com o nome "${duplicNome.name}" (Cód. ${duplicNome.code || duplicNome.id}). Verifique antes de cadastrar.`, 'warning', 6000);
+                    document.getElementById('clientName').focus();
+                    document.getElementById('clientName').style.borderColor = '#dc3545';
+                    setTimeout(() => { document.getElementById('clientName').style.borderColor = ''; }, 4000);
+                    return;
+                }
+
+                if (cpfTipado.length === 11) {
+                    const duplicCpf = outrosClientes.find(c =>
+                        c.cpf && c.cpf.replace(/\D/g, '') === cpfTipado
+                    );
+                    if (duplicCpf) {
+                        Toast.show(`CPF já cadastrado para "${duplicCpf.name}". Verifique antes de salvar.`, 'warning', 6000);
+                        document.getElementById('clientCpf').focus();
+                        document.getElementById('clientCpf').style.borderColor = '#dc3545';
+                        setTimeout(() => { document.getElementById('clientCpf').style.borderColor = ''; }, 4000);
+                        return;
+                    }
+                }
+                // ─────────────────────────────────────────────────────────────
+
                 const client = {
-                    // CORREÇÃO: usa Utils.generateId para garantir ID único (o padrão anterior
-                    // usava state.clients.length+1 que gerava IDs duplicados após exclusões)
                     id: state.editingId || Utils.generateId('CLI'),
                     code: document.getElementById('clientCode').value,
                     birthDate: document.getElementById('clientBirthDate').value,
-                    name: document.getElementById('clientName').value,
+                    name: nomeTipado,
                     phone: document.getElementById('clientPhone').value,
                     email: document.getElementById('clientEmail').value,
                     cpf: document.getElementById('clientCpf').value,
@@ -12077,7 +12120,7 @@ ORDER BY t.table_name;
                     state: document.getElementById('clientState').value,
                     updated_at: new Date().toISOString()
                 };
-                
+
                 if (state.editingId) {
                     const index = state.clients.findIndex(c => c.id === state.editingId);
                     if (index !== -1) state.clients[index] = client;
@@ -12323,7 +12366,12 @@ ORDER BY t.table_name;
                  'clientAddress','clientNumber','clientComplement','clientNeighborhood',
                  'clientCity','clientState'].forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) el.value = '';
+                    if (el) { el.value = ''; el.style.borderColor = ''; }
+                });
+                // Limpa avisos de duplicata
+                ['clientNameDupHint','clientCpfDupHint'].forEach(id => {
+                    const h = document.getElementById(id);
+                    if (h) h.style.display = 'none';
                 });
                 // Gera novo código único baseado no timestamp (evita duplicados)
                 const existingCodes = (state.clients || []).map(c => c.code || c.id).filter(Boolean);
@@ -12513,14 +12561,25 @@ ORDER BY t.table_name;
                     if (rows.length < 2) { Toast.show('Arquivo inválido ou sem dados', 'error'); return; }
                     let imported = 0, skipped = 0, errors = 0;
                     const toSync = [];
+
                     for (let i = 1; i < rows.length; i++) {
                         const rawFields = rows[i];
                         const fields = rawFields.map(f => (f instanceof Date ? f : String(f || '').trim()));
                         if (fields.every(f => f === '' || f === undefined)) continue;
                         const name = String(fields[1] || '').trim();
                         if (!name) { errors++; continue; }
-                        // Evita duplicatas pelo nome
-                        if (state.clients.some(c => c.name.trim().toLowerCase() === name.toLowerCase())) { skipped++; continue; }
+
+                        // ── Verificação de duplicata por nome ──
+                        const nomeLower = name.toLowerCase();
+                        if (state.clients.some(c => c.name.trim().toLowerCase() === nomeLower)) {
+                            skipped++; continue;
+                        }
+                        // ── Verificação de duplicata por CPF ──
+                        const cpfRaw = String(fields[4] || '').trim().replace(/\D/g, '');
+                        if (cpfRaw.length === 11 && state.clients.some(c => c.cpf && c.cpf.replace(/\D/g, '') === cpfRaw)) {
+                            skipped++; continue;
+                        }
+
                         const client = {
                             id: Utils.generateId('CLI'),
                             code: String(fields[0] || '').trim(), name,
@@ -12541,19 +12600,25 @@ ORDER BY t.table_name;
                         toSync.push(client);
                         imported++;
                     }
+
                     App.saveData();
                     self.renderTable();
-                    const msg = `${imported} importado${imported !== 1 ? 's' : ''}${skipped ? ', ' + skipped + ' já existentes' : ''}${errors ? ', ' + errors + ' erro(s)' : ''}`;
-                    Toast.show(msg + '. Sincronizando...', imported > 0 ? 'success' : 'warning');
-                    // Sincroniza cada cliente com o Supabase para aparecer em outros dispositivos
+
+                    const parts = [];
+                    if (imported > 0) parts.push(`${imported} importado${imported !== 1 ? 's' : ''}`);
+                    if (skipped  > 0) parts.push(`${skipped} duplicado${skipped !== 1 ? 's' : ''} ignorado${skipped !== 1 ? 's' : ''}`);
+                    if (errors   > 0) parts.push(`${errors} erro${errors !== 1 ? 's' : ''}`);
+                    Toast.show(parts.join(' · ') || 'Nenhum cliente importado', imported > 0 ? 'success' : 'warning');
+
+                    // Sincroniza com Supabase para aparecer em todos os dispositivos
                     if (toSync.length > 0) {
                         let syncOk = 0;
                         for (const c of toSync) {
                             try { await SupaSync.upsertCliente(c); syncOk++; }
-                            catch(e) { console.warn('[Import] Falha ao sync cliente:', c.name, e.message); }
+                            catch(e) { console.warn('[Import] Falha sync:', c.name, e.message); }
                         }
                         if (syncOk > 0) Toast.show(`${syncOk} cliente${syncOk !== 1 ? 's' : ''} sincronizado${syncOk !== 1 ? 's' : ''} com a nuvem ✅`, 'success');
-                        else Toast.show('Clientes salvos localmente. Sincronize manualmente se necessário.', 'warning');
+                        else Toast.show('Salvos localmente. Sincronize manualmente se necessário.', 'warning');
                     }
                 };
 
@@ -13098,7 +13163,7 @@ ORDER BY t.table_name;
             },
             confirmacaoOS: {
                 title:  '📋 Confirmação de OS',
-                sub:    'Vendas → botão WhatsApp após salvar a OS',
+                sub:    'Modal "Venda Salva" → botão WhatsApp após salvar',
                 vars:   ['{{NOME}}','{{OS}}','{{DATA_VENDA}}','{{PREVISAO}}','{{PAGAMENTO}}','{{TOTAL}}','{{EMPRESA}}','{{TELEFONE}}'],
                 exemplo:{ '{{NOME}}':'João', '{{OS}}':'2025/042', '{{DATA_VENDA}}':'15/01/2025', '{{PREVISAO}}':'20/01/2025', '{{PAGAMENTO}}':'Crédito 5x', '{{TOTAL}}':'R$ 690,00', '{{EMPRESA}}':'Ótica Exemplo', '{{TELEFONE}}':'(11) 9999-9999' }
             },
@@ -16722,70 +16787,60 @@ ${container.innerHTML}
                 const saleId = this._osGeradoSaleId;
                 if (!saleId) { Toast.show('Salve a OS primeiro', 'warning'); return; }
                 if (tipo === 'confirmacao') this.enviarConfirmacaoOS(saleId);
-                else if (tipo === 'status')   this.enviarStatusPedidoWhatsApp(saleId);
-                else if (tipo === 'retirada') this.enviarLembreteRetiradaWhatsApp(saleId);
+                else if (tipo === 'status') this.enviarStatusPedidoWhatsApp(saleId);
             },
 
-            // ── WhatsApp: Confirmação de OS (após salvar venda) ──
+            // ── WhatsApp: Confirmação de OS ──
             enviarConfirmacaoOS(saleId) {
-                const sale    = state.sales.find(s => s.id === saleId);
-                const client  = state.clients.find(c => c.id === sale?.clientId);
-                const company = state.company;
-                if (!sale || !client) { Toast.show('Dados da venda não encontrados', 'warning'); return; }
-                const phone   = (client.whatsapp || client.phone || '').replace(/\D/g, '');
-                if (!phone)   { Toast.show('Cliente sem WhatsApp/telefone cadastrado', 'warning'); return; }
-                const fd      = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
-                const METH    = { pix:'PIX', cash:'Dinheiro', debit:'Débito', credit:'Crédito', installment:'Crediário' };
-                let pagamento = METH[sale.paymentMethod] || sale.paymentMethod || '—';
+                const sale   = state.sales.find(s => s.id === saleId);
+                const client = state.clients.find(c => c.id === sale?.clientId);
+                const co     = state.company;
+                if (!sale || !client) { Toast.show('Dados da venda não encontrados','warning'); return; }
+                const phone  = (client.whatsapp || client.phone || '').replace(/\D/g,'');
+                if (!phone)  { Toast.show('Cliente sem WhatsApp/telefone cadastrado','warning'); return; }
+                const fd = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                const METH = {pix:'PIX',cash:'Dinheiro',debit:'Débito',credit:'Crédito',installment:'Crediário'};
+                let pag = METH[sale.paymentMethod] || sale.paymentMethod || '—';
                 if (sale.paymentMode === 'dual' && sale.dualPayments?.length === 2)
-                    pagamento = sale.dualPayments.map(d => METH[d.method] || d.method).join(' + ');
+                    pag = sale.dualPayments.map(d => METH[d.method]||d.method).join(' + ');
                 const det = sale.paymentDetails || {};
-                if (det.parcels?.length) pagamento += ` ${det.parcels.length}x`;
+                if (det.parcels?.length) pag += ` ${det.parcels.length}x`;
                 const msg = ConfigWpp.get('confirmacaoOS')
                     .replace(/{{NOME}}/g,       client.name.split(' ')[0])
-                    .replace(/{{OS}}/g,         sale.number || '')
+                    .replace(/{{OS}}/g,         sale.number||'')
                     .replace(/{{DATA_VENDA}}/g, fd(sale.date))
                     .replace(/{{PREVISAO}}/g,   sale.deliveryForecast ? fd(sale.deliveryForecast) : '—')
-                    .replace(/{{PAGAMENTO}}/g,  pagamento)
-                    .replace(/{{TOTAL}}/g,      Utils.formatCurrency(sale.total || 0))
-                    .replace(/{{EMPRESA}}/g,    company.name || '')
-                    .replace(/{{TELEFONE}}/g,   [company.phone, company.whatsapp].filter(Boolean).join(' | '));
-                WppConfirm.show({ nome: client.name, phone,
-                    subtitle: `Confirmação da OS ${sale.number}`, msg,
-                    url: `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}` });
+                    .replace(/{{PAGAMENTO}}/g,  pag)
+                    .replace(/{{TOTAL}}/g,      Utils.formatCurrency(sale.total||0))
+                    .replace(/{{EMPRESA}}/g,    co.name||'')
+                    .replace(/{{TELEFONE}}/g,   [co.phone,co.whatsapp].filter(Boolean).join(' | '));
+                WppConfirm.show({ nome:client.name, phone, subtitle:`Confirmação OS ${sale.number}`, msg,
+                    url:`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}` });
             },
 
-            // ── WhatsApp: Lembrete de Retirada (óculos prontos) ──
+            // ── WhatsApp: Lembrete de Retirada ──
             enviarLembreteRetiradaWhatsApp(saleId) {
-                const sale    = state.sales.find(s => s.id === saleId);
-                const client  = state.clients.find(c => c.id === sale?.clientId);
-                const company = state.company;
-                if (!sale || !client) { Toast.show('Dados da venda não encontrados', 'warning'); return; }
-                const phone   = (client.whatsapp || client.phone || '').replace(/\D/g, '');
-                if (!phone)   { Toast.show('Cliente sem WhatsApp/telefone cadastrado', 'warning'); return; }
-                const endereco = [company.address, company.number ? ', ' + company.number : '',
-                    company.city ? ' — ' + company.city : '', company.state ? '/' + company.state : ''].filter(Boolean).join('');
+                const sale   = state.sales.find(s => s.id === saleId);
+                const client = state.clients.find(c => c.id === sale?.clientId);
+                const co     = state.company;
+                if (!sale || !client) { Toast.show('Dados da venda não encontrados','warning'); return; }
+                const phone  = (client.whatsapp || client.phone || '').replace(/\D/g,'');
+                if (!phone)  { Toast.show('Cliente sem WhatsApp/telefone cadastrado','warning'); return; }
+                const end = [co.address, co.number?', '+co.number:'', co.city?' — '+co.city:'', co.state?'/'+co.state:''].filter(Boolean).join('');
                 const det = sale.paymentDetails || {};
-                let saldoRetStr = '';
-                const retVal  = parseFloat(det.retiradaValue || det.retiradaEntry || 0);
-                if (retVal > 0.01 && !sale.retiradaPaga)
-                    saldoRetStr = `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(retVal)}*`;
-                else if (sale.paymentMode === 'dual' && sale.dualPayments?.length) {
-                    const tot = sale.dualPayments.reduce((a, sl, i) =>
-                        (sl.retirada || 0) > 0.01 && !sale[`retiradaPaga_dual${i}`] ? a + sl.retirada : a, 0);
-                    if (tot > 0.01) saldoRetStr = `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(tot)}*`;
-                }
-                if (!saldoRetStr) saldoRetStr = '✅ Pedido totalmente quitado!';
+                const retVal = parseFloat(det.retiradaValue || det.retiradaEntry || 0);
+                let saldoStr = retVal > 0.01 && !sale.retiradaPaga
+                    ? `💰 *Saldo a pagar na retirada: ${Utils.formatCurrency(retVal)}*`
+                    : '✅ Pedido totalmente quitado!';
                 const msg = ConfigWpp.get('lembreteRetirada')
                     .replace(/{{NOME}}/g,           client.name.split(' ')[0])
-                    .replace(/{{OS}}/g,             sale.number || '')
-                    .replace(/{{SALDO_RETIRADA}}/g, saldoRetStr)
-                    .replace(/{{EMPRESA}}/g,        company.name || '')
-                    .replace(/{{ENDERECO}}/g,       endereco)
-                    .replace(/{{TELEFONE}}/g,       [company.phone, company.whatsapp].filter(Boolean).join(' | '));
-                WppConfirm.show({ nome: client.name, phone,
-                    subtitle: `Retirada — OS ${sale.number}`, msg,
-                    url: `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}` });
+                    .replace(/{{OS}}/g,             sale.number||'')
+                    .replace(/{{SALDO_RETIRADA}}/g, saldoStr)
+                    .replace(/{{EMPRESA}}/g,        co.name||'')
+                    .replace(/{{ENDERECO}}/g,       end)
+                    .replace(/{{TELEFONE}}/g,       [co.phone,co.whatsapp].filter(Boolean).join(' | '));
+                WppConfirm.show({ nome:client.name, phone, subtitle:`Retirada — OS ${sale.number}`, msg,
+                    url:`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}` });
             },
 
             sendWhatsApp() {
