@@ -5628,6 +5628,7 @@ tr:hover td { background: rgba(255,107,0,0.03) !important; }
                         <button class="btn btn-info btn-sm" onclick="Clients.exportToExcel()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
                         <button class="btn btn-success btn-sm" onclick="document.getElementById('importClientsFile').click()"><i class="fas fa-upload"></i> Importar</button>
                         <input type="file" id="importClientsFile" accept=".xlsx,.csv" class="d-none" onchange="Clients.importFromFile(event)">
+                        <button class="btn btn-sm" style="background:#dc3545;color:white;border:none;" onclick="Clients.removeDuplicates()" title="Detectar e remover clientes duplicados (mesmo nome ou mesmo CPF)"><i class="fas fa-broom"></i> Remover Duplicatas</button>
                     </div>
                 </div>
 
@@ -12419,6 +12420,75 @@ ORDER BY t.table_name;
                 this._resetPrescFields();
                 Toast.show('Receituário limpo');
             },
+
+            // ── Remove clientes duplicados (mesmo nome OU mesmo CPF) ──────────
+            removeDuplicates() {
+                const total = state.clients.length;
+                if (total === 0) { Toast.show('Nenhum cliente cadastrado.', 'warning'); return; }
+
+                // Pontuação: quantos campos relevantes estão preenchidos
+                const score = c => [c.phone,c.email,c.cpf,c.birthDate,c.address,c.city,c.cep].filter(Boolean).length
+                    + (state.prescriptions.some(p => p.clientId === c.id) ? 5 : 0)
+                    + (state.sales.some(s => s.clientId === c.id) ? 10 : 0);
+
+                // Escolhe o "melhor" de um grupo de clientes duplicados
+                const best = arr => arr.reduce((a, b) => score(b) > score(a) ? b : a);
+
+                // Agrupa por nome normalizado
+                const byName = {};
+                state.clients.forEach(c => {
+                    const key = (c.name || '').trim().toLowerCase();
+                    if (!byName[key]) byName[key] = [];
+                    byName[key].push(c);
+                });
+
+                // Agrupa por CPF (somente CPF com 11 digitos)
+                const byCpf = {};
+                state.clients.forEach(c => {
+                    const cpf = (c.cpf || '').replace(/\D/g, '');
+                    if (cpf.length === 11) {
+                        if (!byCpf[cpf]) byCpf[cpf] = [];
+                        byCpf[cpf].push(c);
+                    }
+                });
+
+                const toRemove = new Set();
+
+                Object.values(byName).forEach(group => {
+                    if (group.length < 2) return;
+                    const keeper = best(group);
+                    group.forEach(c => { if (c.id !== keeper.id) toRemove.add(c.id); });
+                });
+
+                Object.values(byCpf).forEach(group => {
+                    if (group.length < 2) return;
+                    const keeper = best(group);
+                    group.forEach(c => { if (c.id !== keeper.id) toRemove.add(c.id); });
+                });
+
+                if (toRemove.size === 0) {
+                    Toast.show('Nenhum cliente duplicado encontrado!', 'success');
+                    return;
+                }
+
+                const nomes = [...toRemove].map(id => {
+                    const c = state.clients.find(x => x.id === id);
+                    return c ? '- ' + c.name + ' (' + (c.cpf || 'sem CPF') + ')' : '- ' + id;
+                });
+                const preview = nomes.slice(0, 10).join('\n') + (nomes.length > 10 ? '\n... e mais ' + (nomes.length - 10) : '');
+
+                if (!confirm('Serao removidos ' + toRemove.size + ' cliente(s) duplicado(s) (o com mais dados e mantido):\n\n' + preview + '\n\nConfirmar?')) return;
+
+                state.clients = state.clients.filter(c => !toRemove.has(c.id));
+                state.prescriptions = state.prescriptions.filter(p => !toRemove.has(p.clientId));
+
+                toRemove.forEach(id => SupaSync.deletarCliente(id));
+
+                App.saveData();
+                this.renderTable();
+                Toast.show(toRemove.size + ' duplicata(s) removida(s) com sucesso!', 'success', 5000);
+            },
+            // ─────────────────────────────────────────────────────────────────
 
             exportToExcel() {
                 if (state.clients.length === 0) {
