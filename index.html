@@ -7986,7 +7986,7 @@ ORDER BY t.table_name;
         const LocalFirst = {
             _syncing: false,
             _syncTimer: null,
-            _SYNC_INTERVAL_MS: 15000, // auto-sync a cada 15s para máxima sincronização multi-dispositivo
+            _SYNC_INTERVAL_MS: 10000, // BUG FIX #8: Reduzido de 15s para 10s — melhor responsividade multi-dispositivo
             _TS_KEY: 'lf_last_sync_ts',
 
             // Tabelas sincronizáveis com Supabase (nome local → tabela Supabase)
@@ -8063,6 +8063,8 @@ ORDER BY t.table_name;
                         setTimeout(() => { if (navigator.onLine) this._initRealtime(); }, 10000);
                     } else if (status === 'CLOSED') {
                         this._realtimeStatus = 'Fechado';
+                        // BUG FIX #1: Reconecta automaticamente ao fechar (não só em erro)
+                        setTimeout(() => { if (navigator.onLine) this._initRealtime(); }, 5000);
                     } else {
                         this._realtimeStatus = 'Conectando...';
                     }
@@ -8073,7 +8075,10 @@ ORDER BY t.table_name;
             },
 
             // ── FLAGS anti-loop ───────────────────────────────────────────────
-            _pushing: false,        // true enquanto estamos fazendo push (ignora Realtime próprio)
+            _pushingCount: 0,       // contador de pushes ativos (evita race condition do boolean)
+            get _pushing() { return this._pushingCount > 0; },
+            _beginPush() { this._pushingCount++; },
+            _endPush()   { if (this._pushingCount > 0) this._pushingCount--; },
             _realtimeDebounce: null,// debounce separado para eventos Realtime
             _dirtyKeys: new Set(),  // stateKeys com mudanças locais pendentes de push
 
@@ -8099,10 +8104,9 @@ ORDER BY t.table_name;
             // Pull: mescla dados remotos; detecta tombstones (_deleted=true) e remove localmente
             async sync(reason = 'manual') {
                 if (this._syncing) {
-                    // Evento chegou enquanto sync estava rodando — agenda re-sync para não perder
-                    if (!this._syncTimer) {
-                        this._syncTimer = setTimeout(() => this.sync('retry'), 2000);
-                    }
+                    // BUG FIX #3: Sempre reagenda para não perder sync durante sync ativo
+                    clearTimeout(this._syncTimer);
+                    this._syncTimer = setTimeout(() => this.sync('retry'), 2000);
                     return;
                 }
                 if (!navigator.onLine) { this._updatePanel(); return; }
@@ -8120,11 +8124,11 @@ ORDER BY t.table_name;
                         console.log('[LocalFirst] Estado local vazio — forçando full sync do Supabase');
                     }
                     const now = new Date().toISOString();
-                    // Buffer de 30s para compensar diferença de relógio entre cliente e servidor Supabase
-                    // Sem isso, registros podem ser perdidos se o relógio do cliente estiver adiantado
+                    // BUG FIX #7: Buffer de 120s (era 30s) — compensa melhor diferença de relógio
+                    // Se o relógio do dispositivo estiver até 2min à frente do servidor, não perde registros
                     const lastSyncWithBuffer = lastSync === '1970-01-01T00:00:00.000Z'
                         ? lastSync
-                        : new Date(new Date(lastSync).getTime() - 30000).toISOString();
+                        : new Date(new Date(lastSync).getTime() - 120000).toISOString();
 
                     let pushed = 0, pulled = 0;
                     const dirtyNow = new Set(this._dirtyKeys);
@@ -8145,7 +8149,7 @@ ORDER BY t.table_name;
                         const deletedKey = 'lf_deleted_' + stateKey;
                         const pendingDeletes = await this._getPending(deletedKey);
                         if (pendingDeletes.length > 0) {
-                            this._pushing = true;
+                            this._beginPush();
                             const flushed = [];
                             for (const delId of pendingDeletes) {
                                 try {
@@ -8163,11 +8167,13 @@ ORDER BY t.table_name;
                                 await IDB.set(deletedKey, pendingDeletes.filter(id => !flushed.includes(id)));
                             }
                             await new Promise(r => setTimeout(r, 50));
-                            this._pushing = false;
+                            this._endPush();
                         }
 
                         // ── PUSH: registros locais modificados ────────────────────
-                        const shouldPush = (reason !== 'realtime') && dirtyNow.has(stateKey);
+                        // BUG FIX #4: Permite push mesmo em sync realtime se há dados dirty locais
+                        // Antes: reason=realtime sempre ignorava push, perdendo dados offline
+                        const shouldPush = dirtyNow.has(stateKey);
                         if (shouldPush) {
                             const pendingKey = 'lf_pending_' + stateKey;
                             const pendingIds = await this._getPending(pendingKey);
@@ -8175,7 +8181,7 @@ ORDER BY t.table_name;
                             const localItems = (state[stateKey] || []).filter(item => pendingSet.has(item.id));
 
                             if (localItems.length > 0) {
-                                this._pushing = true;
+                                this._beginPush();
                                 const rows = localItems.map(item => ({
                                     id: item.id,
                                     _data: JSON.stringify(item),
@@ -8192,7 +8198,7 @@ ORDER BY t.table_name;
                                     console.warn('[LocalFirst] Push erro em', table, error.message);
                                 }
                                 await new Promise(r => setTimeout(r, 50));
-                                this._pushing = false;
+                                this._endPush();
                             } else {
                                 this._dirtyKeys.delete(stateKey);
                             }
@@ -8278,7 +8284,7 @@ ORDER BY t.table_name;
 
                 } catch(e) {
                     console.warn('[LocalFirst] Sync falhou:', e.message);
-                    this._pushing = false;
+                    this._endPush();
                 } finally {
                     this._syncing = false;
                     if (btn) { btn.classList.remove('syncing'); btn.title = 'Status de sincronização'; }
@@ -8366,7 +8372,7 @@ ORDER BY t.table_name;
 
                 if (!navigator.onLine) return;
                 try {
-                    this._pushing = true;
+                    this._beginPush();
                     const row = {
                         id: item.id,
                         _data: JSON.stringify(item),
@@ -8379,9 +8385,9 @@ ORDER BY t.table_name;
                         this._dirtyKeys.delete(table);
                     }
                     await new Promise(r => setTimeout(r, 50));
-                    this._pushing = false;
+                    this._endPush();
                 } catch(e) {
-                    this._pushing = false;
+                    this._endPush();
                     console.warn('[LocalFirst] pushItem falhou:', e.message);
                 }
             },
@@ -8407,7 +8413,7 @@ ORDER BY t.table_name;
 
                 // Online: envia tombstone imediatamente
                 try {
-                    this._pushing = true;
+                    this._beginPush();
                     const tombstone = {
                         id: id,
                         _data: JSON.stringify({ id: id, _deleted: true }),
@@ -8424,9 +8430,9 @@ ORDER BY t.table_name;
                         console.warn('[LocalFirst] deleteItem falhou:', error.message);
                     }
                     await new Promise(r => setTimeout(r, 300));
-                    this._pushing = false;
+                    this._endPush();
                 } catch(e) {
-                    this._pushing = false;
+                    this._endPush();
                     console.warn('[LocalFirst] deleteItem erro:', e.message);
                 }
             },
@@ -9743,6 +9749,10 @@ ORDER BY t.table_name;
             }
         };
 
+        // Inicializa campos NF-e no state se não existirem (BUG FIX #9)
+        if (!state.nfe_historico) state.nfe_historico = [];
+        if (!state.nfe_counter)   state.nfe_counter   = '1';
+
         // ==================== UTILITÁRIOS ====================
         const Utils = {
             formatCurrency(value) {
@@ -11003,7 +11013,36 @@ ORDER BY t.table_name;
                 }
             },
             async syncDelta()         { return LocalFirst.sync('delta'); },
-            async migrarParaSupabase(){ return LocalFirst.sync('manual'); },
+            async migrarParaSupabase(){
+                // BUG FIX #5: Envia TODOS os dados locais (não só os pendentes)
+                Toast.show('Enviando todos os dados para o Supabase...', 'info', 4000);
+                let total = 0, erros = 0;
+                const now = new Date().toISOString();
+                for (const [stateKey, table] of Object.entries(LocalFirst._TABLES)) {
+                    if (stateKey === 'config') {
+                        try { await LocalFirst.pushConfig(); } catch(e) {}
+                        continue;
+                    }
+                    const items = (state[stateKey] || []).filter(i => i && i.id);
+                    if (!items.length) continue;
+                    const rows = items.map(item => ({
+                        id: item.id,
+                        _data: JSON.stringify(item),
+                        updated_at: item.updated_at || now
+                    }));
+                    // Envia em lotes de 50
+                    for (let i = 0; i < rows.length; i += 50) {
+                        const batch = rows.slice(i, i + 50);
+                        try {
+                            const { error } = await supabaseClient.from(table).upsert(batch, { onConflict: 'id' });
+                            if (error) { erros++; console.error('[Migrate]', table, error.message); }
+                            else total += batch.length;
+                        } catch(e) { erros++; }
+                    }
+                }
+                if (erros === 0) Toast.show(`✅ ${total} registros enviados ao Supabase!`, 'success', 4000);
+                else Toast.show(`⚠️ ${total} enviados, ${erros} lotes com erro. Veja o console.`, 'warning', 5000);
+            },
             async _flushQueue()       {}
         };
         // ==================== /SUPABASE SYNC MODULE ====================
@@ -11141,8 +11180,14 @@ ORDER BY t.table_name;
                         Toast.show('Erro ao carregar dados. Usando dados de exemplo.', 'warning');
                     }
                 } else {
-                    this.initSampleData();
-                    Toast.show('Bem-vindo! Configure sua ótica em Configurações.', 'info', 5000);
+                    // BUG FIX #6: Só carrega sample data se offline — online vai sincronizar do Supabase
+                    if (!navigator.onLine) {
+                        this.initSampleData();
+                        Toast.show('Bem-vindo! Configure sua ótica em Configurações.', 'info', 5000);
+                    } else {
+                        // Online: aguarda sync para buscar dados reais do Supabase
+                        console.log('[App] Novo dispositivo online — aguardando sync do Supabase...');
+                    }
                 }
                 // O sync com Supabase acontece em background via LocalFirst.boot()
             },
@@ -18703,19 +18748,32 @@ const NFeModule = window.NFeModule = {
     },
 
     _loadStorage() {
+        // BUG FIX #9: Migrado de localStorage para state global (sincronizado via Supabase)
         try {
-            const h = localStorage.getItem('nfe_historico');
-            if (h) this.historico = JSON.parse(h);
-            const c = localStorage.getItem('nfe_counter');
-            if (c) this.nfeCounter = parseInt(c) || 1;
-        } catch(e) {}
+            if (Array.isArray(state.nfe_historico) && state.nfe_historico.length > 0) {
+                this.historico = state.nfe_historico;
+            } else {
+                // Fallback legado: migra do localStorage uma única vez
+                const h = localStorage.getItem('nfe_historico');
+                if (h) {
+                    this.historico = JSON.parse(h);
+                    state.nfe_historico = this.historico;
+                    App.saveData(true).catch(()=>{});
+                    localStorage.removeItem('nfe_historico');
+                }
+            }
+            const savedCounter = state.nfe_counter || localStorage.getItem('nfe_counter');
+            if (savedCounter) { this.nfeCounter = parseInt(savedCounter) || 1; localStorage.removeItem('nfe_counter'); }
+        } catch(e) { console.warn('[NFe] _loadStorage:', e.message); }
     },
 
     _saveStorage() {
         try {
-            localStorage.setItem('nfe_historico', JSON.stringify(this.historico));
-            localStorage.setItem('nfe_counter', String(this.nfeCounter));
-        } catch(e) {}
+            // BUG FIX #9: Salva no state global para sync multi-dispositivo
+            state.nfe_historico = this.historico;
+            state.nfe_counter   = String(this.nfeCounter);
+            App.saveData(true).catch(()=>{});
+        } catch(e) { console.warn('[NFe] _saveStorage:', e.message); }
     },
 
     _fmt(v) {
