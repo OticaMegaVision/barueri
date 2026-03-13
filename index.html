@@ -3421,9 +3421,9 @@
   .comprovante-body               { color: #000 !important; }
   .comprovante-body strong        { font-weight: 800 !important; }
 
-  /* Receituário */
+  /* Receituário — para PDF não altera cores (valores negativos mantêm cor via inline style) */
   .presc-container label          { color: #333 !important; font-weight: 600 !important; }
-  .presc-container .presc-field   { color: #000 !important; font-weight: 700 !important; background: #fff !important; }
+  .presc-container .presc-field   { font-weight: 700 !important; background: #fff !important; }
 </style>
 
 <!-- ═══════════════════════════════════════════════════════
@@ -8002,7 +8002,7 @@ ORDER BY t.table_name;
         const LocalFirst = {
             _syncing: false,
             _syncTimer: null,
-            _SYNC_INTERVAL_MS: 10000, // BUG FIX #8: Reduzido de 15s para 10s — melhor responsividade multi-dispositivo
+            _SYNC_INTERVAL_MS: 8000, // Fix Sync: 8s — melhor responsividade multi-dispositivo e multi-navegador
             _TS_KEY: 'lf_last_sync_ts',
 
             // Tabelas sincronizáveis com Supabase (nome local → tabela Supabase)
@@ -8024,7 +8024,19 @@ ORDER BY t.table_name;
             boot() {
                 // ── Limpa filas pendentes corrompidas (não-array) no boot ──
                 const tableKeys = Object.keys(this._TABLES);
-                Promise.all(tableKeys.map(k => this._getPending('lf_pending_' + k))).then(() => {
+                // FIX SYNC: verifica filas pendentes E marca stateKeys como dirty
+                // Sem isso, pushes que falharam em sessões anteriores nunca seriam reenviados
+                // pois _dirtyKeys é reiniciado a cada carregamento da página.
+                Promise.all(tableKeys.map(k => this._getPending('lf_pending_' + k).then(ids => {
+                    if (ids.length > 0) {
+                        this._markDirty(k);
+                        console.log('[LocalFirst] Boot: ' + ids.length + ' item(s) pendente(s) em "' + k + '" — marcado dirty para reenvio');
+                    }
+                }))).then(() => {
+                    if (this._dirtyKeys.size > 0) {
+                        console.log('[LocalFirst] Boot: agendando sync para reenviar itens pendentes...');
+                        this._triggerSync('boot_dirty');
+                    }
                     console.log('[LocalFirst] Filas pendentes verificadas');
                 });
 
@@ -8039,6 +8051,20 @@ ORDER BY t.table_name;
 
                 // Sync periódico em background (já foi feito no DOMContentLoaded antes do primeiro render)
                 setTimeout(() => this._triggerSync('background'), 5000); // segundo sync 5s depois para pegar qualquer dado perdido
+
+                // ── Fix Sync Cross-Tab: BroadcastChannel para notificar outras abas do mesmo navegador ──
+                try {
+                    window._lfBroadcast = new BroadcastChannel('lf_sync_channel');
+                    window._lfBroadcast.addEventListener('message', (evt) => {
+                        if (evt.data && evt.data.type === 'sync' && evt.data.pushed > 0) {
+                            console.log('[LocalFirst] Cross-tab: outra aba fez push, disparando pull...');
+                            this._triggerSync('crosstab');
+                        }
+                    });
+                } catch(e) {
+                    console.warn('[LocalFirst] BroadcastChannel indisponível (cross-tab sync desabilitado)');
+                    window._lfBroadcast = null;
+                }
 
                 // ── REALTIME: escuta mudancas em todas as tabelas ──
                 this._initRealtime();
@@ -8101,10 +8127,11 @@ ORDER BY t.table_name;
             // Debounce para evitar syncs em cascata
             _triggerSync(reason) {
                 // Eventos Realtime gerados pelo próprio push → ignorar para quebrar o loop
+                // Cross-tab e outros eventos externos nunca são ignorados
                 if (reason === 'realtime' && this._pushing) return;
 
-                // Realtime usa debounce de 1s — resposta rápida para outros dispositivos
-                const delay = reason === 'realtime' ? 1000 : 500;
+                // Realtime e cross-tab usam debounce de 1s — resposta rápida para outros dispositivos
+                const delay = (reason === 'realtime' || reason === 'crosstab') ? 1000 : 500;
                 if (this._syncTimer) clearTimeout(this._syncTimer);
                 // Realtime só precisa de PULL (os dados já estão no Supabase)
                 this._syncTimer = setTimeout(() => this.sync(reason), delay);
@@ -8273,6 +8300,8 @@ ORDER BY t.table_name;
                         }
                         // Atualiza UI sempre que houve qualquer pull nesta tabela
                         if (data && data.length > 0) {
+                            // Fix Sync: salva estado antes de atualizar a UI para evitar renderização de estado stale
+                            await App.saveData(true);
                             this._refreshTableUI(stateKey);
                         }
                     }
@@ -8289,6 +8318,13 @@ ORDER BY t.table_name;
 
                     await IDB.set(this._TS_KEY, now);
                     window._lastSyncTime = now;
+
+                    // Fix Sync Cross-Tab: notifica outras abas/janelas do mesmo navegador
+                    try {
+                        if (window._lfBroadcast) {
+                            window._lfBroadcast.postMessage({ type: 'sync', pushed, pulled, ts: now });
+                        }
+                    } catch(e) {}
 
                     if (pushed > 0 || pulled > 0) {
                         console.log(`[LocalFirst] Sync OK — ↑${pushed} push, ↓${pulled} pull (motivo: ${reason})`);
@@ -8624,13 +8660,18 @@ ORDER BY t.table_name;
             async saveAll(contas) {
                 // Fix Bug #2: salva sempre como string para consistência
                 await IDB.set(this._key, JSON.stringify(contas));
+                // FIX SYNC: salva timestamp local imediatamente para evitar race condition:
+                // sem isso, getAll() (chamado em seguida) via Supabase podia sobrescrever dados
+                // locais recém-gravados, pois localTs era null e remoteTs > null = true.
+                const tsAgora = new Date().toISOString();
+                await IDB.set('contas_financeiras_ts', tsAgora);
                 // Sincroniza contas manuais com Supabase para funcionar em múltiplos dispositivos
                 if (navigator.onLine) {
                     try {
                         await supabaseClient.from('config').upsert({
                             id: 'contas_financeiras',
                             _data: JSON.stringify(contas),
-                            updated_at: new Date().toISOString()
+                            updated_at: tsAgora
                         }, { onConflict: 'id' });
                     } catch(e) { console.warn('[ContasManager] saveAll sync erro:', e.message); }
                 }
@@ -8819,11 +8860,12 @@ ORDER BY t.table_name;
 
                     // ── À vista (PIX / Dinheiro / Débito / Crédito) ────────────
                     if (metodosAVista.includes(method)) {
-                        if (sale.status === 'entregue') continue; // Fix Bug #1
+                        // FIX BUG ENTREGUE: status 'entregue' NÃO significa pagamento quitado —
+                        // uma venda pode ser entregue e ainda ter saldo pendente na retirada.
+                        // Só pula se retiradaPaga=true (marcado manualmente ao receber).
+                        if (sale.status === 'entregue' && sale.retiradaPaga) continue;
                         // Só gera conta a receber se foi explicitamente salvo um saldo de retirada
-                        // (det.retiradaValue > 0) E a entrada foi menor que o total
                         const retiradaAVista = parseFloat(det.retiradaValue || 0);
-                        // Bug fix: remover condição entradaAVista > 0 — retirada existe independente de ter entrada gravada
                         if (retiradaAVista > 0.01 && !sale.retiradaPaga) {
                             contasVendas.push({
                                 id: 'venda_' + sale.id + '_retirada',
@@ -9242,12 +9284,12 @@ ORDER BY t.table_name;
                     }
                 } else if (tipo === 'retirada') {
                     // Valor na retirada (crediário ou à vista com saldo)
-                    if (sale.paymentDetails && sale.paymentDetails.retiradaEntry) {
-                        sale.retiradaPaga = true;
-                    } else if (sale.paymentDetails && sale.paymentDetails.retiradaValue) {
-                        sale.paymentDetails.retiradaValue = 0;
-                        sale.retiradaPaga = true;
+                    // Fix: unifica zeragem de retiradaEntry e retiradaValue
+                    if (sale.paymentDetails) {
+                        if (sale.paymentDetails.retiradaEntry) sale.paymentDetails.retiradaEntry = 0;
+                        if (sale.paymentDetails.retiradaValue) sale.paymentDetails.retiradaValue = 0;
                     }
+                    sale.retiradaPaga = true;
                     // Fix Bug #5: verifica quitação completa após registrar retirada
                     if (this.checkPaymentComplete(sale)) {
                         sale.paymentStatus = 'pago';
@@ -9299,6 +9341,14 @@ ORDER BY t.table_name;
                         }
                     }
                     return true;
+                }
+                // Fix PIX-RETIRADA: verifica retirada pendente para métodos à vista
+                // (PIX, Dinheiro, Débito, Crédito). Antes caia direto no return true,
+                // causando paymentStatus='pago' antes da retirada ser recebida.
+                const _metodosAVista = ['pix', 'cash', 'debit', 'credit'];
+                if (_metodosAVista.includes(sale.paymentMethod)) {
+                    const retiradaAV = parseFloat((sale.paymentDetails || {}).retiradaValue || 0);
+                    if (retiradaAV > 0.01 && !sale.retiradaPaga) return false;
                 }
                 return true;
             },
@@ -10505,6 +10555,23 @@ ORDER BY t.table_name;
                 }
             },
 
+            // FIX GRAUS NEGATIVOS: aplica cores em todos os campos de grau de uma vez
+            // Necessário após carregar receituário salvo (valores negativos → vermelho, positivos → azul)
+            refreshAllColors() {
+                const ids = [
+                    'odSph','odCyl','odAdd','oeSph','oeCyl','oeAdd',
+                    'odNearSph','odNearCyl','oeNearSph','oeNearCyl',
+                    'clientOdSph','clientOdCyl','clientOdAdd',
+                    'clientOeSph','clientOeCyl','clientOeAdd',
+                    'clientOdNearSph','clientOdNearCyl',
+                    'clientOeNearSph','clientOeNearCyl'
+                ];
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) this.updateColor(el, id);
+                });
+            },
+
             formatAxis(el) {
                 let v = el.value.replace(/\D/g, '');
                 if (!v) {
@@ -10696,6 +10763,14 @@ ORDER BY t.table_name;
                 const cSite   = company.website || '';
 
                 const fmtD = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+                // Fix: colorir graus negativos (vermelho) e positivos (azul) no PDF
+                const fmtGrau = (v, isCyl) => {
+                    const n = parseFloat(v);
+                    const s = Utils.sanitizeHTML(v);
+                    if (isNaN(n) || n === 0) return `<span style="color:#000;">${s}</span>`;
+                    if (n < 0) return `<span style="color:#dc3545;font-weight:800;">${s}</span>`;
+                    return `<span style="color:#1565c0;">${s}</span>`;
+                };
 
                 // Calcular validade (1 ano a partir da data da consulta)
                 const validade = (() => {
@@ -10773,18 +10848,18 @@ ORDER BY t.table_name;
                             <tbody>
                                 <tr>
                                     <td class="olho-label">OD</td>
-                                    <td>${Utils.sanitizeHTML(odSph)}</td>
-                                    <td>${Utils.sanitizeHTML(odCyl)}</td>
+                                    <td>${fmtGrau(odSph)}</td>
+                                    <td>${fmtGrau(odCyl)}</td>
                                     <td>${Utils.sanitizeHTML(odAxis)}</td>
-                                    <td>${Utils.sanitizeHTML(odAdd)}</td>
+                                    <td>${fmtGrau(odAdd)}</td>
                                     <td>${odDnp ? Utils.sanitizeHTML(odDnp) : '—'}</td>
                                 </tr>
                                 <tr>
                                     <td class="olho-label">OE</td>
-                                    <td>${Utils.sanitizeHTML(oeSph)}</td>
-                                    <td>${Utils.sanitizeHTML(oeCyl)}</td>
+                                    <td>${fmtGrau(oeSph)}</td>
+                                    <td>${fmtGrau(oeCyl)}</td>
                                     <td>${Utils.sanitizeHTML(oeAxis)}</td>
-                                    <td>${Utils.sanitizeHTML(oeAdd)}</td>
+                                    <td>${fmtGrau(oeAdd)}</td>
                                     <td>${oeDnp ? Utils.sanitizeHTML(oeDnp) : '—'}</td>
                                 </tr>
                             </tbody>
@@ -10801,15 +10876,15 @@ ORDER BY t.table_name;
                             <tbody>
                                 <tr>
                                     <td class="olho-label">OD</td>
-                                    <td>${Utils.sanitizeHTML(odNearSph)}</td>
-                                    <td>${Utils.sanitizeHTML(odNearCyl)}</td>
+                                    <td>${fmtGrau(odNearSph)}</td>
+                                    <td>${fmtGrau(odNearCyl)}</td>
                                     <td>${Utils.sanitizeHTML(odNearAxis)}</td>
                                     <td>${odNearDnp ? Utils.sanitizeHTML(odNearDnp) : '—'}</td>
                                 </tr>
                                 <tr>
                                     <td class="olho-label">OE</td>
-                                    <td>${Utils.sanitizeHTML(oeNearSph)}</td>
-                                    <td>${Utils.sanitizeHTML(oeNearCyl)}</td>
+                                    <td>${fmtGrau(oeNearSph)}</td>
+                                    <td>${fmtGrau(oeNearCyl)}</td>
                                     <td>${Utils.sanitizeHTML(oeNearAxis)}</td>
                                     <td>${oeNearDnp ? Utils.sanitizeHTML(oeNearDnp) : '—'}</td>
                                 </tr>
@@ -10961,6 +11036,7 @@ ORDER BY t.table_name;
                 
                 Presc.updateClientPertoOD();
                 Presc.updateClientPertoOE();
+                Presc.refreshAllColors(); // FIX: aplica cores (vermelho=negativo, azul=positivo) antes de exportar PDF
                 
                 // Chamar a função de impressão
                 this.exportClientPrescToPDF();
@@ -12307,6 +12383,7 @@ ORDER BY t.table_name;
                     
                     Presc.updateClientPertoOD();
                     Presc.updateClientPertoOE();
+                    Presc.refreshAllColors(); // FIX: aplica cores (vermelho=negativo, azul=positivo) após carregar receita
                 }
             },
 
@@ -14850,6 +14927,7 @@ ${container.innerHTML}
                 Presc.updateAllPertoOD();
                 Presc.updateAllPertoOE();
                 Presc.updateDP();
+                Presc.refreshAllColors(); // FIX: aplica cores em todos os graus (vermelho=negativo, azul=positivo)
             },
 
             renderItems() {
@@ -17182,7 +17260,10 @@ ${container.innerHTML}
                         const entradaVal = entradaEl ? (parseFloat(entradaEl.value) || 0) : 0;
                         const totalFinal = state.currentSale.total || 0;
                         const retiradaVal = Math.max(0, totalFinal - entradaVal);
-                        if (entradaVal > 0.01 && retiradaVal > 0.01) {
+                        // FIX BUG PIX-RETIRADA: condição anterior "entradaVal > 0.01" impedia de salvar
+                        // retiradaValue quando entrada=0 (100% na retirada). Corrigido para verificar
+                        // apenas se há saldo restante, independente de ter entrada ou não.
+                        if (retiradaVal > 0.01) {
                             paymentDetailsToSave = { retiradaValue: retiradaVal, entradaValue: entradaVal };
                         } else {
                             paymentDetailsToSave = null; // venda à vista integral — sem detalhes extras
