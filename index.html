@@ -14493,7 +14493,8 @@ ${container.innerHTML}
                         armacoes.forEach(p => {
                             const opt = document.createElement('option');
                             opt.value = p.id + '|' + p.price;
-                            opt.textContent = p.name + ' - ' + Utils2.fmt(p.price) + (p.qty <= 0 ? ' (sem estoque)' : '');
+                            const codeLabel = p.code ? '[' + p.code + '] ' : '';
+                            opt.textContent = codeLabel + p.name + ' - ' + Utils2.fmt(p.price) + (p.qty <= 0 ? ' (sem estoque)' : '');
                             if (p.qty <= 0) opt.disabled = true;
                             selArmacao.appendChild(opt);
                         });
@@ -14523,7 +14524,7 @@ ${container.innerHTML}
                 if (selTratamento) {
                     selTratamento.innerHTML = '<option value="">Selecione um tratamento</option>';
                     // Inclui produtos categorizados como tratamento E todos os serviços
-                    const trats = [...(state.products || []).filter(p => p.type === 'tratamento' || p.category === 'tratamento'),
+                    const trats = [...(state.products || []).filter(p => p.type === 'tratamento' || p.category === 'tratamento' || p.category === 'tratamentos'),
                                    ...(state.services || [])];
                     if (trats.length > 0) {
                         trats.forEach(t => {
@@ -14962,7 +14963,7 @@ ${container.innerHTML}
                         </div>
                         <div style="flex:1;min-width:0;">
                             <div style="font-weight:700;font-size:0.83rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${Utils.sanitizeHTML(item.name)}</div>
-                            <div style="font-size:0.72rem;color:#888;margin-top:1px;">${item.qty}× ${Utils.formatCurrency(item.price)}</div>
+                            <div style="font-size:0.72rem;color:#888;margin-top:1px;">${item.code ? '<span style="background:#e8f5e9;color:#2e7d32;border-radius:4px;padding:0 4px;font-weight:700;margin-right:4px;">' + Utils.sanitizeHTML(item.code) + '</span>' : ''}${item.qty}× ${Utils.formatCurrency(item.price)}</div>
                         </div>
                         <div style="font-weight:800;font-size:0.9rem;color:${color};white-space:nowrap;">${Utils.formatCurrency(item.subtotal)}</div>
                         <button onclick="Sales.removeItem(${i})" title="Remover"
@@ -15031,8 +15032,9 @@ ${container.innerHTML}
                 const price = parseFloat(priceStr);
                 const prod = state.products.find(p => p.id === prodId);
                 const name = prod ? prod.name : select.options[select.selectedIndex].text.split(' - ')[0];
+                const code = prod ? (prod.code || '') : '';
                 if (prod && prod.qty < qty) { Toast.show('Estoque insuficiente! Disponível: ' + prod.qty, 'warning'); return; }
-                state.currentSale.items.push({ type: 'armacao', productId: prodId, name, qty, price, subtotal: price * qty });
+                state.currentSale.items.push({ type: 'armacao', productId: prodId, code, name, qty, price, subtotal: price * qty });
                 select.value = '';
                 document.getElementById('armacaoQty').value = 1;
                 this.renderItems(); this.calculateTotal();
